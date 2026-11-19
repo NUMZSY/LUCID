@@ -11,6 +11,7 @@ import { SKIN_ID } from '../core/skins/SkinLibrary.js';
 import { safeJoin } from '../core/util/paths.js';
 import { loadChangelog, notesFor } from './releaseNotes.js';
 import { backgroundDataUrl, clearBackground, pickBackground } from './appearance.js';
+import { validateExternalHttpsUrl } from './externalLinks.js';
 import { openMicrosoftLogin } from './microsoftLogin.js';
 import type { ChatClient } from '../core/social/ChatClient.js';
 import { DOWNLOAD_PAGE, type UpdateService } from './updates.js';
@@ -155,6 +156,7 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
   ipcMain.handle('updates:install', () => updates?.install());
   // Only ever the one fixed page: the renderer cannot ask for any other address to be opened.
   ipcMain.handle('updates:open-download', () => shell.openExternal(DOWNLOAD_PAGE));
+  ipcMain.handle('app:open-external', (_event, raw: unknown) => shell.openExternal(validateExternalHttpsUrl(raw)));
   ipcMain.handle('app:release-notes', (_e, version: unknown) => {
     const notes = loadChangelog(join(app.getAppPath(), 'dist', 'CHANGELOG.md'));
     return typeof version === 'string' && version ? notesFor(notes, version) : notes.slice(0, 8);

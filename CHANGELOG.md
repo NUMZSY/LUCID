@@ -1,11 +1,19 @@
-# What's new in Snowball Client
+# What's new in LUCID
 
 Written for the people who play it. Each release says what changed, what got
 fixed, and nothing else. Technical notes live in the commit history.
 
-Snowball updates itself: when it starts it checks for a new version, installs
+LUCID updates itself: when it starts it checks for a new version, installs
 it and restarts into it, waiting if a game is running. You only download an
 installer once.
+
+---
+
+## 2.1.1
+
+### What's new
+- **A new LUCID launchpad.** A spacious, grid-lit play stage keeps the selected instance and Play action front and centre, with a responsive featured rail on the right.
+- **Promotion slots you control.** Configure the featured cards locally with optional bundled artwork and HTTPS links. No ad network or third-party ad scripts are included.
 
 ---
 

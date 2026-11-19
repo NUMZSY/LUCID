@@ -251,3 +251,13 @@ be added after a Microsoft account.
 Snowball Client is MIT licensed. The in-game menu uses Minecraft's own font. The launcher bundles
 Monocraft, a Minecraft-style font under the SIL Open Font License
 (`launcher/src/renderer/assets/fonts/OFL-Monocraft.txt`).
+
+
+## Home-page featured and promotion slots
+
+The launcher Home screen has three owner-configured feature/promotion cards. Edit
+`launcher/src/renderer/home-promotions.ts` to set the card text, optional local banner image, and
+HTTPS click-through URL. Store images under `launcher/src/renderer/assets/promotions/` and refer to
+them with a packaged path such as `assets/promotions/example.webp`. Links are opened in the system
+browser and the main process rejects anything except HTTPS. This is a manual content slot, not an
+ad network; no third-party ad scripts or trackers are loaded.

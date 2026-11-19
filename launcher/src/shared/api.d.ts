@@ -508,6 +508,8 @@ declare namespace Snowball {
     /** Opens the website's download page, for builds that cannot update themselves. */
     openDownloadPage(): Promise<void>;
     updateDiagnostics(): Promise<string>;
+    /** Opens a promotion link in the system browser; the main process only accepts HTTPS URLs. */
+    openExternalLink(url: string): Promise<void>;
     releaseNotes(version?: string): Promise<ReleaseNote | ReleaseNote[] | null>;
     copyLogs(): Promise<string>;
     openLogFolder(): Promise<void>;

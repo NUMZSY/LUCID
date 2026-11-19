@@ -958,7 +958,7 @@
   function homeView(): Node {
     const state = ui.state!;
     const inst = selected();
-    if (!inst) return h('div', {}, header('HOME', 'Welcome to LUCID'), emptyState('Create an instance to install and play Minecraft.'));
+    if (!inst) return emptyHomeView();
 
     const picker = h('select', { class: 'input picker', onChange: (e: Event) => select((e.target as HTMLSelectElement).value) },
       ...state.instances.map((i) => h('option', { value: i.id, selected: i.id === inst.id }, i.name)));
@@ -1010,9 +1010,59 @@
             h('div', { class: 'row log-head' }, h('div', { class: 'section-title' }, 'OUTPUT'), h('div', { class: 'spacer' }), logTabs),
             logView)),
         h('div', { class: 'home-aside' },
+          featuredPanel(),
           snowballCard(inst),
           playerCount(),
           quickActions(inst))));
+  }
+
+  function emptyHomeView(): HTMLElement {
+    return h('div', { class: 'page-home lucid-home no-instance-home' },
+      h('div', { class: 'welcome home-topbar' },
+        h('div', { class: 'welcome-text' },
+          h('div', { class: 'welcome-hello' }, 'Welcome to LUCID'),
+          h('div', { class: 'welcome-sub' }, 'Set up your game once, then launch it from here.'))),
+      h('div', { class: 'home-grid' },
+        h('div', { class: 'home-main' },
+          h('section', { class: 'card launch-panel empty-launch' },
+            h('div', { class: 'launch-scene empty-scene', 'aria-hidden': 'true' },
+              h('div', { class: 'launch-scene-grid' }),
+              h('div', { class: 'launch-scene-orbit' }),
+              h('img', { class: 'launch-scene-mark', src: 'assets/logo.png', alt: '' }),
+              h('div', { class: 'launch-scene-copy' }, h('span', {}, 'LUCID / LAUNCHPAD'), h('strong', {}, 'READY WHEN YOU ARE'))),
+            h('div', { class: 'empty-launch-title' }, 'Your next world starts here'),
+            h('div', { class: 'empty-launch-copy' }, 'Create a Minecraft instance to add a version, choose a loader, and start playing.'),
+            h('button', { class: 'btn primary', onClick: () => { ui.view = 'instances'; render(); } }, 'CREATE AN INSTANCE'))),
+        h('aside', { class: 'home-aside' }, featuredPanel())));
+  }
+
+  function featuredPanel(): HTMLElement {
+    return h('section', { class: 'card featured-panel', 'aria-label': 'Featured and promoted content' },
+      h('div', { class: 'featured-heading' },
+        h('div', { class: 'section-title' }, 'FEATURED'),
+        h('span', { class: 'featured-heading-tag' }, 'PROMOTED SPACE')),
+      h('div', { class: 'featured-list' }, ...window.lucidPromotions.map((promotion, index) => {
+        const open = () => {
+          if (promotion.url) {
+            void api.openExternalLink(promotion.url).catch((error: unknown) =>
+              toast(error instanceof Error ? error.message : 'Could not open that promotion link.'));
+          } else {
+            toast('Edit home-promotions.ts to add an HTTPS link and optional local banner.');
+          }
+        };
+        const art = promotion.image
+          ? h('div', { class: 'promo-art has-image' }, h('img', { src: promotion.image, alt: '', loading: 'lazy' }))
+          : h('div', { class: `promo-art tone-${promotion.tone}` },
+              h('span', { class: 'promo-art-mark' }, 'L'),
+              h('span', { class: 'promo-art-caption' }, `SPOTLIGHT / 0${index + 1}`));
+        return h('button', { class: `promo-card tone-${promotion.tone}`, type: 'button', onClick: open },
+          art,
+          h('span', { class: 'promo-copy' },
+            h('span', { class: 'promo-meta' }, h('span', {}, promotion.label), h('span', { class: 'promo-number' }, `0${index + 1}`)),
+            h('strong', { class: 'promo-title' }, promotion.title),
+            h('span', { class: 'promo-description' }, promotion.description),
+            h('span', { class: 'promo-action' }, promotion.action, h('span', { 'aria-hidden': 'true' }, ' ↗'))));
+      })));
   }
 
   /**
@@ -1025,7 +1075,7 @@
     const rank = ui.chat?.rank;
     const online = ui.stats?.online ?? ui.chat?.online ?? 0;
 
-    return h('div', { class: 'welcome' },
+    return h('div', { class: 'welcome home-topbar' },
       h('div', { class: 'welcome-text' },
         h('div', { class: 'welcome-hello' },
           account ? `Welcome back, ${account.name}` : 'Welcome to LUCID',
@@ -1057,6 +1107,11 @@
             h('span', { class: 'tag' }, inst.loaderName),
             inst.snowball.supported ? h('span', { class: 'tag accent' }, `LUCID ${inst.snowball.version ?? ''}`) : null,
             inst.running ? h('span', { class: 'tag running' }, 'RUNNING') : null))),
+      h('div', { class: 'launch-scene', 'aria-hidden': 'true' },
+        h('div', { class: 'launch-scene-grid' }),
+        h('div', { class: 'launch-scene-orbit' }),
+        h('img', { class: 'launch-scene-mark', src: 'assets/logo.png', alt: '' }),
+        h('div', { class: 'launch-scene-copy' }, h('span', {}, 'LUCID / LAUNCHPAD'), h('strong', {}, 'READY WHEN YOU ARE'))),
       h('div', { class: 'stats' },
         stat('Minecraft', inst.minecraftVersion),
         stat('Loader', inst.loader === 'vanilla' ? 'Vanilla' : `${inst.loaderName} ${inst.loaderVersion ?? 'latest'}`),
@@ -1085,7 +1140,7 @@
     return h('div', { class: 'mini-card' },
       h('div', { class: 'mini-head' },
         h('img', { class: 'core-logo', src: 'assets/logo.png', alt: '' }),
-        h('div', { class: 'section-title' }, 'SNOWBALL')),
+        h('div', { class: 'section-title' }, 'LUCID')),
       row('Client', inst.snowball.supported ? inst.snowball.version ?? 'Bundled' : 'Not on this version', inst.snowball.supported ? '' : 'muted'),
       row('Launcher', ui.version ? `v${ui.version}` : '-'),
       row('Updates', updateText, update?.status === 'error' ? 'danger-text' : ''),

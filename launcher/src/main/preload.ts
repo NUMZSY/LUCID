@@ -64,6 +64,7 @@ const api = {
   installUpdate: invoke('updates:install'),
   openDownloadPage: invoke('updates:open-download'),
   updateDiagnostics: invoke('updates:diagnostics'),
+  openExternalLink: invoke('app:open-external'),
   releaseNotes: invoke('app:release-notes'),
   copyLogs: invoke('logs:copy'),
   openLogFolder: () => ipcRenderer.invoke('app:open-folder', 'logs'),
