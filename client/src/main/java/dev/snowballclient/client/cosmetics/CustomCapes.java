@@ -58,7 +58,7 @@ public final class CustomCapes {
 	}
 
 	static String baseUrl() {
-		String url = System.getProperty("snowball.chatUrl", "").trim();
+		String url = System.getProperty("lucid.apiUrl", "").trim();
 		return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
 	}
 

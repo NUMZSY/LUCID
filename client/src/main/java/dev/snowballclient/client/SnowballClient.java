@@ -270,7 +270,7 @@ public final class SnowballClient implements ClientModInitializer {
 		SkinHooks.platform = new MinecraftSkinPlatform();
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> SnowballPresence.stop());
 		// The launcher passes the rank the backend granted this account; the client only reads it.
-		SnowballPlayers.setSelfRank(Rank.byId(System.getProperty("snowball.rank", "snowball")));
+		SnowballPlayers.setSelfRank(Rank.byId(System.getProperty("lucid.rank", "snowball")));
 		LOGGER.info("LUCID initialised with {} modules", modules.all().size());
 	}
 

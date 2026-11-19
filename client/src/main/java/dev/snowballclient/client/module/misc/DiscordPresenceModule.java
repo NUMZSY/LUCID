@@ -23,7 +23,7 @@ import java.util.List;
  */
 public final class DiscordPresenceModule extends Module {
 	/** Set by the launcher. Without it Discord has no application to attach the presence to. */
-	private static final String APP_ID = System.getProperty("snowball.discordAppId", "");
+	private static final String APP_ID = System.getProperty("lucid.discordAppId", "");
 	private static final int UPDATE_TICKS = 20;
 
 	public final ChoiceSetting activity = setting(new ChoiceSetting("activity", "Doing", "The line above the server",
@@ -70,7 +70,7 @@ public final class DiscordPresenceModule extends Module {
 				activity.get() + " with LUCID",
 				where(mc, showServer.isOn()),
 				showTime.isOn() ? startSeconds : 0,
-				"snowball",
+				"lucid",
 				showVersion.isOn() ? "LUCID " + version + " on Minecraft " + minecraftVersion : "LUCID"));
 	}
 

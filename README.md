@@ -4,10 +4,11 @@ LUCID is a derivative version of [Snowball Client](https://github.com/met4a/snow
 open-source Minecraft client and launcher. This repository retains the upstream source and its MIT
 license; see `LICENSE` for the original copyright and license terms.
 
-The launcher and in-game UI are branded LUCID, but the inherited chat/ranks/bug-report integration
-still uses the upstream Snowball service configured in `launcher/app-config.json`. Replace that
-endpoint with a compatible LUCID service before distributing a build that should use separate
-accounts or data.
+The launcher and in-game UI are branded LUCID. No Snowball-operated backend, admin account,
+Microsoft app registration or Discord app ID is configured by default. The optional backend source in
+`server/chat-worker/` can be deployed to your own Cloudflare account; see its README. The launcher
+still uses official Microsoft/Minecraft, Mojang, Modrinth and GitHub services for their normal
+functions.
 
 A Minecraft client and launcher: an instance-based launcher (in the spirit of Prism Launcher) and a
 Fabric client mod with a radial control menu, HUD and quality-of-life modules (in the spirit of
@@ -23,7 +24,7 @@ snowball-client/
 │                  with Stonecutter, and client/legacy for Minecraft 1.8.9 on Legacy Fabric,
 │                  sharing the same menus and settings). client/tools publishes the rank badges.
 ├── launcher/      Electron + TypeScript launcher (Windows, macOS and Linux packaging)
-├── server/        Cloudflare Worker behind global chat, ranks and bug reports
+├── server/        Optional self-hosted Cloudflare Worker for chat, ranks and bug reports
 ├── website/       The public site, published with GitHub Pages
 ├── store/         Microsoft Store listing copy
 ├── CHANGELOG.md   What changed in each release, written for players
@@ -102,7 +103,7 @@ mouse is re-captured on close and that `modules.json` persisted the change.
 
 | Category | Modules |
 | --- | --- |
-| CLIENT | Client HUD, Custom Crosshair, FPS Counter, Ping Counter, Coordinates, Direction HUD, Speed, Combo Counter, Reach Display, Memory Usage, Pack Display, Armor HUD, Menu & Accessibility (look: liquid glass, frosted or classic), 3D Menus (windows standing in the world, or leaning screens), Skins (skin changer), Cosmetics (capes; Snowball+ Cape Studio) |
+| CLIENT | Client HUD, Custom Crosshair, FPS Counter, Ping Counter, Coordinates, Direction HUD, Speed, Combo Counter, Reach Display, Memory Usage, Pack Display, Armor HUD, Menu & Accessibility (look: liquid glass, frosted or classic), 3D Menus (windows standing in the world, or leaning screens), Skins (skin changer), Cosmetics (capes; LUCID+ Cape Studio) |
 | FPS BOOST | Boost (preset cards: Max FPS, Balanced, Quality, Off), Smart Culling (skips entities and block entities walls hide). Under Advanced: Faster Rendering (Sodium), Faster Game Logic (Lithium), Lower Memory Use (FerriteCore), Skip Hidden Mobs (Entity Culling), Faster HUD (ImmediatelyFast), Animation Optimization, Background FPS Limit, Particle Limiter, Performance Advisor |
 | RENDER | Boost, Fullbright, Zoom, Freelook, Third-Person Camera, Time Changer, Hit Colour, Crystal Glow, Block Outline, No Hurt Shake, Low Fire, FOV Settings, Render Distance, Entity Distance, Weather Effects, Potion HUD |
 | MISC | Chat Upgrades (stack repeats, mention highlight, right-click copy, timestamps), Emotes (wheel on B), Spotify (now playing, no sign-in), Nick Hider, Screenshot Utility, Notifications, Time Display, Server Information, Session Timer |
@@ -196,11 +197,11 @@ settings.json accounts.json
   https link or a PNG file, Classic/Slim arms (detected from the picture), favourites, rename and
   delete, and Equip through Mojang's API for the signed-in Microsoft account. The skin you are wearing
   is added when the page opens, so changing skin never loses it. The library lives in
-  `<data folder>/skins/` and is passed to the game as `-Dsnowball.skinsDir`, so the in-game Skins panel
+  `<data folder>/skins/` and is passed to the game as `-Dlucid.skinsDir`, so the in-game Skins panel
   shows the same skins; PNGs dropped into that folder are added too. Format and rules: `design/skins.md`.
 - New Fabric instances get the newest Fabric API for their exact Minecraft version once; if it cannot
   be installed yet it is retried on launch, and removing it afterwards is respected.
-- Snowball Client is part of the launcher, not a mod in the instance (`src/core/snowball/`), the way
+- LUCID is part of the launcher, not a mod in the instance (`src/core/snowball/`), the way
   Lunar and Feather work. The launcher keeps a SHA-1 verified copy of each client build in
   `<data folder>/client/` and loads it into the game with Fabric Loader's `-Dfabric.addMods=...`, so it
   never appears in the mods folder or mod list and can't be deleted or turned off there. Every instance
@@ -232,12 +233,24 @@ build needs an **Azure application (client) ID**:
 2. Add a redirect URI of type "Mobile and desktop applications":
    `https://login.microsoftonline.com/common/oauth2/nativeclient`
 3. Request Minecraft API access for that app through Mojang's app review form (aka.ms/mce-reviewappid).
-4. Put the ID in `launcher/app-config.json` (`"microsoftClientId"`) before `npm run dist` so every user
-   can sign in, or paste it in Settings > Accounts.
+4. LUCID ships no Microsoft client ID. Enter your own registered and approved ID in Settings > Accounts,
+   or set `"microsoftClientId"` in `launcher/app-config.json` before building to supply it as a default.
+
+Discord Rich Presence is disabled by default too. To use it, set your own Discord application ID in
+`launcher/app-config.json` before building; add an application asset named `lucid` if you want the
+client icon to appear in the activity.
 
 Refresh tokens are encrypted with the operating system keychain (Electron `safeStorage`) and never
 written in plain text; access tokens stay in memory. Offline profiles (for singleplayer/LAN) can only
 be added after a Microsoft account.
+
+## Optional LUCID backend
+
+Chat, ranks, bug reports, player presence and community capes require a separately deployed backend.
+The source build leaves `lucidApiUrl` empty, so those features do not contact a Snowball-operated
+server. To host your own service, follow [`server/chat-worker/README.md`](server/chat-worker/README.md),
+then set the resulting URL in `launcher/app-config.json` before building. The Worker owner UUID is a
+Cloudflare secret; it is no longer included in launcher source or builds.
 
 ## Security notes
 

@@ -1,4 +1,4 @@
-// Snowball+ from the Stripe store: given while the subscription is paid for, taken back when it ends.
+// LUCID+ from the Stripe store: given while the subscription is paid for, taken back when it ends.
 //   node --test test/*.test.mjs
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
@@ -47,7 +47,7 @@ test('nothing is given without the store set up and a fresh, real signature', as
   assert.equal(r.ranks.size, 0);
 });
 
-test('a paid checkout gives Snowball+ at once, and cancelling takes it back', async () => {
+test('a paid checkout gives LUCID+ at once, and cancelling takes it back', async () => {
   const r = await store();
   const open = launcher(r, BUYER);
   assert.equal((await send(r, checkout())).status, 200);
@@ -93,7 +93,7 @@ test('a custom cape comes off when the subscription ends, and the design is kept
 
   await send(r, subscription('customer.subscription.deleted', { status: 'canceled' }));
   assert.equal(r.looks.get(BUYER), undefined);
-  // The game keeps asking for it on its heartbeat; it stays off until Snowball+ is back.
+  // The game keeps asking for it on its heartbeat; it stays off until LUCID+ is back.
   r.setLooks(BUYER, { cape: 'custom' });
   assert.equal(r.looks.get(BUYER), undefined);
   assert.equal(r.capes.get(BUYER).approved.version, 1);
@@ -103,7 +103,7 @@ test('a custom cape comes off when the subscription ends, and the design is kept
   assert.deepEqual(r.looks.get(BUYER), { cape: 'custom', v: 1 });
 });
 
-test('a late copy of an old event does not bring Snowball+ back', async () => {
+test('a late copy of an old event does not bring LUCID+ back', async () => {
   const r = await store();
   await send(r, checkout());
   await send(r, subscription('customer.subscription.deleted', { status: 'canceled', created: NOW + 300 }));
@@ -121,8 +121,8 @@ test('a gift goes to the account named at checkout', async () => {
 
 test('the store never touches a rank staff gave', async () => {
   const r = await store();
-  r.ranks.set(STAFF, { rank: 'staff', by: OWNER, byName: 'Met4a' });
-  r.ranks.set(FRIEND, { rank: 'plus', by: OWNER, byName: 'Met4a' });
+  r.ranks.set(STAFF, { rank: 'staff', by: OWNER, byName: 'Owner' });
+  r.ranks.set(FRIEND, { rank: 'plus', by: OWNER, byName: 'Owner' });
   await send(r, checkout({ uuid: STAFF, name: 'Staffer', sub: 'sub_a' }));
   await send(r, checkout({ uuid: FRIEND, name: 'Friend', sub: 'sub_b' }));
   assert.equal(r.rankOf(STAFF), 'staff');
@@ -130,10 +130,10 @@ test('the store never touches a rank staff gave', async () => {
   await send(r, subscription('customer.subscription.deleted', { sub: 'sub_b', status: 'canceled' }));
   assert.equal(r.rankOf(STAFF), 'staff');
   assert.equal(r.rankOf(FRIEND), 'plus');
-  assert.equal(r.ranks.get(FRIEND).byName, 'Met4a');
+  assert.equal(r.ranks.get(FRIEND).byName, 'Owner');
 });
 
-test('with two subscriptions, Snowball+ stays until the last one ends', async () => {
+test('with two subscriptions, LUCID+ stays until the last one ends', async () => {
   const r = await store();
   await send(r, checkout({ sub: 'sub_a' }));
   await send(r, checkout({ sub: 'sub_b' }));
@@ -143,7 +143,7 @@ test('with two subscriptions, Snowball+ stays until the last one ends', async ()
   assert.equal(r.rankOf(BUYER), 'snowball');
 });
 
-test('checkouts and subscriptions that are not Snowball+ are ignored', async () => {
+test('checkouts and subscriptions that are not LUCID+ are ignored', async () => {
   const r = await store();
   const other = checkout();
   other.data.object.client_reference_id = null;
@@ -157,7 +157,7 @@ test('checkouts and subscriptions that are not Snowball+ are ignored', async () 
   assert.equal(r.subs.size, 0);
 });
 
-test('a + cape shows only on a Snowball+ player, and comes off when it ends', async () => {
+test('a + cape shows only on a LUCID+ player, and comes off when it ends', async () => {
   const r = await store();
   r.inClient.set(BUYER, Date.now());
   r.setLooks(BUYER, { cape: 'comet' });
@@ -172,7 +172,7 @@ test('a + cape shows only on a Snowball+ player, and comes off when it ends', as
   assert.deepEqual(r.looks.get(BUYER), { cape: 'aurora' });
 });
 
-test('a name colour shows only for Snowball+, in game and in the launcher chat', async () => {
+test('a name colour shows only for LUCID+, in game and in the launcher chat', async () => {
   const r = await store();
   r.inClient.set(BUYER, Date.now());
   r.setLooks(BUYER, { cape: 'aurora', colour: 'gold' });
@@ -190,7 +190,7 @@ test('a name colour shows only for Snowball+, in game and in the launcher chat',
   await r.onChat(socket, member, { text: 'hello' });
   assert.equal(r.history.at(-1).colour, 'gold');
 
-  // When Snowball+ ends the colour goes from game and chat alike.
+  // When LUCID+ ends the colour goes from game and chat alike.
   await send(r, subscription('customer.subscription.deleted', { status: 'canceled' }));
   assert.equal(r.looks.get(BUYER), undefined);
   member.times = [];
@@ -199,7 +199,7 @@ test('a name colour shows only for Snowball+, in game and in the launcher chat',
   assert.equal(r.history.at(-1).colour, undefined);
 });
 
-test('a + emote reaches others only from a Snowball+ player', async () => {
+test('a + emote reaches others only from a LUCID+ player', async () => {
   const r = await store();
   const watcher = { got: [], send(data) { this.got.push(JSON.parse(data)); } };
   const doer = { send() {} };

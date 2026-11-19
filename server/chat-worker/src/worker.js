@@ -1,5 +1,5 @@
 /*
- * Snowball Client global chat.
+ * LUCID global chat.
  *
  * One Durable Object holds the room: the sockets, the last messages, the announcement and the mutes.
  * Identity is not taken on trust. Mojang blocks requests from workers, so instead of asking it, the
@@ -11,7 +11,7 @@
 
 import { verifyPlayerProof } from './identity.js';
 
-/** How often a game running Snowball Client says so, and how long that counts for after it stops. */
+/** How often a game running LUCID says so, and how long that counts for after it stops. */
 const PRESENCE_EVERY_S = 120;
 const PRESENCE_TTL_MS = 5 * 60_000;
 /** How long a proved game may keep saying so on its ticket before proving the account again. */
@@ -22,12 +22,12 @@ const PRESENCE_TICKET_MS = 12 * 60 * 60_000;
  * never forwards anything a modified client makes up.
  */
 const CAPES = ['snowball', 'aurora', 'northern_lights', 'frost', 'ember', 'sakura', 'midnight', 'void', 'glacier', 'comet', 'prism'];
-/** The capes only Snowball+ may wear; every client ships them so everyone sees them. */
+/** The capes only LUCID+ may wear; every client ships them so everyone sees them. */
 const PLUS_CAPES = ['glacier', 'comet', 'prism'];
-/** Snowball+ name colours: ids must match the client's Looks.COLOURS and the launcher's chat. */
+/** LUCID+ name colours: ids must match the client's Looks.COLOURS and the launcher's chat. */
 const COLOURS = ['ice', 'snow', 'mint', 'gold', 'ember', 'rose', 'violet'];
 const EMOTES = ['wave', 'clap', 'cheer', 'dab', 'salute', 'facepalm', 'bow', 'tpose', 'dance', 'spin', 'think', 'point', 'zombie', 'star_jump', 'shrug', 'headbang', 'throw', 'flex', 'victory', 'float'];
-/** The emotes only Snowball+ may do; every client ships them so everyone sees them. */
+/** The emotes only LUCID+ may do; every client ships them so everyone sees them. */
 const PLUS_EMOTES = ['throw', 'flex', 'victory', 'float'];
 /** An emote at most this often, and this many a minute. */
 const EMOTE_GAP_MS = 700;
@@ -40,18 +40,18 @@ const WATCH_MAX = 200;
  * to four times one after another for an animated one.
  */
 const CUSTOM_CAPE = /^(?:[0-9a-f]{960}){1,4}$/;
-/** A Snowball+ player may send a new design this often. */
+/** A LUCID+ player may send a new design this often. */
 const CAPE_SUBMIT_GAP_MS = 60_000;
 
 /**
- * Snowball+ sold as a monthly subscription through a Stripe Payment Link. Stripe signs every
+ * LUCID+ sold as a monthly subscription through a Stripe Payment Link. Stripe signs every
  * webhook with the endpoint's secret (STRIPE_WEBHOOK_SECRET, set with `wrangler secret put`). A
  * subscription in these states is still paid for; past_due means Stripe is retrying the card.
  */
 const STRIPE_PAID = ['active', 'trialing', 'past_due'];
 /** How old a signed webhook may be, the same five minutes Stripe's own libraries allow. */
 const STRIPE_TOLERANCE_S = 300;
-/** Who the rank history says gave Snowball+ when the store did. */
+/** Who the rank history says gave LUCID+ when the store did. */
 const STORE = { uuid: 'store', name: 'Store' };
 
 /**
@@ -77,9 +77,9 @@ async function stripeSigned(body, header, secret, now = Date.now()) {
 }
 
 /**
- * The Minecraft account a checkout bought Snowball+ for. The store page looks the name up and sends
+ * The Minecraft account a checkout bought LUCID+ for. The store page looks the name up and sends
  * the buyer to the Payment Link with client_reference_id "<account id>_<name>"; any other checkout
- * on the Stripe account is not a Snowball+ one.
+ * on the Stripe account is not a LUCID+ one.
  */
 function plusAccount(reference) {
   const match = /^([0-9a-f]{32})_([A-Za-z0-9_]{1,16})$/.exec(String(reference ?? ''));
@@ -110,7 +110,7 @@ const MUTE_DEFAULT_MINUTES = 10;
 
 /** Ranks from least to most. The client displays these; this file is what actually decides them. */
 const RANKS = ['snowball', 'plus', 'tester', 'bug_hunter', 'partner', 'staff', 'developer', 'owner'];
-const RANK_NAMES = { plus: 'Snowball+', tester: 'Tester', bug_hunter: 'Bug Hunter', partner: 'Partner', staff: 'Staff', developer: 'Developer', owner: 'Owner' };
+const RANK_NAMES = { plus: 'LUCID+', tester: 'Tester', bug_hunter: 'Bug Hunter', partner: 'Partner', staff: 'Staff', developer: 'Developer', owner: 'Owner' };
 
 /**
  * What each rank may do. A rank keeps everything the rank below it has, so a new ability given to
@@ -197,7 +197,7 @@ export class ChatRoom {
     this.flags = {};
     this.nonces = new Map();
     this.tickets = new Map();
-    // Who is playing with Snowball Client right now: account id -> when the game last said so.
+    // Who is playing with LUCID right now: account id -> when the game last said so.
     // Held in memory on purpose: it only has to outlive the next heartbeat, never a restart.
     this.inClient = new Map();
     // Handed to a game after it proved its account, so its heartbeats need not prove it again.
@@ -209,10 +209,10 @@ export class ChatRoom {
     // Custom capes: account id -> { name, approved: { pixels, version, at, by } | null,
     // request: { pixels, at, status: 'pending' | 'denied', reason } | null }.
     this.capes = new Map();
-    // Snowball+ subscriptions from the store: Stripe subscription id -> { uuid, name, paid, at }, at
+    // LUCID+ subscriptions from the store: Stripe subscription id -> { uuid, name, paid, at }, at
     // being when Stripe created the latest event about it, in seconds.
     this.subs = new Map();
-    // Snowball+ name colours, account id -> colour id, kept for the launcher's chat.
+    // LUCID+ name colours, account id -> colour id, kept for the launcher's chat.
     this.colours = new Map();
     this.ready = state.blockConcurrencyWhile(async () => {
       this.history = (await state.storage.get('history')) ?? [];
@@ -236,7 +236,7 @@ export class ChatRoom {
       return Response.json({ ...this.stats(), announcement: this.announcement ?? null }, { headers: { 'cache-control': 'no-store' } });
     }
     if (url.pathname.endsWith('/flags')) return Response.json(this.flags, { headers: { 'cache-control': 'no-store' } });
-    // A game running Snowball Client saying so, every couple of minutes while it runs. The first
+    // A game running LUCID saying so, every couple of minutes while it runs. The first
     // time it proves the account with the key Mojang issued (the same proof the launcher's chat
     // uses) and gets a ticket; after that the ticket is enough. Nothing else about the player is
     // kept, and it is forgotten a few minutes after the game stops saying so.
@@ -279,9 +279,9 @@ export class ChatRoom {
       this.setLooks(uuid, body.looks);
       return Response.json({ ok: true, ticket, every: PRESENCE_EVERY_S });
     }
-    // Which of these accounts are playing with Snowball Client right now, and what they hold. The
+    // Which of these accounts are playing with LUCID right now, and what they hold. The
     // game asks about the players it can see so it can draw their badge. Only a game that is
-    // running Snowball Client counts: somebody who used it once and now plays on another client
+    // running LUCID counts: somebody who used it once and now plays on another client
     // gets no badge, and neither does the owner.
     if (url.pathname.endsWith('/ranks') && request.method === 'POST') {
       const body = await request.json().catch(() => ({}));
@@ -300,12 +300,12 @@ export class ChatRoom {
       }
       return Response.json({ ranks: out, looks }, { headers: { 'cache-control': 'no-store' } });
     }
-    // Custom capes. A Snowball+ player sends a design; it shows on nobody until staff approve it.
+    // Custom capes. A LUCID+ player sends a design; it shows on nobody until staff approve it.
     if (url.pathname.endsWith('/capes/submit') && request.method === 'POST') {
       const body = await request.json().catch(() => ({}));
       const held = this.presenceTickets.get(String(body.ticket ?? ''));
       if (!held || held.until < Date.now()) return Response.json({ error: 'Join a world first, so Snowball knows it is you' }, { status: 403 });
-      if (!can({ rank: this.rankOf(held.uuid) }, 'plus.features')) return Response.json({ error: 'Custom capes come with Snowball+' }, { status: 403 });
+      if (!can({ rank: this.rankOf(held.uuid) }, 'plus.features')) return Response.json({ error: 'Custom capes come with LUCID+' }, { status: 403 });
       const pixels = String(body.pixels ?? '');
       if (!CUSTOM_CAPE.test(pixels)) return Response.json({ error: 'That is not a cape design' }, { status: 400 });
       const entry = this.capes.get(held.uuid) ?? { approved: null, request: null };
@@ -331,7 +331,7 @@ export class ChatRoom {
       if (!approved) return new Response('Not found', { status: 404 });
       return Response.json({ pixels: approved.pixels, version: approved.version });
     }
-    // Snowball+ bought on the website: Stripe takes the payment and tells this room.
+    // LUCID+ bought on the website: Stripe takes the payment and tells this room.
     if (url.pathname.endsWith('/store/stripe') && request.method === 'POST') return this.onStripe(request);
     // Emotes travel live: a game opens this with the ticket its heartbeat holds, says whose emotes it
     // wants (the players it can see), and hears theirs as they happen.
@@ -437,9 +437,9 @@ export class ChatRoom {
   }
 
   /**
-   * A webhook from Stripe. Snowball+ is given when the checkout for it is paid, kept while the
+   * A webhook from Stripe. LUCID+ is given when the checkout for it is paid, kept while the
    * subscription is paid for, and taken back when it is cancelled or the card keeps failing. The
-   * store only ever takes back the Snowball+ it gave: a rank staff handed out, Snowball+ or higher,
+   * store only ever takes back the LUCID+ it gave: a rank staff handed out, LUCID+ or higher,
    * stays.
    */
   async onStripe(request) {
@@ -460,13 +460,13 @@ export class ChatRoom {
     let paid;
     if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
       buyer = plusAccount(object.client_reference_id);
-      if (!buyer || object.mode !== 'subscription' || !object.subscription) return Response.json({ ok: true, ignored: 'not a Snowball+ checkout' });
+      if (!buyer || object.mode !== 'subscription' || !object.subscription) return Response.json({ ok: true, ignored: 'not a LUCID+ checkout' });
       id = String(object.subscription);
       paid = object.payment_status === 'paid' || object.payment_status === 'no_payment_required';
     } else if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
       id = String(object.id ?? '');
       buyer = this.subs.get(id);
-      if (!buyer) return Response.json({ ok: true, ignored: 'not a Snowball+ subscription' });
+      if (!buyer) return Response.json({ ok: true, ignored: 'not a LUCID+ subscription' });
       paid = event.type === 'customer.subscription.updated' && STRIPE_PAID.includes(object.status);
     } else {
       return Response.json({ ok: true, ignored: event.type });
@@ -481,7 +481,7 @@ export class ChatRoom {
     await this.state.storage.put('subs', [...this.subs]);
 
     if (buyer.uuid === String(this.env.ADMIN_UUID ?? '').replace(/-/g, '')) return Response.json({ ok: true });
-    // Somebody given two subscriptions keeps Snowball+ until the last one ends.
+    // Somebody given two subscriptions keeps LUCID+ until the last one ends.
     const stillPaid = [...this.subs.values()].some((sub) => sub.uuid === buyer.uuid && sub.paid);
     const held = this.ranks.get(buyer.uuid);
     if (stillPaid && !held) await this.setRank(buyer.uuid, 'plus', STORE, { name: buyer.name });
@@ -512,7 +512,7 @@ export class ChatRoom {
     }
     // Players who can see them in game get the new badge now.
     if (this.playingNow(uuid)) this.liveSend(uuid, { type: 'rank', uuid, rank });
-    // Custom and + capes and name colours come with Snowball+: look again at what they wear.
+    // Custom and + capes and name colours come with LUCID+: look again at what they wear.
     const worn = this.looks.get(uuid);
     if (worn) this.setLooks(uuid, worn);
   }
@@ -541,7 +541,7 @@ export class ChatRoom {
 
   /** Stores what a player wears and tells the games watching them straight away when it changes. */
   setLooks(uuid, raw) {
-    // Custom and + capes are Snowball+ features, so they come off when Snowball+ ends; a custom
+    // Custom and + capes are LUCID+ features, so they come off when LUCID+ ends; a custom
     // design is kept for when it comes back.
     const plus = can({ rank: this.rankOf(uuid) }, 'plus.features');
     const looks = looksOf(raw, plus ? this.capes.get(uuid)?.approved : null, plus);
@@ -606,7 +606,7 @@ export class ChatRoom {
     }
   }
 
-  /** Whether this account's game said it runs Snowball Client within the last few minutes. */
+  /** Whether this account's game said it runs LUCID within the last few minutes. */
   playingNow(uuid) {
     const at = this.inClient.get(uuid);
     if (at === undefined) return false;
@@ -654,7 +654,7 @@ export class ChatRoom {
     if (!check.ok) return socket.send(JSON.stringify({ type: 'error', message: check.reason }));
 
     const message = { type: 'msg', id: crypto.randomUUID(), name: member.name, uuid: member.uuid, text: check.text, at: new Date().toISOString(), staff: member.owner, rank: member.rank };
-    // A Snowball+ name colour, while they still have Snowball+.
+    // A LUCID+ name colour, while they still have LUCID+.
     const colour = this.colours.get(member.uuid);
     if (colour && can(member, 'plus.features')) message.colour = colour;
     this.history.push(message);
@@ -678,7 +678,7 @@ export class ChatRoom {
   }
 
   /**
-   * The same record for someone playing with Snowball Client, who may never open the launcher's
+   * The same record for someone playing with LUCID, who may never open the launcher's
    * chat. Heartbeats come every two minutes, so storage is only written when the day's and week's
    * counts could change.
    */
@@ -701,7 +701,7 @@ export class ChatRoom {
       if (now - person.last < day) today++;
       if (now - person.last < 7 * day) week++;
     }
-    // Right now: everyone in game with Snowball Client or in the launcher's chat, each account once.
+    // Right now: everyone in game with LUCID or in the launcher's chat, each account once.
     const online = new Set([...this.sockets.values()].map((member) => member.uuid));
     for (const uuid of [...this.inClient.keys()]) if (this.playingNow(uuid)) online.add(uuid);
     return { online: online.size, today, week, total: this.people.size };
@@ -762,7 +762,7 @@ export class ChatRoom {
     if (!can(member, needed)) return reply(false, `Your rank cannot do that (it needs ${needed}).`);
 
     if (payload.action === 'ranked') {
-      // Everyone holding a rank above plain Snowball, with who gave it, for the Ranks overview.
+      // Everyone holding a rank above plain LUCID, with who gave it, for the Ranks overview.
       const owner = String(this.env.ADMIN_UUID ?? '').replace(/-/g, '');
       const people = [...this.ranks].map(([uuid, given]) => ({ uuid, name: this.people.get(uuid)?.name ?? given.name ?? '', rank: given.rank, at: given.at ?? 0, byName: given.byName ?? '' }));
       if (owner && !this.ranks.has(owner)) people.push({ uuid: owner, name: this.people.get(owner)?.name ?? '', rank: 'owner', at: 0, byName: '' });
@@ -867,7 +867,7 @@ export class ChatRoom {
 
       await this.setRank(uuid, rank, member);
       socket.send(JSON.stringify({ type: 'rank-set', uuid, rank, history: this.rankLog.get(uuid) ?? [] }));
-      reply(true, rank === 'snowball' ? `${nameOf(uuid)} is back to plain Snowball.` : `${nameOf(uuid)} is now ${RANK_NAMES[rank] ?? rank}. They see it straight away.`);
+      reply(true, rank === 'snowball' ? `${nameOf(uuid)} is back to plain LUCID.` : `${nameOf(uuid)} is now ${RANK_NAMES[rank] ?? rank}. They see it straight away.`);
       return;
     }
     if (payload.action === 'unmute') {
@@ -902,7 +902,7 @@ export class ChatRoom {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === '/' || url.pathname === '/health') return new Response('Snowball chat is up.');
+    if (url.pathname === '/' || url.pathname === '/health') return new Response('LUCID chat is up.');
     // One room for everyone, so every launcher sees the same conversation.
     const id = env.CHAT_ROOM.idFromName('global');
     return env.CHAT_ROOM.get(id).fetch(request);

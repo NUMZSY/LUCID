@@ -213,8 +213,8 @@ describe('launching the game', () => {
     }) as never;
 
     await launcher.launch(config.id);
-    expect(args).toContain(`-Dsnowball.skinsDir=${join(root, 'skins')}`);
+    expect(args).toContain(`-Dlucid.skinsDir=${join(root, 'skins')}`);
     // A JVM option, so it comes before the main class.
-    expect(args.indexOf(`-Dsnowball.skinsDir=${join(root, 'skins')}`)).toBeLessThan(args.indexOf(version.mainClass));
+    expect(args.indexOf(`-Dlucid.skinsDir=${join(root, 'skins')}`)).toBeLessThan(args.indexOf(version.mainClass));
   });
 });

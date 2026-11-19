@@ -4,7 +4,7 @@
 import { createSign, generateKeyPairSync } from 'node:crypto';
 import { ChatRoom } from '../src/worker.js';
 
-export const OWNER = '85c4ac3a0c284c20be4bee8a346ba51e';
+export const OWNER = '00000000000000000000000000000001';
 const mojang = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const mojangPublic = mojang.publicKey.export({ type: 'spki', format: 'der' }).toString('base64');
 
@@ -39,4 +39,3 @@ export async function proof(r, uuid, name) {
     signature: createSign('RSA-SHA256').update(nonce).sign(player.privateKey, 'base64'),
   };
 }
-

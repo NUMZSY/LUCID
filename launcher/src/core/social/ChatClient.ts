@@ -95,7 +95,7 @@ function describeJoinFailure(status: number, body: string): string {
 }
 
 /**
- * The launcher's side of Snowball's global chat. Identity is proven the way a Minecraft server does
+ * The launcher's side of LUCID's optional global chat. Identity is proven the way a Minecraft server does
  * it: the launcher asks Mojang to vouch for the account, and the chat server checks that with Mojang
  * itself - so the access token never leaves this computer and nobody can claim another player's name.
  */
@@ -110,7 +110,7 @@ export class ChatClient extends EventEmitter {
   /** The pending automatic reconnect, so joining by hand can cancel it. */
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly baseUrl: string, private readonly adminUuid: string) {
+  constructor(private readonly baseUrl: string) {
     super();
     this.state = { configured: Boolean(baseUrl), status: 'offline', online: 0, announcement: null, admin: false, rank: 'snowball', permissions: [], flags: {} };
   }
@@ -288,7 +288,7 @@ export class ChatClient extends EventEmitter {
     return this.state.permissions.includes('everything') || this.state.permissions.includes(permission);
   }
 
-  /** Gives an account a rank, or takes it back to plain Snowball. Refused unless the rank allows it. */
+  /** Gives an account a rank, or takes it back to plain LUCID. Refused unless the rank allows it. */
   setRank(uuid: string, rank: SnowballRank): { ok: boolean; reason?: string } {
     if (!this.socket || this.state.status !== 'online') return { ok: false, reason: 'You are not connected to chat.' };
     if (!this.can('ranks.manage')) return { ok: false, reason: 'Your rank cannot change other people\u2019s ranks.' };
@@ -386,7 +386,7 @@ export class ChatClient extends EventEmitter {
       this.retryMs = 3000;
       // Whoever just joined is online, so the count is at least one until the room sends its own;
       // it used to say "0 online" for a moment after joining.
-      this.set({ status: 'online', online: Math.max(this.state.online, 1), admin: session.uuid.replace(/-/g, '') === this.adminUuid.replace(/-/g, ''), message: undefined });
+      this.set({ status: 'online', online: Math.max(this.state.online, 1), admin: false, message: undefined });
     });
     // Only the current socket is listened to, so a socket being replaced cannot deliver anything.
     socket.addEventListener('message', (event: MessageEvent) => {
@@ -482,7 +482,7 @@ export class ChatClient extends EventEmitter {
         this.set({ announcement: typeof payload.text === 'string' && payload.text ? payload.text : null });
         break;
       case 'error':
-        this.emit('message', { id: '', name: 'Snowball', uuid: '', text: String(payload.message ?? 'Something went wrong.'), at: new Date().toISOString(), system: true });
+        this.emit('message', { id: '', name: 'LUCID', uuid: '', text: String(payload.message ?? 'Something went wrong.'), at: new Date().toISOString(), system: true });
         break;
       default:
         break;

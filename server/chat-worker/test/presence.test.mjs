@@ -1,4 +1,4 @@
-// Who gets a Snowball badge: only players whose game is running Snowball Client right now.
+// Who gets a LUCID badge: only players whose game is running LUCID right now.
 //   node --test test/
 // The room runs in plain Node. A stand-in "Mojang" key is added through MOJANG_KEYS, so the proof a
 // game sends is checked for real - both signatures - rather than mocked away.
@@ -8,7 +8,7 @@ import { OWNER, call, proof, room } from './helpers.mjs';
 
 const ranks = async (r, uuids) => (await (await call(r, '/ranks', { uuids })).json()).ranks;
 
-test('nobody has a badge until their game says it runs Snowball Client - not even the owner', async () => {
+test('nobody has a badge until their game says it runs LUCID - not even the owner', async () => {
   const r = await room();
   r.people.set('11111111111111111111111111111111', { first: Date.now() });
   assert.deepEqual(await ranks(r, [OWNER, '11111111111111111111111111111111']), {});
@@ -16,7 +16,7 @@ test('nobody has a badge until their game says it runs Snowball Client - not eve
 
 test('a game that proves its account shows the badge, and keeps it with its ticket', async () => {
   const r = await room();
-  const answer = await call(r, '/presence', await proof(r, OWNER, 'Met4a'));
+  const answer = await call(r, '/presence', await proof(r, OWNER, 'Owner'));
   assert.equal(answer.status, 200);
   const { ticket, every } = await answer.json();
   assert.match(ticket, /^[0-9a-f]{32}$/);

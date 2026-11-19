@@ -69,11 +69,11 @@ public final class SkinLibrary {
 	}
 
 	/**
-	 * Where the library lives: the folder the launcher names with -Dsnowball.skinsDir when that is an
+		 * Where the library lives: the folder the launcher names with -Dlucid.skinsDir when that is an
 	 * absolute path, otherwise {@code skins} in the client's config folder.
 	 */
 	public static Path folder(Path configDir) {
-		String set = System.getProperty("snowball.skinsDir");
+		String set = System.getProperty("lucid.skinsDir");
 		if (set != null && !set.isBlank()) {
 			try {
 				Path path = Paths.get(set.trim());

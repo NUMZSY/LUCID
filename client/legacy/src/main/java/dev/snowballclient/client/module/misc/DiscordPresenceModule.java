@@ -24,7 +24,7 @@ import java.util.List;
  */
 public final class DiscordPresenceModule extends Module {
 	/** Set by the launcher. Without it Discord has no application to attach the presence to. */
-	private static final String APP_ID = System.getProperty("snowball.discordAppId", "");
+	private static final String APP_ID = System.getProperty("lucid.discordAppId", "");
 	private static final int UPDATE_TICKS = 20;
 
 	public final ChoiceSetting activity = setting(new ChoiceSetting("activity", "Doing", "The line above the server",
@@ -65,11 +65,11 @@ public final class DiscordPresenceModule extends Module {
 		SnowballClient client = SnowballClient.get();
 		String version = client != null ? client.version() : "";
 		discord.set(new Presence(
-				activity.get() + " with Snowball Client",
+				activity.get() + " with LUCID",
 				where(MinecraftClient.getInstance(), showServer.isOn()),
 				showTime.isOn() ? startSeconds : 0,
-				"snowball",
-				showVersion.isOn() ? "Snowball Client " + version + " on Minecraft " + minecraftVersion : "Snowball Client"));
+				"lucid",
+				showVersion.isOn() ? "LUCID " + version + " on Minecraft " + minecraftVersion : "LUCID"));
 	}
 
 	/** Where the player is, read from the game, naming a server only when it is public and allowed. */

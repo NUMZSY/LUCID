@@ -123,7 +123,7 @@ public final class SnowballSkinsGameTest implements FabricClientGameTest {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		System.setProperty("snowball.skinsDir", dir.toAbsolutePath().toString());
+		System.setProperty("lucid.skinsDir", dir.toAbsolutePath().toString());
 		for (int[] size : new int[][]{{1280, 720}, {1920, 1080}}) {
 			context.getInput().resizeWindow(size[0], size[1]);
 			context.waitTicks(10);

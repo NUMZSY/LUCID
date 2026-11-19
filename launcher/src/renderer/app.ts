@@ -3177,6 +3177,16 @@
         h('button', { class: 'btn small', onClick: () => void guard(() => api.selectAccount(a.id)).then(refresh) }, 'Use'),
         h('button', { class: 'btn small danger', onClick: () => confirmDialog('Remove account', `Sign out and remove ${a.name}?`, 'Remove', async () => { await api.removeAccount(a.id); await refresh(); }) }, 'Remove'))) : [h('div', { class: 'muted' }, 'No accounts yet.')]));
 
+    const microsoftClientId = h('input', { class: 'input', maxlength: '36', value: s.accounts.microsoftClientId, placeholder: 'Azure application client ID' }) as HTMLInputElement;
+    const saveMicrosoftClientId = async () => {
+      const value = microsoftClientId.value.trim();
+      if (value && !/^[0-9a-fA-F-]{36}$/.test(value)) {
+        toast('Enter a valid 36-character Microsoft application client ID.', 'error');
+        return;
+      }
+      await update({ accounts: { ...s.accounts, microsoftClientId: value } });
+    };
+
     const maxMemory = h('input', { class: 'input', type: 'number', min: '512', step: '256', value: s.java.defaultMaxMemoryMb ?? '', placeholder: `Recommended (${state.memory.recommendedMaxMb} MB)` }) as HTMLInputElement;
 
     return h('div', { class: 'stack' },
@@ -3184,6 +3194,7 @@
       h('div', { class: 'card' },
         h('div', { class: 'section-title' }, 'ACCOUNTS'),
         accounts,
+        settingRow('Microsoft app ID', 'This build ships no upstream sign-in app. Use your own registered and approved application ID.', h('div', { class: 'row', style: 'width:360px;flex:none' }, microsoftClientId, h('button', { class: 'btn', onClick: () => void saveMicrosoftClientId() }, 'Save'))),
         h('div', { class: 'row', style: 'margin-top:12px' },
           h('button', { class: 'btn primary', onClick: () => microsoftSignIn() }, 'Sign in with Microsoft'),
           h('button', { class: 'btn', disabled: !state.canAddOffline, title: state.canAddOffline ? '' : 'Requires a Microsoft account first', onClick: () => offlineDialog() }, 'Add offline profile'))),
@@ -3422,8 +3433,7 @@
   }
 
   function microsoftSetupDialog(): void {
-    // Players never configure anything; the developer ships the app ID in app-config.json (see README).
-    modal('SIGN-IN UNAVAILABLE', h('p', { class: 'muted' }, 'Microsoft sign-in is not enabled in this build of LUCID yet. Please update to the latest version.'), [
+    modal('MICROSOFT SIGN-IN NOT CONFIGURED', h('p', { class: 'muted' }, 'LUCID does not bundle another project’s Microsoft app. Add your own registered and approved application client ID in Settings > Accounts, then try again.'), [
       { label: 'OK', kind: 'primary', onClick: (close) => close() },
     ]);
   }

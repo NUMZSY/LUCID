@@ -9,6 +9,16 @@ installer once.
 
 ---
 
+## 2.1.2
+
+### What's new
+- **No Snowball service defaults.** Chat and community features are disabled until you point LUCID at a backend you host yourself; no upstream admin account or app registrations ship with the launcher.
+- **Bring your own Microsoft app ID.** Set your own approved client ID in Settings > Accounts to enable Microsoft sign-in.
+- **A self-hostable LUCID backend.** The Cloudflare Worker is named for LUCID and reads its owner UUID from a Worker secret.
+- **LUCID release links.** Manual update help now points to the LUCID GitHub Releases page.
+
+---
+
 ## 2.1.1
 
 ### What's new

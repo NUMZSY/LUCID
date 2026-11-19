@@ -172,7 +172,7 @@ public final class LyricsSource {
 		if (http == null) http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(8)).followRedirects(HttpClient.Redirect.NORMAL).build();
 		HttpRequest request = HttpRequest.newBuilder(URI.create(API + path))
 				.timeout(Duration.ofSeconds(12))
-				.header("User-Agent", "SnowballClient (https://github.com/met4a/snowball-client)")
+				.header("User-Agent", "LUCID (https://github.com/NUMZSY/LUCID)")
 				.GET().build();
 		HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 		if (response.statusCode() == 404) return null;

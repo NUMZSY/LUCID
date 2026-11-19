@@ -17,7 +17,7 @@ const result = (socket) => socket.got.filter((m) => m.type === 'admin-result').a
 test('a rank change is confirmed by name, and the ranked list shows it', async () => {
   const r = await room();
   r.people.set(ALEX, { name: 'Alex', last: 1 });
-  r.people.set(OWNER, { name: 'Met4a', last: 1 });
+  r.people.set(OWNER, { name: 'Owner', last: 1 });
   const owner = panel(r, OWNER, 'owner', true);
   await r.onAdmin({ type: 'admin', action: 'rank-set', uuid: ALEX, rank: 'bug_hunter' }, owner, r.sockets.get(owner));
   assert.deepEqual(result(owner), { type: 'admin-result', action: 'rank-set', ok: true, message: 'Alex is now Bug Hunter. They see it straight away.' });
@@ -25,7 +25,7 @@ test('a rank change is confirmed by name, and the ranked list shows it', async (
   await r.onAdmin({ type: 'admin', action: 'ranked' }, owner, r.sockets.get(owner));
   const ranked = owner.got.at(-1);
   assert.equal(ranked.type, 'ranked');
-  assert.deepEqual(ranked.people.map((p) => [p.name, p.rank]), [['Met4a', 'owner'], ['Alex', 'bug_hunter']]);
+  assert.deepEqual(ranked.people.map((p) => [p.name, p.rank]), [['Owner', 'owner'], ['Alex', 'bug_hunter']]);
 });
 
 test('refusals come back to the panel with a reason', async () => {

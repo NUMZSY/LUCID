@@ -168,8 +168,8 @@ public final class SnowballClient implements ClientModInitializer {
 		// loaded until you rejoin, so SkinHooks.platform stays as it is.
 		SkinHooks.account = SnowballClient::presenceAccount;
 		// The launcher passes the rank the backend granted this account; the client only reads it.
-		SnowballPlayers.setSelfRank(Rank.byId(System.getProperty("snowball.rank", "snowball")));
-		LOGGER.info("Snowball Client initialised with {} modules", modules.all().size());
+		SnowballPlayers.setSelfRank(Rank.byId(System.getProperty("lucid.rank", "snowball")));
+		LOGGER.info("LUCID initialised with {} modules", modules.all().size());
 	}
 
 	/** The signed-in account, as 1.8.9 keeps it: the id comes without dashes. */

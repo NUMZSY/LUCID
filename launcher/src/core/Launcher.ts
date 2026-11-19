@@ -76,8 +76,8 @@ export interface LauncherOptions {
   launcherVersion: string;
   /** Discord application id from the build config; empty when the presence module is not set up. */
   discordAppId?: string;
-  /** The LUCID backend, passed to the game so it can look up other players' ranks. */
-  chatUrl?: string;
+  /** Optional self-hosted LUCID backend, passed to the game for presence, ranks and capes. */
+  lucidApiUrl?: string;
   consoleLogs?: boolean;
   /** Azure application (client) ID shipped with this build (app-config.json); Settings can override it. */
   defaultMicrosoftClientId?: string;
@@ -137,7 +137,7 @@ export class Launcher extends EventEmitter {
     // re-checksum thousands of assets every time.
     const verified = new VerifiedFiles(join(paths.cache, 'verified-files.json'));
     await verified.load();
-    const downloads = new DownloadManager({ concurrency: s.downloads.concurrency, retries: s.downloads.retries, userAgent: `SnowballClientLauncher/${options.launcherVersion}`, verified });
+    const downloads = new DownloadManager({ concurrency: s.downloads.concurrency, retries: s.downloads.retries, userAgent: `LUCIDLauncher/${options.launcherVersion}`, verified });
     const versions = new VersionManager(paths, downloads);
     const java = new JavaManager(paths.runtimes, downloads, undefined, join(paths.cache, 'java-probes.json'));
     const instances = new InstanceManager(paths.instances);
@@ -608,19 +608,19 @@ export class Launcher extends EventEmitter {
         paths: this.paths,
         account: session,
         nativesDir,
-        launcherName: 'snowball-client-launcher',
+        launcherName: 'lucid-launcher',
         launcherVersion: this.options.launcherVersion,
         // LUCID is loaded straight from the launcher's folder, so it is never a file in the instance.
         extraJvmArgs: [
           ...(prep.clientJar ? [`-Dfabric.addMods=${prep.clientJar}`] : []),
           // The client's Discord presence needs an application id; without one the module stays off.
-          ...(this.discordAppId ? [`-Dsnowball.discordAppId=${this.discordAppId}`] : []),
+          ...(this.discordAppId ? [`-Dlucid.discordAppId=${this.discordAppId}`] : []),
           // The rank the backend granted this account; the client only reads it, never sets it.
-          `-Dsnowball.rank=${this.settings.get().accounts.rank}`,
-          // So the client can ask which of the players around you are on Snowball.
-          ...(this.options.chatUrl ? [`-Dsnowball.chatUrl=${this.options.chatUrl}`] : []),
+          `-Dlucid.rank=${this.settings.get().accounts.rank}`,
+          // No server is contacted unless the build maintainer supplies a self-hosted LUCID API URL.
+          ...(this.options.lucidApiUrl ? [`-Dlucid.apiUrl=${this.options.lucidApiUrl}`] : []),
           // The skin library the Skins page keeps, so the game's Skins panel shows the same skins.
-          `-Dsnowball.skinsDir=${this.paths.skins}`,
+          `-Dlucid.skinsDir=${this.paths.skins}`,
         ],
       });
       cancel.signal.throwIfAborted();

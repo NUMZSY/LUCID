@@ -16,7 +16,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe('chat client', () => {
   it('counts whoever just joined as online before the room sends its count', async () => {
     vi.stubGlobal('WebSocket', OpeningSocket);
-    const chat = new ChatClient('https://chat.invalid', '');
+    const chat = new ChatClient('https://chat.invalid');
     (chat as unknown as { proveIdentity: () => Promise<string> }).proveIdentity = async () => 'ticket';
     const shown: string[] = [];
     chat.on('state', (s: ChatState) => shown.push(s.status === 'online' ? `${s.online} online` : s.status));
@@ -24,6 +24,16 @@ describe('chat client', () => {
     await new Promise((r) => setTimeout(r, 0));
     // It said "0 online" for a moment after joining.
     expect(shown).toEqual(['connecting', '1 online']);
+  });
+
+  it('makes no network calls when this build has no self-hosted backend', async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    const chat = new ChatClient('');
+    expect(chat.current().configured).toBe(false);
+    await chat.connect({ name: 'Alex', uuid: '0'.repeat(32), accessToken: 'token', type: 'msa' });
+    expect(await chat.stats()).toBeNull();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('passes cape designs waiting for staff to the admin panel, and gates deciding them', async () => {
@@ -39,7 +49,7 @@ describe('chat client', () => {
       }
     }
     vi.stubGlobal('WebSocket', RoomSocket);
-    const chat = new ChatClient('https://chat.invalid', '');
+    const chat = new ChatClient('https://chat.invalid');
     (chat as unknown as { proveIdentity: () => Promise<string> }).proveIdentity = async () => 'ticket';
     const capes: unknown[] = [];
     chat.on('capes', (list: unknown[]) => capes.push(...list));
@@ -65,7 +75,7 @@ describe('chat client', () => {
       }
     }
     vi.stubGlobal('WebSocket', RoomSocket);
-    const chat = new ChatClient('https://chat.invalid', '');
+    const chat = new ChatClient('https://chat.invalid');
     (chat as unknown as { proveIdentity: () => Promise<string> }).proveIdentity = async () => 'ticket';
     const results: unknown[] = [];
     const chatLines: unknown[] = [];

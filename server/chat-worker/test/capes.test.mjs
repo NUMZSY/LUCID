@@ -1,4 +1,4 @@
-// Snowball+ custom capes: sent from the game, approved by staff in the launcher, then worn.
+// LUCID+ custom capes: sent from the game, approved by staff in the launcher, then worn.
 //   node --test test/*.test.mjs
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -20,7 +20,7 @@ function panel(r, uuid, rank) {
   return socket;
 }
 
-test('only Snowball+ can send a design, and only a real one', async () => {
+test('only LUCID+ can send a design, and only a real one', async () => {
   const r = await room();
   r.ranks.set(PLUS, { rank: 'plus' });
   const free = await ticketFor(r, FREE, 'Free');

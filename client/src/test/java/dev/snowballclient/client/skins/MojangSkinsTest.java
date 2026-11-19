@@ -28,8 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class MojangSkinsTest {
 	private static final String TOKEN = "eyJ" + "b".repeat(60);
-	private static final UUID ID = UUID.fromString("85c4ac3a-0c28-4c20-be4b-ee8a346ba51e");
-	private static final SnowballPresence.Account ACCOUNT = new SnowballPresence.Account("Met4a", ID, TOKEN);
+	private static final UUID ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
+	private static final SnowballPresence.Account ACCOUNT = new SnowballPresence.Account("TestPlayer", ID, TOKEN);
 	private static final String WORN = "3b60a1f6d562f52aaebbf1434f1de147933a3affe0e764fa49ea057536623cd3";
 	private static final String NEW = "a7d1f2e0c9b8a7d1f2e0c9b8a7d1f2e0c9b8a7d1f2e0c9b8a7d1f2e0c9b8a7d1";
 	private static final String NOTCH_ID = "069a79f444e94726a5befca90e38aaf5";
@@ -105,7 +105,7 @@ class MojangSkinsTest {
 	}
 
 	private static String profile(String activeHash, String variant) {
-		return "{\"id\":\"85c4ac3a0c284c20be4bee8a346ba51e\",\"name\":\"Met4a\",\"skins\":["
+		return "{\"id\":\"00000000000000000000000000000002\",\"name\":\"TestPlayer\",\"skins\":["
 				+ "{\"id\":\"old\",\"state\":\"INACTIVE\",\"url\":\"http://textures.minecraft.net/texture/" + "c".repeat(64) + "\",\"variant\":\"CLASSIC\"},"
 				+ "{\"id\":\"now\",\"state\":\"ACTIVE\",\"url\":\"http://textures.minecraft.net/texture/" + activeHash + "\",\"variant\":\"" + variant + "\"}"
 				+ "],\"capes\":[]}";
@@ -134,7 +134,7 @@ class MojangSkinsTest {
 		MojangSkins.Answer<MojangSkins.Fetched> current = MojangSkins.current(ACCOUNT, worn);
 		assertTrue(current.ok(), current.error());
 		assertArrayEquals(png, current.value().png());
-		assertEquals("Met4a's skin", current.value().name());
+		assertEquals("TestPlayer's skin", current.value().name());
 		assertEquals("current", current.value().source());
 		assertEquals(WORN, current.value().texture());
 		assertTrue(current.value().slim());

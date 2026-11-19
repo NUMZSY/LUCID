@@ -8,8 +8,8 @@ they next load your profile, which on a server means after you rejoin).
 ## Where the library lives
 
 - The launcher keeps it in `<launcher data root>/skins/` (next to `settings.json`), and passes
-  `-Dsnowball.skinsDir=<that folder>` to the game when it launches.
-- The game uses `System.getProperty("snowball.skinsDir")` when it is set and is an absolute path,
+  `-Dlucid.skinsDir=<that folder>` to the game when it launches.
+- The game uses `System.getProperty("lucid.skinsDir")` when it is set and is an absolute path,
   and otherwise `<config dir>/snowballclient/skins/` (dev runs, other launchers).
 
 ## Files

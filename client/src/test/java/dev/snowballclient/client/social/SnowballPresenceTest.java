@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class SnowballPresenceTest {
 	private static final String TOKEN = "eyJ" + "a".repeat(60);
-	private static final UUID ID = UUID.fromString("85c4ac3a-0c28-4c20-be4b-ee8a346ba51e");
+	private static final UUID ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 	private static final String EXPIRES = "2026-09-29T10:00:00.123456Z";
 
 	private HttpServer server;
@@ -52,7 +52,7 @@ class SnowballPresenceTest {
 		server.createContext("/", this::handle);
 		server.start();
 		String base = "http://127.0.0.1:" + server.getAddress().getPort();
-		System.setProperty("snowball.chatUrl", base);
+		System.setProperty("lucid.apiUrl", base);
 		SnowballPresence.certificates = URI.create(base + "/player/certificates");
 		SnowballPresence.reset();
 	}
@@ -60,7 +60,7 @@ class SnowballPresenceTest {
 	@AfterEach
 	void stop() {
 		server.stop(0);
-		System.clearProperty("snowball.chatUrl");
+		System.clearProperty("lucid.apiUrl");
 	}
 
 	/** Mojang writes both keys as PEM with an RSA header, PKCS#8 and X.509 inside, escaped for JSON. */
@@ -132,12 +132,12 @@ class SnowballPresenceTest {
 
 	@Test
 	void provesTheAccountOnceThenKeepsTheBadgeWithItsTicket() throws Exception {
-		SnowballPresence.Account account = new SnowballPresence.Account("Met4a", ID, TOKEN);
+		SnowballPresence.Account account = new SnowballPresence.Account("Alex", ID, TOKEN);
 		SnowballPresence.beat(account, true);
 		assertEquals("0123456789abcdef0123456789abcdef", SnowballPresence.ticket(), "the server accepted the proof");
 		String proof = presenceBodies.get(0);
-		assertEquals("85c4ac3a0c284c20be4bee8a346ba51e", field(proof, "uuid"));
-		assertEquals("Met4a", field(proof, "name"));
+		assertEquals("00000000000000000000000000000001", field(proof, "uuid"));
+		assertEquals("Alex", field(proof, "name"));
 		assertEquals(nonce, field(proof, "nonce"));
 		assertEquals(String.valueOf(Instant.parse(EXPIRES).toEpochMilli()), field(proof, "expiresAt"));
 		assertEquals("c2lnbmVkLWJ5LW1vamFuZw==", field(proof, "keySignature"));

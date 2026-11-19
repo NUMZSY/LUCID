@@ -1,56 +1,43 @@
-# Snowball global chat
+# LUCID community backend
 
-The chat everyone sees in the launcher. One Cloudflare Worker with one Durable Object: the room keeps
-the last 60 messages, the announcement and the mutes. It costs nothing on Cloudflare's free plan.
+This optional Cloudflare Worker provides launcher chat, announcements, bug reports, ranks, in-game presence and cape review. The repository ships no hosted endpoint or admin account; a build without `lucidApiUrl` makes no requests to a LUCID backend. You can deploy this Worker to your own Cloudflare account and use that deployment instead.
 
 ## What it does
 
-- **Nobody can pretend to be someone else.** A launcher asks this worker for a one-time id, asks
-  Mojang to vouch for the account against that id (the same handshake a Minecraft server uses), and
-  this worker checks that with Mojang. The Minecraft token never leaves the player's computer.
-- **The rules are enforced here, not only in the launcher.** No links, no addresses, no images, no
-  pinging everyone, a word list, a length limit, and a rate limit of 12 messages a minute.
-- **Badges only while someone is really on Snowball.** A game running Snowball Client proves its
-  account the same way (`POST /presence`) and repeats itself every two minutes on a ticket; `POST
-  /ranks` only reports players whose game did so in the last five minutes. Closing the game sends
-  `DELETE /presence`. Nothing about it is written to storage. Tests: `node --test test/`.
-- **Announcements and moderation are yours alone.** Only the UUID in `ADMIN_UUID` may post an
-  announcement, mute someone or clear the chat.
+- Proves Minecraft account identity using the player key issued by Minecraft Services. The account access token stays on the player's computer; only the proof and public identity are sent to this Worker.
+- Stores chat state, ranks, presence, bug reports, announcements and cape approvals in a Cloudflare Durable Object owned by the deployer.
+- Enforces chat moderation and rank permissions on the server. Client-side UI checks are not a substitute for these checks.
+- Keeps player-presence badges short-lived and removes them when a game client disconnects or stops heartbeating.
 
-## Deploy it (about two minutes)
+The Worker uses the `ADMIN_UUID` environment secret as the owner identity. It is intentionally absent from the checked-in configuration; without it, no account is the owner and the admin actions stay unavailable.
 
-1. Put your own Minecraft UUID (no dashes) in `wrangler.toml` under `ADMIN_UUID`.
-2. From this folder:
+## Deploy your own instance
+
+1. From this directory, authenticate with your Cloudflare account and deploy:
 
    ```bash
    npx wrangler login
    npx wrangler deploy
    ```
 
-3. Wrangler prints a URL such as `https://snowball-chat.<your-account>.workers.dev`.
-4. Put that URL in the launcher's `app-config.json` as `chatUrl`, and your UUID as `adminUuid`, then
-   build the launcher. Until a URL is set, the launcher simply hides the chat.
+2. Set the Minecraft UUID (without dashes) of your own owner account as a Worker secret:
 
-## Snowball+ from the store
+   ```bash
+   npx wrangler secret put ADMIN_UUID
+   ```
 
-The website's store page (`website/store.html`) looks up the Minecraft name the player types and
-sends them to a Stripe Payment Link with `client_reference_id` set to `<account id>_<name>`. Stripe
-then calls `POST /store/stripe`, signed with the endpoint's secret, and the room gives that account
-Snowball+ while the monthly subscription is paid for. It takes back only the Snowball+ the store
-gave; a rank staff handed out stays. The rank history shows these as given by "Store".
+   The command prompts for the value. Do not commit the UUID to Git. The new secret takes effect on the Worker deployment.
 
-1. In Stripe, under **Developers > Webhooks**, add an endpoint for
-   `https://snowball-chat.snowball-mc.workers.dev/store/stripe` with the events
-   `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
-   `customer.subscription.updated` and `customer.subscription.deleted`.
-2. `npx wrangler secret put STRIPE_WEBHOOK_SECRET` and paste that endpoint's signing secret
-   (`whsec_...`).
+3. Wrangler prints a URL similar to `https://lucid-chat.<your-account>.workers.dev`. Set that URL as `lucidApiUrl` in `launcher/app-config.json`, then build the launcher. Leave it empty to keep backend-dependent features disabled. The launcher also no longer ships an admin UUID; the Worker is the authority for owner permissions.
 
-Until the secret is set, `/store/stripe` answers 503 and gives nobody anything. Refunds and disputes
-are not followed on their own: cancel the subscription in Stripe when you refund one, and the
-cancellation takes Snowball+ back.
+The endpoint uses Cloudflare Durable Objects and may incur charges under Cloudflare's current plan and usage rules. Review those terms and the data your Worker stores before inviting players.
 
-## Checking it
+## Optional Stripe integration
 
-`GET /` answers `Snowball chat is up.` and `GET /nonce` returns a fresh id, so you can tell the
-worker is live before shipping a launcher that points at it.
+The Worker contains an optional webhook handler for LUCID+ subscriptions. It is not connected to any Snowball account, product, checkout page or webhook by default. Do not enable it until you have configured your own Stripe product, checkout flow, webhook URL and `STRIPE_WEBHOOK_SECRET` in your own Cloudflare account.
+
+## Tests
+
+```bash
+node --test test/
+```

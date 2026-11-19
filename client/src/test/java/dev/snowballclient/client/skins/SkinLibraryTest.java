@@ -34,7 +34,7 @@ class SkinLibraryTest {
 
 	@AfterEach
 	void clearProperty() {
-		System.clearProperty("snowball.skinsDir");
+		System.clearProperty("lucid.skinsDir");
 	}
 
 	private SkinLibrary library() {
@@ -336,11 +336,11 @@ class SkinLibraryTest {
 		Path config = dir.resolve("config");
 		assertEquals(config.resolve("skins"), SkinLibrary.folder(config));
 		Path launcher = dir.resolve("launcher").resolve("skins").toAbsolutePath();
-		System.setProperty("snowball.skinsDir", launcher.toString());
+		System.setProperty("lucid.skinsDir", launcher.toString());
 		assertEquals(launcher, SkinLibrary.folder(config));
-		System.setProperty("snowball.skinsDir", "relative/skins");
+		System.setProperty("lucid.skinsDir", "relative/skins");
 		assertEquals(config.resolve("skins"), SkinLibrary.folder(config), "only an absolute path is trusted");
-		System.setProperty("snowball.skinsDir", "  ");
+		System.setProperty("lucid.skinsDir", "  ");
 		assertEquals(config.resolve("skins"), SkinLibrary.folder(config));
 	}
 

@@ -35,8 +35,8 @@ function clientBuildDirs(): string[] {
   return app.isPackaged ? [join(process.resourcesPath, 'client')] : [join(app.getAppPath(), '..', 'client', 'build', 'libs', 'launcher')];
 }
 
-/** Build-time configuration shipped inside the app (e.g. the Azure client ID for Microsoft sign-in). */
-function appConfig(): { microsoftClientId?: unknown; chatUrl?: unknown; adminUuid?: unknown; discordAppId?: unknown } {
+/** Optional, user-owned app registrations and self-hosted LUCID API endpoint; no upstream defaults. */
+function appConfig(): { microsoftClientId?: unknown; lucidApiUrl?: unknown; discordAppId?: unknown } {
   try {
     return JSON.parse(readFileSync(join(app.getAppPath(), 'app-config.json'), 'utf8')) as Record<string, unknown>;
   } catch {
@@ -65,7 +65,7 @@ async function createWindow(): Promise<void> {
     launcherVersion: app.getVersion(),
     defaultMicrosoftClientId: microsoftClientIdFromConfig(),
     discordAppId: typeof appConfig().discordAppId === "string" ? String(appConfig().discordAppId) : "",
-    chatUrl: typeof appConfig().chatUrl === "string" ? String(appConfig().chatUrl).trim() : "",
+    lucidApiUrl: typeof appConfig().lucidApiUrl === "string" ? String(appConfig().lucidApiUrl).trim() : "",
     skinDecoder,
   });
   mark('launcherReady');
@@ -95,7 +95,7 @@ async function createWindow(): Promise<void> {
     if (!win.isDestroyed()) win.webContents.send('evt:update', state);
   });
   const config = appConfig();
-  const chat = new ChatClient(typeof config.chatUrl === 'string' ? config.chatUrl.trim() : '', typeof config.adminUuid === 'string' ? config.adminUuid.trim() : '');
+  const chat = new ChatClient(typeof config.lucidApiUrl === 'string' ? config.lucidApiUrl.trim() : '');
   // No menu bar on Windows and Linux. macOS always has one, and without its app and Edit menus
   // Cmd+Q, Cmd+C and Cmd+V do nothing, not even in the launcher's text boxes.
   Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, { role: 'windowMenu' }]) : null);

@@ -40,7 +40,7 @@ export async function loadAutoUpdater(
 const HANDOVER = 'pending-update.json';
 
 /** Where a build that cannot replace itself sends people for the new version. */
-export const DOWNLOAD_PAGE = 'https://met4a.github.io/snowball-website/';
+export const DOWNLOAD_PAGE = 'https://github.com/NUMZSY/LUCID/releases';
 
 /** A failure as the window shows it: when Retry cannot help, the website is offered instead. */
 function shown(described: ReturnType<typeof describeUpdateFailure>): Partial<UpdateState> {

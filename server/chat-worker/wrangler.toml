@@ -1,11 +1,9 @@
-name = "snowball-chat"
+name = "lucid-chat"
 main = "src/worker.js"
 compatibility_date = "2026-09-01"
 
-# The account that may post announcements and moderate, as a Minecraft UUID without dashes.
-[vars]
-ADMIN_UUID = "85c4ac3a0c284c20be4bee8a346ba51e"  # Met4a, the Snowball owner account
-# Snowball+ sales come from Stripe. Its webhook secret is not kept here:
+# Set your own Minecraft owner UUID with: npx wrangler secret put ADMIN_UUID
+# Optional Stripe webhook support requires your own secret:
 #   npx wrangler secret put STRIPE_WEBHOOK_SECRET
 
 [[durable_objects.bindings]]

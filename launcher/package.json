@@ -1,7 +1,7 @@
 {
   "name": "lucid-launcher",
   "productName": "LUCID Launcher",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Instance-based Minecraft launcher for LUCID",
   "license": "MIT",
   "main": "dist/main/main.js",
