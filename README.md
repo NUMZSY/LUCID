@@ -1,4 +1,8 @@
-# Snowball Client
+# LUCID
+
+LUCID is a derivative version of [Snowball Client](https://github.com/met4a/snowball-client), an
+open-source Minecraft client and launcher. This repository retains the upstream source and its MIT
+license; see `LICENSE` for the original copyright and license terms.
 
 A Minecraft client and launcher: an instance-based launcher (in the spirit of Prism Launcher) and a
 Fabric client mod with a radial control menu, HUD and quality-of-life modules (in the spirit of
