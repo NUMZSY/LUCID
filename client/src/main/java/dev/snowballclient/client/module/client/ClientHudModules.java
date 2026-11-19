@@ -104,4 +104,20 @@ public final class ClientHudModules {
 			return LocalTime.now().format("24h".equals(format.get()) ? H24 : H12);
 		}
 	}
+
+	public static final class Saturation extends TextHudModule {
+		private final BooleanSetting showFood = setting(new BooleanSetting("show_food", "Show food", "Include the food bar value", true));
+
+		public Saturation() {
+			super("saturation", "Saturation", "Shows food and hidden saturation", ModuleCategory.QOL, 0.0, 0.35);
+		}
+
+		@Override
+		protected String computeText(Minecraft mc) {
+			var food = mc.player.getFoodData();
+			return showFood.isOn()
+					? String.format(Locale.ROOT, "Food %d  Sat %.1f", food.getFoodLevel(), food.getSaturationLevel())
+					: String.format(Locale.ROOT, "Sat %.1f", food.getSaturationLevel());
+		}
+	}
 }

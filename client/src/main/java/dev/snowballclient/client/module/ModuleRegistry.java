@@ -41,6 +41,7 @@ import dev.snowballclient.client.module.qol.Keystrokes;
 import dev.snowballclient.client.module.qol.Snaplook;
 import dev.snowballclient.client.module.qol.ThirdPersonCamera;
 import dev.snowballclient.client.module.qol.ToggleSprint;
+import dev.snowballclient.client.module.qol.ToggleSneak;
 import dev.snowballclient.client.module.qol.Waypoints;
 import dev.snowballclient.client.module.qol.Zoom;
 import dev.snowballclient.client.module.render.ArmorHud;
@@ -58,6 +59,7 @@ import dev.snowballclient.client.module.render.WeatherEffects;
 import dev.snowballclient.client.module.storage.ContainerPreview;
 import dev.snowballclient.client.module.storage.ContainerSearch;
 import dev.snowballclient.client.module.storage.ItemCounter;
+import dev.snowballclient.client.module.storage.ItemTracker;
 import dev.snowballclient.client.module.storage.MapArtViewer;
 import dev.snowballclient.client.module.storage.PackModules;
 import dev.snowballclient.client.module.storage.StorageScreens;
@@ -201,6 +203,7 @@ public final class ModuleRegistry {
 		// QOL
 		m.register(new Keystrokes());
 		m.register(new ToggleSprint());
+		m.register(new ToggleSneak());
 		FREELOOK = m.register(new Freelook());
 		WAYPOINTS = m.register(new Waypoints(waypoints));
 		ZOOM = m.register(new Zoom());
@@ -219,6 +222,8 @@ public final class ModuleRegistry {
 		CONTAINER_PREVIEW = m.register(new ContainerPreview());
 		CONTAINER_SEARCH = m.register(new ContainerSearch());
 		m.register(new ItemCounter());
+		m.register(new ItemTracker());
+		m.register(new ClientHudModules.Saturation());
 		MAP_ART = m.register(new MapArtViewer());
 
 		m.order(ModuleCategory.CLIENT, "client_hud", "presets", "hud_layout", "interface", "cosmetics", "skins", "menu_3d", "watermark", "fps_counter", "ping_display", "coordinates",
@@ -226,11 +231,11 @@ public final class ModuleRegistry {
 		m.order(ModuleCategory.RENDER, "fps_boost", "fov_settings", "potion_hud", "block_outline", "no_hurt_shake", "low_fire", "third_person",
 				"time_changer", "custom_sky", "weather_effects");
 		m.order(ModuleCategory.PVP, "crosshair", "armor_hud", "cps_counter", "combo_counter", "reach_display", "target_info");
-		m.order(ModuleCategory.MOVEMENT, "toggle_sprint", "speed_display");
+		m.order(ModuleCategory.MOVEMENT, "toggle_sprint", "toggle_sneak", "speed_display");
 		m.order(ModuleCategory.VISUALS, "glass_gui", "menu_3d", "fullbright", "zoom", "freelook", "snaplook", "hit_color", "crystal_glow");
 		m.order(ModuleCategory.WORLD, "waypoints", "render_distance", "entity_distance");
 		m.order(ModuleCategory.MISC, "chat_settings", "emotes", "nick_hider", "spotify", "lyrics", "discord_presence", "screenshot_utility", "notifications", "clock", "server_info", "session_timer");
-		m.order(ModuleCategory.QOL, "keystrokes", "ez_pots", "item_counter");
+		m.order(ModuleCategory.QOL, "keystrokes", "ez_pots", "item_counter", "item_tracker", "saturation");
 	}
 
 	private static <M extends Module> M advanced(M module) {
