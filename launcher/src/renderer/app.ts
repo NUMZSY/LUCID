@@ -1477,6 +1477,26 @@
       }
       b.paint();
     };
+    const loadPackInstalled = async () => {
+      const ids = await api.installedModProjects(inst.id).catch(() => null);
+      if (ids && b.instanceId === inst.id) {
+        b.installed = new Set(ids);
+        b.paint();
+      }
+    };
+    const installContained = async (mod: Snowball.ModSearchHit) => {
+      const key = `${inst.id}:${mod.projectId}`;
+      b.installing.add(key);
+      b.paint();
+      const result = await guard(() => api.installMod(inst.id, mod.projectId));
+      b.installing.delete(key);
+      if (result) {
+        const extra = result.installed.filter((name) => name !== mod.title);
+        toast(extra.length ? `Installed ${mod.title} and ${extra.length} required dependenc${extra.length === 1 ? 'y' : 'ies'}.` : `Installed ${mod.title}`);
+        b.installed.add(mod.projectId);
+      }
+      b.paint();
+    };
     const modpackRow = (pack: Snowball.ModpackSearchHit): HTMLElement => {
       const placeholder = h('div', { class: 'mod-icon placeholder' }, pack.title.slice(0, 1).toUpperCase());
       let iconEl: HTMLElement = placeholder;
@@ -1492,26 +1512,33 @@
         h('div', { class: 'mod-side' }, h('div', { class: 'muted' }, `${fmtCount(pack.downloads)} downloads`),
           h('button', { class: 'btn small primary', onClick: () => void viewMods(pack) }, b.packSelected === pack.projectId ? 'Viewing mods' : 'View mods')));
     };
-    const containedRow = (mod: Snowball.ModSearchHit): HTMLElement => h('div', { class: 'mod-row' },
-      h('div', { class: 'mod-icon placeholder' }, mod.title.slice(0, 1).toUpperCase()),
-      h('div', { class: 'grow' }, h('div', { class: 'mod-title' }, mod.title), h('div', { class: 'muted mod-desc' }, mod.description),
-        h('div', { class: 'row mod-meta' }, ...mod.loaders.map((l) => h('span', { class: 'tag' }, MOD_LOADERS.find(([id]) => id === l)?.[1] ?? l)))),
-      h('div', { class: 'mod-side' }, h('div', { class: 'muted' }, `${fmtCount(mod.downloads)} downloads`)));
+    const containedRow = (mod: Snowball.ModSearchHit): HTMLElement => {
+      const key = `${inst.id}:${mod.projectId}`;
+      const installed = b.installed.has(mod.projectId);
+      const installing = b.installing.has(key);
+      return h('div', { class: 'mod-row' },
+        h('div', { class: 'mod-icon placeholder' }, mod.title.slice(0, 1).toUpperCase()),
+        h('div', { class: 'grow' }, h('div', { class: 'mod-title' }, mod.title), h('div', { class: 'muted mod-desc' }, mod.description),
+          h('div', { class: 'row mod-meta' }, ...mod.loaders.map((l) => h('span', { class: 'tag' }, MOD_LOADERS.find(([id]) => id === l)?.[1] ?? l)))),
+        h('div', { class: 'mod-side' }, h('div', { class: 'muted' }, `${fmtCount(mod.downloads)} downloads`),
+          h('button', { class: `btn small${installed ? '' : ' primary'}`, disabled: installed || installing || engaged(inst), onClick: () => void installContained(mod) }, installed ? 'Installed' : installing ? 'Installing...' : 'Install')));
+    };
     const paint = () => {
       if (b.packError) { results.replaceChildren(h('div', { class: 'issue' }, `Could not load modpacks from Modrinth: ${b.packError}`, h('button', { class: 'btn small', onClick: () => void runPackSearch(false) }, 'Retry'))); footer.replaceChildren(); return; }
       const selected = b.packSelected ? b.packHits.find((p) => p.projectId === b.packSelected) : null;
       if (selected) {
         const mods = b.packMods.get(selected.projectId) ?? [];
-        results.replaceChildren(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { class: 'section-title' }, `${selected.title} — contained mods`), h('div', { class: 'spacer' }), h('button', { class: 'btn small ghost', onClick: () => { b.packSelected = null; paint(); } }, 'Back to packs')), h('p', { class: 'muted' }, 'Read-only view. LUCID will not install this modpack or any of its mods.'), b.packLoading ? h('div', { class: 'muted' }, 'Loading contained mods...') : mods.length ? h('div', { class: 'list' }, ...mods.map(containedRow)) : h('div', { class: 'muted' }, 'No compatible mods were listed for this version.'))); footer.replaceChildren(); return;
+        results.replaceChildren(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { class: 'section-title' }, `${selected.title} — contained mods`), h('div', { class: 'spacer' }), h('button', { class: 'btn small ghost', onClick: () => { b.packSelected = null; paint(); } }, 'Back to packs')), h('p', { class: 'muted' }, 'Install individual mods from this pack. Required dependencies are added automatically; the complete modpack is never installed as one action.'), b.packLoading ? h('div', { class: 'muted' }, 'Loading contained mods...') : mods.length ? h('div', { class: 'list' }, ...mods.map(containedRow)) : h('div', { class: 'muted' }, 'No compatible mods were listed for this version.'))); footer.replaceChildren(); return;
       }
       if (!b.packHits.length) { results.replaceChildren(h('div', { class: 'muted' }, b.packLoading || !b.packSearched ? 'Searching...' : 'No modpacks match these filters.')); footer.replaceChildren(); return; }
       results.replaceChildren(...b.packHits.map(modpackRow));
       footer.replaceChildren(h('div', { class: 'row' }, h('span', { class: 'muted' }, `Showing ${b.packHits.length} of ${fmtCount(b.packTotal)}`), h('div', { class: 'spacer' }), b.packHits.length < b.packTotal ? h('button', { class: 'btn', disabled: b.packLoading, onClick: () => void runPackSearch(true) }, b.packLoading ? 'Loading...' : 'Load more') : null));
     };
     b.paint = paint;
+    void loadPackInstalled();
     if (!b.packSearched && !b.packLoading) void runPackSearch(false); else paint();
     return h('div', { class: 'stack' },
-      header('MODPACKS', `Browse-only modpack search for ${inst.minecraftVersion} ${inst.loaderName}`, h('button', { class: 'btn ghost', onClick: () => { b.mode = 'mods'; b.packSelected = null; render(); } }, 'Browse mods')),
+      header('MODPACKS', `Browse and install individual mods for ${inst.minecraftVersion} ${inst.loaderName}`, h('button', { class: 'btn ghost', onClick: () => { ui.view = 'mods'; render(); } }, 'Manage installed mods'), h('button', { class: 'btn ghost', onClick: () => { b.mode = 'mods'; b.packSelected = null; render(); } }, 'Browse mods')),
       h('div', { class: 'browse-toolbar' }, search, loaderSelect, versionSelect), h('div', { class: 'card' }, results, footer));
   }
 
