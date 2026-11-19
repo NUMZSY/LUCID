@@ -175,7 +175,7 @@ export class UpdateService {
       status: 'error',
       version: now,
       title: 'The update did not finish',
-      message: `Snowball tried to update to ${pending?.expecting ?? 'a new version'} but is still running ${now}. Nothing is broken — the update simply did not get applied.`,
+      message: `LUCID tried to update to ${pending?.expecting ?? 'a new version'} but is still running ${now}. Nothing is broken — the update simply did not get applied.`,
       hints: ['Press Retry to download and apply it again.', 'If Windows asked for permission and it was dismissed, allow it this time.'],
       detail: `expected=${pending?.expecting ?? '?'} running=${now}`,
       canRetry: true,
@@ -223,8 +223,8 @@ export class UpdateService {
           newVersion: found,
           downloadUrl: DOWNLOAD_PAGE,
           message: this.isMac()
-            ? `Snowball ${found} is out. On a Mac, download it from the website and drag it into Applications to replace this copy.`
-            : `Snowball ${found} is out. The portable build cannot replace itself, so download the new file when you are ready.`,
+            ? `LUCID ${found} is out. On a Mac, download it from the website and drag it into Applications to replace this copy.`
+            : `LUCID ${found} is out. The portable build cannot replace itself, so download the new file when you are ready.`,
         });
       }
       // From here electron-updater's own events drive the state: downloading -> verifying -> ready.
@@ -269,7 +269,7 @@ export class UpdateService {
   diagnostics(): string {
     const s = this.state;
     return [
-      `Snowball Client launcher ${app.getVersion()}`,
+      `LUCID launcher ${app.getVersion()}`,
       `Platform: ${process.platform} ${process.arch}, Electron ${process.versions.electron}`,
       `Packaged: ${app.isPackaged}${this.isPortable() ? ' (portable)' : ''}`,
       `Update status: ${s.status}${s.newVersion ? ` -> ${s.newVersion}` : ''}`,
@@ -334,7 +334,7 @@ export class UpdateService {
           version: app.getVersion(),
           title: 'That update was rejected',
           message: 'The downloaded package was not a newer version of Snowball, so it was not installed. Your launcher is unchanged.',
-          hints: ['Try again later.', 'If it keeps happening, download Snowball from the website.'],
+          hints: ['Try again later.', 'If it keeps happening, download LUCID from the website.'],
           detail: `downloaded=${info.version} running=${app.getVersion()}`,
           canRetry: true,
         });

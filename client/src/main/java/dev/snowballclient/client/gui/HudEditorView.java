@@ -205,7 +205,7 @@ public final class HudEditorView extends View {
 		}
 		String hint;
 		if (elements.isEmpty()) {
-			hint = "No HUD elements are switched on yet - turn some on in the Snowball menu";
+			hint = "No HUD elements are switched on yet - turn some on in the LUCID menu";
 		} else if (selected == null) {
 			hint = "Click a HUD element to pick it up  ·  G grid  ·  S snap";
 		} else {

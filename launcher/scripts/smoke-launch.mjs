@@ -37,7 +37,7 @@ Object.defineProperty(launcher, 'auth', {
 const instance = await launcher.createInstance({ name: `Smoke ${minecraftVersion}`, minecraftVersion, loader });
 console.log(`[smoke] ${process.platform}/${process.arch}: Minecraft ${minecraftVersion} (${loader}), instance ${instance.id}, data in ${root}`);
 const support = launcher.snowballSupport(minecraftVersion, loader);
-console.log(`[smoke] Snowball Client for this version: ${support.supported ? support.version : 'not available'}`);
+console.log(`[smoke] LUCID for this version: ${support.supported ? support.version : 'not available'}`);
 
 const tail = [];
 launcher.processes.on('log', (entry) => {

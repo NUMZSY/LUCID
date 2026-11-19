@@ -27,7 +27,7 @@ export interface ModInfo {
   depends?: string[];
   /** Mod ids this jar makes available: its own, declared "provides" and bundled jar-in-jar mods. */
   provides?: string[];
-  /** Set for the Fabric API a Snowball instance needs ("required"); it can be updated but not removed or turned off. */
+  /** Set for the Fabric API a LUCID instance needs ("required"); it can be updated but not removed or turned off. */
   protection?: Protection;
   error?: string;
 }
@@ -225,7 +225,7 @@ export class ModManager {
     if (extname(sourcePath).toLowerCase() !== '.jar') throw new Error('Only .jar mod files can be installed.');
     const meta = await readModMetadata(sourcePath);
     if (meta.error && meta.loader === 'unknown' && meta.error.startsWith('Not a valid jar')) throw new Error(meta.error);
-    if (meta.id === SNOWBALL_MOD_ID) throw new ProtectedModError("Snowball Client is built into the launcher and loaded automatically, so it can't be added as a mod file.");
+    if (meta.id === SNOWBALL_MOD_ID) throw new ProtectedModError("LUCID is built into the launcher and loaded automatically, so it can't be added as a mod file.");
     const fileName = sanitizeFileName(basename(sourcePath, '.jar'), 'mod') + '.jar';
     const dir = this.modsDir(gameDir);
     await mkdir(dir, { recursive: true });
@@ -322,7 +322,7 @@ export class ModManager {
   }
 
   /**
-   * Applies the in-game client's mod-requests.json (mods the player toggled in the Snowball menu).
+   * Applies the in-game client's mod-requests.json (mods the player toggled in the LUCID menu).
    * Every mod whose id is listed is disabled; listed-then-unlisted mods are re-enabled.
    */
   async applyClientRequests(gameDir: string): Promise<{ changed: string[]; performanceProfile: string | null }> {

@@ -7,7 +7,7 @@ import dev.snowballclient.client.gui.ScreenshotsView;
 import dev.snowballclient.client.module.ModuleCategory;
 import dev.snowballclient.client.ui.Host;
 
-/** STORAGE entries that open Snowball management screens. */
+/** STORAGE entries that open LUCID management screens. */
 public final class StorageScreens {
 	private StorageScreens() {
 	}

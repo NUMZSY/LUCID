@@ -44,6 +44,6 @@ public final class PerformanceAdvisor extends Module {
 	}
 
 	private static net.minecraft.network.chat.MutableComponent prefix() {
-		return Component.literal("[Snowball] ").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD).append(Component.literal("").withStyle(ChatFormatting.RESET));
+		return Component.literal("[LUCID] ").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD).append(Component.literal("").withStyle(ChatFormatting.RESET));
 	}
 }

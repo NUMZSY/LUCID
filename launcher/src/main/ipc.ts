@@ -406,7 +406,7 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
   handle('core:status', async (id: unknown) => launcher.inspectCore(await instanceId(id)));
   handle('core:repair', async (id: unknown) => {
     const iid = await instanceId(id);
-    if (launcher.processes.isRunning(iid) || launcher.launchPhase(iid)) throw new Error('Stop the game before repairing Snowball Client.');
+    if (launcher.processes.isRunning(iid) || launcher.launchPhase(iid)) throw new Error('Stop the game before repairing LUCID.');
     return launcher.repairCore(iid);
   });
   handle('game:verify-files', async (id: unknown) => {

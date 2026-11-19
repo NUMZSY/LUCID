@@ -180,7 +180,7 @@ public final class CrashView extends View {
 		c.push();
 		c.translate(x + PAD, y + PAD);
 		c.scale(1.5f, 1.5f);
-		c.drawText("Snowball caught a crash", 0, 0, TEXT, false);
+		c.drawText("LUCID caught a crash", 0, 0, TEXT, false);
 		c.pop();
 		c.fill(x + PAD, y + PAD + 17, x + PAD + 28, y + PAD + 18, ACCENT);
 

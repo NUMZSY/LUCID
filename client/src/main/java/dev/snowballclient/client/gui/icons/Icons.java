@@ -43,7 +43,7 @@ public final class Icons {
 	private Icons() {
 	}
 
-	/** Set by every Snowball screen as it opens. */
+	/** Set by every LUCID screen as it opens. */
 	public static void use(Textures source) {
 		if (source != textures) {
 			KEPT.clear();
@@ -52,7 +52,7 @@ public final class Icons {
 		textures = source;
 	}
 
-	/** Called as each frame of a Snowball screen begins: icons let go of in earlier frames are released now. */
+	/** Called as each frame of a LUCID screen begins: icons let go of in earlier frames are released now. */
 	public static void frameStarted() {
 		frame++;
 		if (RETIRED.isEmpty()) return;

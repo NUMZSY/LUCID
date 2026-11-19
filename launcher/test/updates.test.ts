@@ -46,7 +46,7 @@ describe('describeUpdateFailure', () => {
     ['timeout', 'connect ETIMEDOUT 140.82.121.4:443', 'The connection dropped'],
     ['reset', 'read ECONNRESET', 'The connection dropped'],
     ['corrupt download', 'sha512 checksum mismatch, expected abc got def', 'The download was damaged'],
-    ['permissions', 'EPERM: operation not permitted, rename', "Snowball couldn't write the update"],
+    ['permissions', 'EPERM: operation not permitted, rename', "LUCID couldn't write the update"],
     ['disk full', 'ENOSPC: no space left on device', 'Not enough disk space'],
     ['no release', 'Cannot find latest.yml in the latest release', 'No update was published'],
     ['rate limited', 'HTTP 429 rate limit exceeded', 'The update server is busy'],
@@ -87,13 +87,13 @@ describe('describeUpdateFailure', () => {
 
 describe('update signatures', () => {
   // What electron-updater said to every 1.7.0 - 1.8.1 launcher offered 1.8.1.
-  const refusal = 'New version 1.8.1 is not signed by the application owner: publisherNames: Snowball Client, raw info: {"SignerCertificate":null,"Status":2}';
+  const refusal = 'New version 1.8.1 is not signed by the application owner: publisherNames: LUCID, raw info: {"SignerCertificate":null,"Status":2}';
 
   it('lets an unsigned copy take an unsigned update, without asking Windows about the file', async () => {
     let asked = 0;
     const verify = async () => (asked++, refusal);
     const check = requireSignatureWhenSigned(verify, async () => false);
-    expect(await check(['Snowball Client'], 'C:/update/setup.exe')).toBeNull();
+    expect(await check(['LUCID'], 'C:/update/setup.exe')).toBeNull();
     expect(asked).toBe(0);
   });
 
@@ -101,8 +101,8 @@ describe('update signatures', () => {
     const seen: string[] = [];
     const verify = async (_names: string[], file: string) => (seen.push(file), file.includes('unsigned') ? refusal : null);
     const check = requireSignatureWhenSigned(verify, async () => true);
-    expect(await check(['Snowball Client'], 'C:/update/unsigned-setup.exe')).toBe(refusal);
-    expect(await check(['Snowball Client'], 'C:/update/signed-setup.exe')).toBeNull();
+    expect(await check(['LUCID'], 'C:/update/unsigned-setup.exe')).toBe(refusal);
+    expect(await check(['LUCID'], 'C:/update/signed-setup.exe')).toBeNull();
     expect(seen).toEqual(['C:/update/unsigned-setup.exe', 'C:/update/signed-setup.exe']);
   });
 

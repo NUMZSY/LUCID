@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Shows what you are doing on Discord. You pick the line about you; where you are playing is read
- * from the game itself, so a Snowball presence never claims a server you are not actually on.
+ * from the game itself, so a LUCID presence never claims a server you are not actually on.
  *
  * Anyone can read a Discord profile, so nothing private goes there: no account, no file path, no IP
  * address and no home-network or dynamic-DNS server name. A server is named only when you turn that
@@ -41,7 +41,7 @@ public final class DiscordPresenceModule extends Module {
 	private int countdown;
 
 	public DiscordPresenceModule(String minecraftVersion) {
-		super("discord_presence", "Discord presence", "Tell Discord you are on Snowball Client", ModuleCategory.MISC, false);
+		super("discord_presence", "Discord presence", "Tell Discord you are on LUCID", ModuleCategory.MISC, false);
 		this.minecraftVersion = minecraftVersion;
 	}
 
@@ -67,11 +67,11 @@ public final class DiscordPresenceModule extends Module {
 		SnowballClient client = SnowballClient.get();
 		String version = client != null ? client.version() : "";
 		discord.set(new Presence(
-				activity.get() + " with Snowball Client",
+				activity.get() + " with LUCID",
 				where(mc, showServer.isOn()),
 				showTime.isOn() ? startSeconds : 0,
 				"snowball",
-				showVersion.isOn() ? "Snowball Client " + version + " on Minecraft " + minecraftVersion : "Snowball Client"));
+				showVersion.isOn() ? "LUCID " + version + " on Minecraft " + minecraftVersion : "LUCID"));
 	}
 
 	/** Where the player is, read from the game, naming a server only when it is public and allowed. */

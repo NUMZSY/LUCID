@@ -104,7 +104,7 @@ export async function scanJar(path: string, trusted: ReadonlySet<string> = new S
     sha1 = sha1Hint ?? (await sha1File(path));
     if (trusted.has(sha1)) {
       // A file the launcher put there itself and verified: it is what it says it is.
-      return { fileName, sha1, sizeBytes, verdict: 'known', score: 0, findings: [], modId: 'snowballclient', scannedAt, known: { source: 'Snowball', project: 'Snowball Client', version: '' } };
+      return { fileName, sha1, sizeBytes, verdict: 'known', score: 0, findings: [], modId: 'snowballclient', scannedAt, known: { source: 'Snowball', project: 'LUCID', version: '' } };
     }
     const release = known.get(sha1);
     if (release) return { fileName, sha1, sizeBytes, verdict: 'known', score: 0, findings: [], modId: null, scannedAt, known: release };

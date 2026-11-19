@@ -102,17 +102,17 @@ describe('Discord Rich Presence', () => {
     const fake = await discord(path);
     const client = rpc(path);
     client.start();
-    client.setPresence({ details: 'Using Snowball Launcher', state: 'Browsing instances' });
+    client.setPresence({ details: 'Using LUCID Launcher', state: 'Browsing instances' });
     await until(() => fake.activities.length === 1);
     expect(client.status).toBe('connected');
-    expect(fake.activities[0]).toMatchObject({ details: 'Using Snowball Launcher', state: 'Browsing instances' });
+    expect(fake.activities[0]).toMatchObject({ details: 'Using LUCID Launcher', state: 'Browsing instances' });
   });
 
   it('waits quietly while Discord is closed and connects when it opens', async () => {
     const path = pipe();
     const client = rpc(path);
     client.start();
-    client.setPresence({ details: 'Using Snowball Launcher' });
+    client.setPresence({ details: 'Using LUCID Launcher' });
     await until(() => client.status === 'unavailable');
     const fake = await discord(path);
     await until(() => fake.activities.length === 1);
@@ -139,16 +139,16 @@ describe('Discord Rich Presence', () => {
     const fake = await discord(path);
     const client = rpc(path);
     client.start();
-    client.setPresence({ details: 'Using Snowball Launcher' });
+    client.setPresence({ details: 'Using LUCID Launcher' });
     await until(() => fake.activities.length === 1);
-    client.setPresence({ details: 'Using Snowball Launcher' });
+    client.setPresence({ details: 'Using LUCID Launcher' });
     // Three changes in a burst: the last one is what is shown, once, after the wait.
     client.setPresence({ details: 'Preparing Minecraft' });
     client.setPresence({ details: 'Launching Minecraft' });
     client.setPresence({ details: 'Playing Minecraft' });
     await until(() => fake.activities.length === 2);
     await new Promise((r) => setTimeout(r, 250));
-    expect(fake.activities.map((a) => a?.details)).toEqual(['Using Snowball Launcher', 'Playing Minecraft']);
+    expect(fake.activities.map((a) => a?.details)).toEqual(['Using LUCID Launcher', 'Playing Minecraft']);
   });
 
   it('stops trying when Discord rejects the application id', async () => {
@@ -166,7 +166,7 @@ describe('Discord Rich Presence', () => {
     const fake = await discord(path);
     const client = rpc(path);
     client.start();
-    client.setPresence({ details: 'Using Snowball Launcher' });
+    client.setPresence({ details: 'Using LUCID Launcher' });
     await until(() => fake.activities.length === 1);
     await client.stop();
     await until(() => fake.activities.length === 2);

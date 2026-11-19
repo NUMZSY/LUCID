@@ -4,44 +4,59 @@ LUCID is a derivative version of [Snowball Client](https://github.com/met4a/snow
 open-source Minecraft client and launcher. This repository retains the upstream source and its MIT
 license; see `LICENSE` for the original copyright and license terms.
 
+The launcher and in-game UI are branded LUCID, but the inherited chat/ranks/bug-report integration
+still uses the upstream Snowball service configured in `launcher/app-config.json`. Replace that
+endpoint with a compatible LUCID service before distributing a build that should use separate
+accounts or data.
+
 A Minecraft client and launcher: an instance-based launcher (in the spirit of Prism Launcher) and a
 Fabric client mod with a radial control menu, HUD and quality-of-life modules (in the spirit of
 Lunar Client).
 
-Snowball Client is a legitimate client-side customisation, accessibility and performance project.
+LUCID is a legitimate client-side customisation, accessibility and performance project.
 It contains no ESP, X-ray, combat automation, reach, aim assistance, player tracking or anti-cheat
 bypasses.
 
 ```
 snowball-client/
-├── client/        Snowball Client (Fabric; one source tree built for Minecraft 26.2 and 1.21.11
+├── client/        LUCID (Fabric; one source tree built for Minecraft 26.2 and 1.21.11
 │                  with Stonecutter, and client/legacy for Minecraft 1.8.9 on Legacy Fabric,
 │                  sharing the same menus and settings). client/tools publishes the rank badges.
-├── launcher/      Electron + TypeScript launcher (builds the Windows .exe)
+├── launcher/      Electron + TypeScript launcher (Windows, macOS and Linux packaging)
 ├── server/        Cloudflare Worker behind global chat, ranks and bug reports
 ├── website/       The public site, published with GitHub Pages
 ├── store/         Microsoft Store listing copy
 ├── CHANGELOG.md   What changed in each release, written for players
 ├── SECURITY.md    Reporting a security problem, and how updates are trusted
-├── Snowball.png   Source artwork for the logo
+├── brand/         LUCID app icon artwork
 └── README.md
 ```
 
 ## Quick start (what you run)
 
-The thing you run is the launcher `.exe`. The client mod is a `.jar` because Fabric can only load
-Java mods; the launcher bundles that jar and installs it into instances for you.
+Run the LUCID launcher for your operating system. The client mod is a `.jar` because Fabric can only
+load Java mods; the launcher bundles that jar and installs it into instances for you.
 
 ```bash
 cd launcher
 npm install
-npm run dist
+npm run dist             # Windows installer/portable packages
+npm run dist:linux       # Linux AppImage and Debian packages (x64)
 ```
 
 Output (Windows):
 
-- `launcher/release/SnowballClient-<version>-setup.exe` - installer
-- `launcher/release/SnowballClient-<version>-portable.exe` - single-file portable build
+- `launcher/release/LUCID-<version>-setup.exe` - installer
+- `launcher/release/LUCID-<version>-portable.exe` - single-file portable build
+
+Output (Linux x64):
+
+- `launcher/release/LUCID-<version>-linux-x86_64.AppImage` - portable AppImage
+- `launcher/release/LUCID-<version>-linux-amd64.deb` - Debian/Ubuntu package
+
+The headless Linux CI artifact is a preview: it compiles the client but skips its actual Minecraft
+startup/gameplay test. Run `npm run dist:linux` on a desktop with a working display to include that
+test before treating a build as release-ready.
 
 Then `npm run verify:signature`, which prints the Authenticode status of everything in
 `release/` and refuses anything signed badly or by an unexpected publisher. Snowball has no
@@ -77,7 +92,7 @@ mouse is re-captured on close and that `modules.json` persisted the change.
 
 ### Using the client
 
-- **Right Shift** opens the radial menu (rebind it in Controls under *Snowball Client*).
+- **Right Shift** opens the radial menu (rebind it in Controls under *LUCID*).
 - Click a segment (or use Left/Right/Tab) to pick a category; the panel on the right lists its modules.
 - Every row shows the module name and a short description. Start typing to search all modules;
   Esc clears the search.

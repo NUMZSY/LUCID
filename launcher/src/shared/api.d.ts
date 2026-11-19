@@ -22,7 +22,7 @@ declare namespace Snowball {
     jvmArgs: string;
     gameArgs: string;
     window: { width: number; height: number; fullscreen: boolean };
-    /** Snowball Client build for this instance's version and loader; supported is false when none exists yet. */
+    /** LUCID build for this instance's version and loader; supported is false when none exists yet. */
     snowball: { supported: boolean; version: string | null };
     performanceProfile: PerformanceProfileId;
     created: string;
@@ -63,7 +63,7 @@ declare namespace Snowball {
     loader: string;
     size: number;
     managed: boolean;
-    /** The Fabric API a Snowball instance needs ("required") can be updated but not removed or turned off. */
+    /** The Fabric API a LUCID instance needs ("required") can be updated but not removed or turned off. */
     protection: 'required' | null;
     error?: string;
   }
@@ -177,7 +177,7 @@ declare namespace Snowball {
     memory: { totalMb: number; recommendedMaxMb: number; safeUpperLimitMb: number };
     profiles: PerformanceProfile[];
     dataRoot: string;
-    /** Snowball Client builds shipped with this launcher, newest first. */
+    /** LUCID builds shipped with this launcher, newest first. */
     snowballBuilds: Array<{ version: string; minecraft: string }>;
     canAddOffline: boolean;
     /** Discord Rich Presence: whether this build has an application, and how the connection is. */
@@ -330,7 +330,7 @@ declare namespace Snowball {
     status: 'open' | 'investigating' | 'fixed' | 'duplicate' | 'invalid';
   }
 
-  /** A Snowball+ player's cape design waiting for staff: 10x16 colours as 960 hex digits. */
+  /** A LUCID+ player's cape design waiting for staff: 10x16 colours as 960 hex digits. */
   interface CapeRequest {
     uuid: string;
     name: string;

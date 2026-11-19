@@ -22,7 +22,7 @@ export interface LaunchInput {
   nativesDir: string;
   launcherName: string;
   launcherVersion: string;
-  /** Launcher-controlled JVM arguments (e.g. loading Snowball Client), placed before the player's own. */
+  /** Launcher-controlled JVM arguments (e.g. loading LUCID), placed before the player's own. */
   extraJvmArgs?: string[];
   ruleContext?: RuleContext;
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 public enum Permission {
 	/** Ordinary use: chat, HUD, the modules everyone gets. */
 	BASE,
-	/** The extra modules, cosmetics and presets that come with Snowball+. */
+	/** The extra modules, cosmetics and presets that come with LUCID+. */
 	PLUS_FEATURES,
 	/** Builds and features that are still being tested. */
 	BETA_ACCESS,
@@ -27,7 +27,7 @@ public enum Permission {
 	CHAT_MODERATE,
 	/** Post the announcement everyone sees. */
 	CHAT_ANNOUNCE,
-	/** See the list of Snowball accounts. */
+	/** See the list of LUCID accounts. */
 	USERS_VIEW,
 	/** Give and take away ranks. */
 	RANKS_MANAGE,

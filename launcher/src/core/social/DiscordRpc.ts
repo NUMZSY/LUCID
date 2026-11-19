@@ -6,7 +6,7 @@ import { getLogger } from '../logging/Logger.js';
 
 const log = getLogger('discord');
 
-/** What Discord shows under "Playing Snowball Client". Nothing private: no paths, no addresses. */
+/** What Discord shows under "Playing LUCID". Nothing private: no paths, no addresses. */
 export interface Presence {
   details: string;
   state?: string;

@@ -76,7 +76,7 @@ async function createWindow(): Promise<void> {
     // is checked for overflow down to this size.
     minWidth: 800,
     minHeight: 460,
-    title: 'Snowball Client',
+    title: 'LUCID',
     backgroundColor: '#05070a',
     // The tile icon, so the window matches the .exe. The bare snowball stays the mark used
     // inside the interface.
@@ -262,16 +262,16 @@ if (!app.requestSingleInstanceLock()) {
     const code = (err as NodeJS.ErrnoException).code;
     const cause =
       code === 'EACCES' || code === 'EPERM'
-        ? 'Windows refused access to the Snowball folder. Antivirus software or folder permissions are the usual reason.'
+        ? 'Windows refused access to the LUCID folder. Antivirus software or folder permissions are the usual reason.'
         : code === 'ENOSPC'
-          ? 'There is no free space left on the drive Snowball stores its files on.'
-          : 'A file Snowball needs could not be read or created.';
+          ? 'There is no free space left on the drive LUCID stores its files on.'
+          : 'A file LUCID needs could not be read or created.';
     dialog.showErrorBox(
-      'Snowball Client could not start',
+      'LUCID could not start',
       `${cause}\n\nWhat you can try:\n` +
         `  1. Restart Snowball.\n` +
         `  2. Restart your computer, in case a file is still in use.\n` +
-        `  3. Reinstall Snowball from the website — your instances and worlds are kept.\n\n` +
+        `  3. Reinstall LUCID from the website — your instances and worlds are kept.\n\n` +
         `The full details are in:\n${join(defaultDataRoot(), 'logs')}\n\n` +
         `Technical detail: ${err.message}`,
     );

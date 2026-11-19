@@ -85,7 +85,7 @@ public final class ModProfilesView extends PanelView {
 
 	@Override
 	protected void renderContent(Canvas c, int mouseX, int mouseY) {
-		UiText.draw(c, "Changes apply on the next launch from the Snowball launcher.", UiText.UI_SMALL, panelX + 12, panelY + HEADER_H + 4, theme.mutedText());
+		UiText.draw(c, "Changes apply on the next launch from the LUCID launcher.", UiText.UI_SMALL, panelX + 12, panelY + HEADER_H + 4, theme.mutedText());
 		scroll = Math.max(0, Math.min(scroll, mods.size() - visibleRows()));
 		for (int i = scroll; i < Math.min(mods.size(), scroll + visibleRows()); i++) {
 			Entry e = mods.get(i);

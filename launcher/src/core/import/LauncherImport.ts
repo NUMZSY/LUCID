@@ -488,7 +488,7 @@ async function readVanilla(launcher: string, dir: string): Promise<FoundInstance
 }
 
 /**
- * A folder the player chose by hand, for a launcher Snowball does not know. Instance folders of the
+ * A folder the player chose by hand, for a launcher LUCID does not know. Instance folders of the
  * known launchers are recognised by their files; anything else is taken as a game folder, and the
  * version is read from it where it says, or left for the player to pick.
  */

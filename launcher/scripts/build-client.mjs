@@ -1,4 +1,4 @@
-// Builds Snowball Client for every supported Minecraft version so the launcher can bundle the jars
+// Builds LUCID for every supported Minecraft version so the launcher can bundle the jars
 // (see package.json "build.extraResources"). The launcher picks the right build per instance.
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, rmSync } from 'node:fs';
@@ -27,7 +27,7 @@ let result = gradle(['build', 'buildAndCollect']);
 if (result.status === 0) result = gradle(['-p', 'legacy', 'build', 'buildAndCollect']);
 const jars = existsSync(outDir) ? readdirSync(outDir).filter((f) => f.endsWith('.jar')) : [];
 if (result.status !== 0 || jars.length === 0) {
-  console.error('Client build failed; the launcher cannot be packaged without the Snowball Client jars.');
+  console.error('Client build failed; the launcher cannot be packaged without the LUCID jars.');
   process.exit(result.status || 1);
 }
 
@@ -56,4 +56,4 @@ if (process.env.SNOWBALL_SKIP_GAMETEST === '1') {
     }
   }
 }
-console.log(`Snowball Client builds ready in ${outDir}:\n${jars.map((j) => `  ${j}`).join('\n')}`);
+console.log(`LUCID builds ready in ${outDir}:\n${jars.map((j) => `  ${j}`).join('\n')}`);

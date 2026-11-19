@@ -78,8 +78,8 @@ public final class CrashRecovery {
 		IntegratedServer server = mc.getSingleplayerServer();
 		CrashGuard.GAME.beginRecovery();
 		try {
-			if (report == null) report = CrashReport.forThrowable(error, "Caught by Snowball Anti-Crash");
-			LOGGER.error("Snowball Anti-Crash caught a crash and is keeping the game open", error);
+			if (report == null) report = CrashReport.forThrowable(error, "Caught by LUCID Anti-Crash");
+			LOGGER.error("LUCID Anti-Crash caught a crash and is keeping the game open", error);
 			if (!clearDelayedCrash(report)) {
 				LOGGER.warn("Anti-Crash could not clear a crash reported from another thread; letting the game close");
 				return false;
@@ -135,7 +135,7 @@ public final class CrashRecovery {
 		String stamp = Util.getFilenameFormattedDateTime();
 		Path file = dir.resolve("crash-" + stamp + "-client.txt");
 		for (int n = 2; Files.exists(file); n++) file = dir.resolve("crash-" + stamp + "-" + n + "-client.txt");
-		boolean saved = report.saveToFile(file, ReportType.CRASH, List.of("Snowball Anti-Crash caught this error and kept the game open."));
+		boolean saved = report.saveToFile(file, ReportType.CRASH, List.of("LUCID Anti-Crash caught this error and kept the game open."));
 		return saved ? file : null;
 	}
 

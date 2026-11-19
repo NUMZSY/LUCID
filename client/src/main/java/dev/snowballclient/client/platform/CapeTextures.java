@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * The texture of the cape a player wears: one of the capes in the client jar, or a Snowball+
+ * The texture of the cape a player wears: one of the capes in the client jar, or a LUCID+
  * design built from its approved pixels the first time it is needed. Render thread only.
  */
 public final class CapeTextures {

@@ -16,7 +16,7 @@ import java.util.Deque;
 import java.util.List;
 
 /**
- * The cape studio (Snowball+): draw the outside of your cape a pixel at a time, then send it to
+ * The cape studio (LUCID+): draw the outside of your cape a pixel at a time, then send it to
  * staff. It is what other players see on your back; the inside, the edges and the elytra are made
  * from it. Nothing shows on anybody until staff approve it in the launcher.
  *
@@ -109,7 +109,7 @@ public final class CapeStudioView extends PanelView {
 	@Override
 	protected void renderContent(Canvas c, int mouseX, int mouseY) {
 		if (!SnowballPlayers.can(Permission.PLUS_FEATURES)) {
-			UiText.draw(c, "The cape studio comes with Snowball+.", UiText.UI, panelX + 14, panelY + HEADER_H + 14, theme.text());
+			UiText.draw(c, "The cape studio comes with LUCID+.", UiText.UI, panelX + 14, panelY + HEADER_H + 14, theme.text());
 			UiText.draw(c, "Get it at snowball.krakensmp.xyz/store.html", UiText.DETAIL, panelX + 14, panelY + HEADER_H + 28, theme.mutedText());
 			return;
 		}

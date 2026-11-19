@@ -15,19 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Cosmetics: the cape you wear, which every Snowball player around you sees, and whether you see
- * theirs. Snowball+ adds the cape studio, where you draw your own and send it to staff.
+ * Cosmetics: the cape you wear, which every LUCID player around you sees, and whether you see
+ * theirs. LUCID+ adds the cape studio, where you draw your own and send it to staff.
  */
 public final class Cosmetics extends Module implements CustomSettingsScreen {
 	public static final String NONE = "none";
 
 	public final ChoiceSetting cape;
-	/** A Snowball+ name colour (see Looks.COLOURS), or none. */
+	/** A LUCID+ name colour (see Looks.COLOURS), or none. */
 	public final ChoiceSetting nameColour;
-	public final BooleanSetting showOthers = setting(new BooleanSetting("show_others", "See others' cosmetics", "Show the capes other Snowball players wear", true));
+	public final BooleanSetting showOthers = setting(new BooleanSetting("show_others", "See others' cosmetics", "Show the capes other LUCID players wear", true));
 
 	public Cosmetics() {
-		super("cosmetics", "Cosmetics", "Capes other Snowball players see", ModuleCategory.CLIENT);
+		super("cosmetics", "Cosmetics", "Capes other LUCID players see", ModuleCategory.CLIENT);
 		List<String> capes = new ArrayList<>();
 		capes.add(NONE);
 		capes.addAll(Looks.CAPES);

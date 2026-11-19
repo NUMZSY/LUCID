@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.UUID;
 
 /**
- * Shows a player's Snowball rank in the player list as the rank's badge, unless it is turned off in
+ * Shows a player's LUCID rank in the player list as the rank's badge, unless it is turned off in
  * Menu & Accessibility. Nothing is drawn for players who are not on Snowball. The list measures the whole name, badge included, so its column is
  * sized for it rather than written past. Your own line has your name swapped when Nick Hider is on.
  */

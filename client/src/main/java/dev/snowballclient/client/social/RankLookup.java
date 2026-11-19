@@ -19,12 +19,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Finds out which of the players around you are playing with Snowball Client right now, so their
+ * Finds out which of the players around you are playing with LUCID right now, so their
  * badge can be drawn above their head and in the player list. The backend only reports a player
- * whose game is running Snowball Client (see {@link SnowballPresence}), and players are asked about
+ * whose game is running LUCID (see {@link SnowballPresence}), and players are asked about
  * again every couple of minutes, so a badge goes when its owner switches to another client.
  *
- * The client never decides a rank: it asks the Snowball backend and shows whatever it is told.
+ * The client never decides a rank: it asks the LUCID backend and shows whatever it is told.
  * Ranks are already public - they are on show in chat - so this needs no account behind it, and
  * sends nothing but the account ids the game can already see.
  *
@@ -36,7 +36,7 @@ public final class RankLookup {
 	private static final long EVERY_MS = 30_000;
 	/** When each player is next asked about, so the same faces are not looked up every half minute. */
 	private static final Map<UUID, Long> ASKED = new ConcurrentHashMap<>();
-	/** How many answers in a row said a player is not on Snowball yet. */
+	/** How many answers in a row said a player is not on LUCID yet. */
 	private static final Map<UUID, Integer> MISSES = new ConcurrentHashMap<>();
 	/** How long an answer stands before the player is asked about again. */
 	private static final long REASK_MS = 120_000;
@@ -157,7 +157,7 @@ public final class RankLookup {
 				Looks.setCape(id, capes.get(id), versions.getOrDefault(id, 0));
 				Looks.setColour(id, colours.get(id));
 			}
-			// Everyone asked about and not in the answer is not playing with Snowball Client now.
+			// Everyone asked about and not in the answer is not playing with LUCID now.
 			for (UUID id : wanted) {
 				Rank rank = playing.get(id);
 				if (rank != null) {

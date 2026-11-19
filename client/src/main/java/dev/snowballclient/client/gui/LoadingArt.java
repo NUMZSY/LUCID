@@ -5,7 +5,7 @@ import dev.snowballclient.client.hud.GuiDraw;
 import dev.snowballclient.client.ui.Canvas;
 
 /**
- * The Snowball loading screen, drawn over Minecraft's own while the game loads its resources.
+ * The LUCID loading screen, drawn over Minecraft's own while the game loads its resources.
  * Everything here is drawn from rectangles: no textures and no fonts are needed, because the
  * first thing the game loads is the resources those would come from.
  */
@@ -67,7 +67,7 @@ public final class LoadingArt {
 
 		if (!withText) return;
 		UiText.setDensity(c.guiScale());
-		UiText.drawCentered(c, "SNOWBALL CLIENT", UiText.TITLE_SMALL, centreX, barY - 24, Theme.withAlpha(theme.text(), alpha));
+		UiText.drawCentered(c, "LUCID CLIENT", UiText.TITLE_SMALL, centreX, barY - 24, Theme.withAlpha(theme.text(), alpha));
 		UiText.drawCentered(c, Math.round(progress * 100) + "%", UiText.DETAIL, centreX, barY + BAR_H + 8, Theme.withAlpha(theme.mutedText(), 0.9f * alpha));
 	}
 }

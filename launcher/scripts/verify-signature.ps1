@@ -18,7 +18,7 @@
 
 $ErrorActionPreference = 'Stop'
 $release = Join-Path $PSScriptRoot '..\release'
-$expectedPublisher = 'Snowball Client'
+$expectedPublisher = 'LUCID'
 $allowUnsigned = $env:SNOWBALL_ALLOW_UNSIGNED -eq '1'
 
 if (-not (Test-Path $release)) {

@@ -276,7 +276,7 @@ export class AuthManager {
     if (mc.status !== 200 || !mc.body.access_token) {
       const detail = String(mc.body.errorMessage ?? mc.body.error ?? '');
       if (mc.status === 403 || /app registration|AppRegInfo/i.test(detail)) {
-        throw new AuthError('Your Microsoft account signed in, but Minecraft has not approved this launcher yet. This starts working once Mojang approves the Snowball Client app ID.');
+        throw new AuthError('Your Microsoft account signed in, but Minecraft has not approved this launcher yet. This starts working once Mojang approves the LUCID app ID.');
       }
       throw new AuthError(`Minecraft services rejected the Xbox token (HTTP ${mc.status}${detail ? `: ${detail}` : ''}).`);
     }

@@ -71,12 +71,12 @@ export class LaunchBlockedError extends Error {
 export interface LauncherOptions {
   root: string;
   cipher: SecretCipher;
-  /** Folders holding the Snowball Client jars shipped with the launcher (missing folders are ignored). */
+  /** Folders holding the LUCID jars shipped with the launcher (missing folders are ignored). */
   clientBuildDirs: string[];
   launcherVersion: string;
   /** Discord application id from the build config; empty when the presence module is not set up. */
   discordAppId?: string;
-  /** The Snowball backend, passed to the game so it can look up other players' ranks. */
+  /** The LUCID backend, passed to the game so it can look up other players' ranks. */
   chatUrl?: string;
   consoleLogs?: boolean;
   /** Azure application (client) ID shipped with this build (app-config.json); Settings can override it. */
@@ -225,7 +225,7 @@ export class Launcher extends EventEmitter {
   }
 
   /**
-   * Whether this launcher has a Snowball Client build for a Minecraft version and loader, the API set up with
+   * Whether this launcher has a LUCID build for a Minecraft version and loader, the API set up with
    * it, and whether performance profiles apply (their optimisation mods exist for Fabric and Quilt on 1.14+).
    */
   snowballSupport(minecraftVersion: string, loader: LoaderId): { supported: boolean; version: string | null; fabricApi: string; performanceProfiles: boolean } {
@@ -260,7 +260,7 @@ export class Launcher extends EventEmitter {
   }
 
   /**
-   * Creates an instance ready to play: the loader version is chosen, Fabric API and Snowball Client are
+   * Creates an instance ready to play: the loader version is chosen, Fabric API and LUCID are
    * installed and verified. Steps that need the internet and fail (e.g. offline) finish on the next Play.
    */
   async createInstance(options: CreateInstanceOptions): Promise<InstanceConfig> {
@@ -284,7 +284,7 @@ export class Launcher extends EventEmitter {
         await this.core.ensure(this.coreTarget(id, config), say);
         say('success', `${config.name} is ready to play`);
       } catch (err) {
-        say('warn', `Snowball Client setup will finish when you press Play (${(err as Error).message})`);
+        say('warn', `LUCID setup will finish when you press Play (${(err as Error).message})`);
       }
     }
     return this.instances.load(id);
@@ -382,7 +382,7 @@ export class Launcher extends EventEmitter {
     return { config: await this.instances.load(instanceId), version, javaPath, clientJar: core.clientJar };
   }
 
-  /** Fabric API, the client's mod requests, a performance profile, then Snowball Client itself. */
+  /** Fabric API, the client's mod requests, a performance profile, then LUCID itself. */
   private async prepareMods(instanceId: string, config: InstanceConfig, gameDir: string, signal: AbortSignal | undefined, stage: (name: string) => void) {
     const mc = config.minecraftVersion;
     if (config.loader !== 'vanilla') stage('Checking mods');
@@ -404,7 +404,7 @@ export class Launcher extends EventEmitter {
       }
     }
 
-    // Snowball Client is verified and repaired before every launch; on versions without a build, a
+    // LUCID is verified and repaired before every launch; on versions without a build, a
     // stray copy is set aside so it cannot stop the game from starting.
     if (this.core.registry.find(mc, config.loader)) stage('Checking core files');
     return this.core.ensure(this.coreTarget(instanceId, config), this.activity.reporter(instanceId), signal);
@@ -413,7 +413,7 @@ export class Launcher extends EventEmitter {
   /** The Java this launch runs on: the instance's own choice, one already installed, or Mojang's. */
   private async javaFor(config: InstanceConfig, version: VersionJson, signal: AbortSignal | undefined, stage: (name: string) => void, downloadStage: (name: string, p?: DownloadProgress) => void): Promise<string> {
     const mc = config.minecraftVersion;
-    // Snowball Client builds can need a newer Java than the game itself: Minecraft 1.8.9 asks for Java 8,
+    // LUCID builds can need a newer Java than the game itself: Minecraft 1.8.9 asks for Java 8,
     // and the client for that version is built for Java 21, which 1.8.9 runs on happily.
     const gameJava = version.javaVersion?.majorVersion ?? 8;
     const clientJava = this.core.registry.find(mc, config.loader)?.javaMajor ?? 0;
@@ -425,7 +425,7 @@ export class Launcher extends EventEmitter {
     if (config.java.executable) {
       const check = await this.java.validateFor(config.java.executable, required);
       if (!check.ok || !check.java) throw new Error(check.message ?? 'The selected Java is not usable.');
-      if (cpu && javaCpu(check.java.arch) !== cpu) throw new Error(`Minecraft ${mc} needs an Intel (x64) Java on Apple Silicon Macs; the selected Java is ${check.java.arch}. Clear the Java setting to let Snowball download one.`);
+      if (cpu && javaCpu(check.java.arch) !== cpu) throw new Error(`Minecraft ${mc} needs an Intel (x64) Java on Apple Silicon Macs; the selected Java is ${check.java.arch}. Clear the Java setting to let LUCID download one.`);
       javaPath = check.java.path;
     } else {
       javaPath = (await this.java.pickFor(required, cpu))?.path ?? null;
@@ -459,13 +459,13 @@ export class Launcher extends EventEmitter {
     return detectInstances();
   }
 
-  /** A folder the player chose by hand: an instance of a launcher Snowball does not list, or a game folder. */
+  /** A folder the player chose by hand: an instance of a launcher LUCID does not list, or a game folder. */
   async inspectImportFolder(dir: string): Promise<FoundInstance | null> {
     return inspectFolder(dir);
   }
 
   /**
-   * Copies an instance out of another launcher: a new Snowball instance with the same Minecraft
+   * Copies an instance out of another launcher: a new LUCID instance with the same Minecraft
    * version and loader, and the files the player asked to bring across. Nothing is moved or deleted,
    * so the other launcher keeps working exactly as before.
    */
@@ -610,7 +610,7 @@ export class Launcher extends EventEmitter {
         nativesDir,
         launcherName: 'snowball-client-launcher',
         launcherVersion: this.options.launcherVersion,
-        // Snowball Client is loaded straight from the launcher's folder, so it is never a file in the instance.
+        // LUCID is loaded straight from the launcher's folder, so it is never a file in the instance.
         extraJvmArgs: [
           ...(prep.clientJar ? [`-Dfabric.addMods=${prep.clientJar}`] : []),
           // The client's Discord presence needs an application id; without one the module stays off.

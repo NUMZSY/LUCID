@@ -121,7 +121,7 @@ jobs:
           export SNOWBALLCLIENT_LAUNCHER_HOME="$RUNNER_TEMP/snowball-home"
           APP="$(ls -d release/mac-arm64/*.app | head -1)"
           echo "Opening $APP"
-          "$APP/Contents/MacOS/Snowball Client Launcher" > "$RUNNER_TEMP/app.log" 2>&1 &
+          "$APP/Contents/MacOS/LUCID Launcher" > "$RUNNER_TEMP/app.log" 2>&1 &
           PID=$!
           for i in $(seq 1 45); do
             if grep -rqs "Start-up timings" "$SNOWBALLCLIENT_LAUNCHER_HOME/logs"; then
@@ -144,7 +144,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: snowball-client-mac
+          name: lucid-mac
           path: |
             launcher/release/*.dmg
             launcher/release/*.zip

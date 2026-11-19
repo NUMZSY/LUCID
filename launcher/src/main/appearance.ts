@@ -88,7 +88,7 @@ export async function pickBackground(win: BrowserWindow, root: string): Promise<
     return { ok: false, reason: `That picture is ${(bytes.byteLength / 1024 / 1024).toFixed(0)} MB. Please choose one under 24 MB.` };
   }
   const type = sniff(bytes);
-  if (!type) return { ok: false, reason: 'That file is not a picture Snowball can read. Try a PNG, JPG or WEBP.' };
+  if (!type) return { ok: false, reason: 'That file is not a picture LUCID can read. Try a PNG, JPG or WEBP.' };
 
   await clearBackground(root);
   const ext = type === 'image/jpeg' ? '.jpg' : type === 'image/png' ? '.png' : type === 'image/webp' ? '.webp' : '.gif';

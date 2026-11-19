@@ -30,7 +30,7 @@ import static dev.snowballclient.client.gui.ToggleWidget.scaleAlpha;
 
 /**
  * Snowball's main menu, shown instead of Minecraft's title screen. Every button opens the game's own
- * screen, so nothing the player could do before is lost; the extras are the Snowball menu and your
+ * screen, so nothing the player could do before is lost; the extras are the LUCID menu and your
  * account. Smooth and rounded: text in the menu font, shapes with anti-aliased edges at any GUI
  * scale. Turn it off under Menu &amp; Accessibility to get the vanilla title screen back.
  */
@@ -52,7 +52,7 @@ public final class TitleMenuView extends View {
 	private enum Kind {
 		/** Singleplayer, Multiplayer: the wide dark buttons. */
 		BUTTON,
-		/** The Snowball menu: the wide button in the menu colour. */
+		/** The LUCID menu: the wide button in the menu colour. */
 		ACCENT,
 		/** Quitting the game, under the column. */
 		QUIT,
@@ -106,7 +106,7 @@ public final class TitleMenuView extends View {
 	private float age;
 
 	public TitleMenuView(SnowballClient client, TitleActions actions) {
-		super("Snowball Client");
+		super("LUCID");
 		this.client = client;
 		this.actions = actions;
 		this.theme = client.theme();
@@ -145,7 +145,7 @@ public final class TitleMenuView extends View {
 			x += ICON_BUTTON + GAP;
 		}
 
-		// The column in the middle: the logo with the name, the game's buttons, the Snowball menu, Quit.
+		// The column in the middle: the logo with the name, the game's buttons, the LUCID menu, Quit.
 		int top = EDGE + ICON_BUTTON + 10;
 		int bottom = height - 22;
 		int[] layout = LAYOUTS[LAYOUTS.length - 1];
@@ -170,7 +170,7 @@ public final class TitleMenuView extends View {
 		multi.blocked = actions.multiplayerBlockedReason();
 		place(multi, bx, by, BUTTON_W, buttonH);
 		by += buttonH + buttonGap + 4;
-		place(new Item(Kind.ACCENT, "SNOWBALL MENU", null, null, this::openSnowballMenu), bx, by, BUTTON_W, buttonH);
+		place(new Item(Kind.ACCENT, "LUCID MENU", null, null, this::openSnowballMenu), bx, by, BUTTON_W, buttonH);
 		by += buttonH + layout[4];
 		int quitW = 90;
 		place(new Item(Kind.QUIT, "Quit Game", null, null, actions::quit), width / 2 - quitW / 2, by, quitW, QUIT_H);
@@ -266,9 +266,9 @@ public final class TitleMenuView extends View {
 		}
 
 		// Both footer lines share one row, so on a narrow window the version line gives way first.
-		String version = "Snowball Client " + client.version() + "  ·  Minecraft " + actions.minecraftVersion();
+		String version = "LUCID " + client.version() + "  ·  Minecraft " + actions.minecraftVersion();
 		int disclaimerW = UiText.width(c, DISCLAIMER, UiText.UI_SMALL);
-		if (!footerFits(c, version, disclaimerW)) version = "Snowball Client " + client.version();
+		if (!footerFits(c, version, disclaimerW)) version = "LUCID " + client.version();
 		boolean showDisclaimer = footerFits(c, version, disclaimerW);
 		UiText.draw(c, version, UiText.UI_SMALL, EDGE, height - 16, scaleAlpha(theme.mutedText(), alpha));
 		int disclaimerX = width - EDGE - disclaimerW;

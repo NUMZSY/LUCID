@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-/** The Snowball main menu's buttons on this Minecraft version: every one opens the game's own screen. */
+/** The LUCID main menu's buttons on this Minecraft version: every one opens the game's own screen. */
 public final class MinecraftTitleActions implements TitleActions {
 	private final GameProfile profile;
 	private final CompletableFuture<Optional<PlayerSkin>> skin;
@@ -39,7 +39,7 @@ public final class MinecraftTitleActions implements TitleActions {
 		return Minecraft.getInstance();
 	}
 
-	/** Opens a Minecraft screen that returns to the Snowball menu when it is closed. */
+	/** Opens a Minecraft screen that returns to the LUCID menu when it is closed. */
 	private static void open(Function<Screen, Screen> factory) {
 		if (mc().gui.screen() instanceof ViewScreen screen) screen.openScreen(factory);
 	}

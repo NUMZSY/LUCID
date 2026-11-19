@@ -27,7 +27,7 @@ public final class ScreenshotsView extends PanelView {
 	private static final int GAP = 6;
 	private static final int THUMB_MAX = 192;
 	private static final ExecutorService DECODER = Executors.newSingleThreadExecutor(r -> {
-		Thread t = new Thread(r, "Snowball Client screenshot thumbnails");
+		Thread t = new Thread(r, "LUCID screenshot thumbnails");
 		t.setDaemon(true);
 		return t;
 	});

@@ -1,4 +1,4 @@
-; Dark window chrome for the Snowball Client installer and uninstaller (Windows 10 1809+ and 11).
+; Dark window chrome for the LUCID installer and uninstaller (Windows 10 1809+ and 11).
 ; Only macros live here: SNOWBALL_DARK_FUNCTIONS is inserted after MUI2 and LogicLib are loaded.
 ; Older Windows versions ignore the dark-mode calls and keep the normal look.
 

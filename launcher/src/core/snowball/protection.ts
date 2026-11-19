@@ -4,13 +4,13 @@ import { dirname, join } from 'node:path';
 import { fabricApiName, isFabricApi } from '../minecraft/fabricFamily.js';
 import { ZipReader } from '../util/zip.js';
 
-/** Mod id of Snowball Client. The launcher loads it from its own folder; it never belongs in a mods folder. */
+/** Mod id of LUCID. The launcher loads it from its own folder; it never belongs in a mods folder. */
 export const SNOWBALL_MOD_ID = 'snowballclient';
 export const SNOWBALL_MOD_FILE = 'snowball-client.jar';
-/** Written into an instance's game folder when Snowball Client is set up for it. */
+/** Written into an instance's game folder when LUCID is set up for it. */
 export const SNOWBALL_MARKER = join('.snowball', 'core.json');
 
-/** "required": a mod Snowball Client cannot run without (Fabric API, or Legacy Fabric API on old versions). */
+/** "required": a mod LUCID cannot run without (Fabric API, or Legacy Fabric API on old versions). */
 export type Protection = 'required';
 
 export class ProtectedModError extends Error {
@@ -24,7 +24,7 @@ export function isSnowballInstance(gameDir: string): boolean {
   return existsSync(join(gameDir, SNOWBALL_MARKER));
 }
 
-/** The single rule set for protected mods: in a Snowball instance, Fabric API (or Legacy Fabric API) is required. */
+/** The single rule set for protected mods: in a LUCID instance, Fabric API (or Legacy Fabric API) is required. */
 export function protectionFor(files: Array<{ fileName: string; id: string | null }>, snowballInstance: boolean): Map<string, Protection> {
   const result = new Map<string, Protection>();
   if (!snowballInstance) return result;
@@ -65,13 +65,13 @@ export async function folderProtection(modsDir: string): Promise<Map<string, Pro
 }
 
 /**
- * Guards every normal mod-management change. In a Snowball instance Fabric API can be updated
- * (replaced) but not removed or turned off, because Snowball Client needs it.
+ * Guards every normal mod-management change. In a LUCID instance Fabric API can be updated
+ * (replaced) but not removed or turned off, because LUCID needs it.
  */
 export async function assertModChangeAllowed(modsDir: string, fileName: string, action: 'remove' | 'disable' | 'replace'): Promise<void> {
   if (action === 'replace') return;
   if ((await folderProtection(modsDir)).get(fileName) === 'required') {
     const name = fabricApiName(await readModId(join(modsDir, fileName)));
-    throw new ProtectedModError(`${name} is required by Snowball Client, so it can't be ${action === 'remove' ? 'removed' : 'turned off'} in this instance.`);
+    throw new ProtectedModError(`${name} is required by LUCID, so it can't be ${action === 'remove' ? 'removed' : 'turned off'} in this instance.`);
   }
 }

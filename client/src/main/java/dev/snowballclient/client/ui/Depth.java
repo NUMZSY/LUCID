@@ -15,7 +15,7 @@ import dev.snowballclient.client.gui.anim.Smoothed;
  * so they land on what is under the mouse.
  *
  * <p>One screen is drawn at a time, so the state is kept here rather than in each view; that also
- * lets the lean carry on smoothly from one Snowball screen to the next.
+ * lets the lean carry on smoothly from one LUCID screen to the next.
  */
 public final class Depth {
 	/** What the 3D Menus module decides; installed by that module, absent on builds without it. */

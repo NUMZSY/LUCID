@@ -1,7 +1,7 @@
 package dev.snowballclient.client.ui;
 
 /**
- * A full-screen piece of Snowball interface (menu, settings, gallery) written once for every Minecraft
+ * A full-screen piece of LUCID interface (menu, settings, gallery) written once for every Minecraft
  * version. Each version shows it inside its own screen class, which forwards drawing and input here.
  */
 public abstract class View {

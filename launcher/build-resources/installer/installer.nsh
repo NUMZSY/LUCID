@@ -1,4 +1,4 @@
-; Snowball Client installer look: dark title bar, pages and button bar to match the launcher.
+; LUCID installer look: dark title bar, pages and button bar to match the launcher.
 ; This file is included before electron-builder's template, so functions are added through macros
 ; that the template inserts after MUI2 and LogicLib are loaded.
 !define MUI_BGCOLOR "05070A"
@@ -23,7 +23,7 @@
     !define allowToChangeInstallationDirectory
     !include StrContains.nsh
 
-    ; Same as the template: always install into a "Snowball Client Launcher" sub-folder.
+    ; Same as the template: always install into a "LUCID Launcher" sub-folder.
     Function SnowballInstFilesPre
       ${StrContains} $0 "${APP_FILENAME}" $INSTDIR
       ${If} $0 == ""
@@ -34,8 +34,8 @@
 !macroend
 
 !macro customWelcomePage
-  !define MUI_WELCOMEPAGE_TITLE "Welcome to Snowball Client"
-  !define MUI_WELCOMEPAGE_TEXT "Setup will install Snowball Client, a free launcher and client for Minecraft: Java Edition.$\r$\n$\r$\n-  Separate instances for every version and modpack$\r$\n-  Browse and install mods from Modrinth in one click$\r$\n-  FPS Boost, PvP HUD and a radial in-game menu$\r$\n$\r$\nNo cheats, no ads. Click Next to continue."
+  !define MUI_WELCOMEPAGE_TITLE "Welcome to LUCID"
+  !define MUI_WELCOMEPAGE_TEXT "Setup will install LUCID, a free launcher and client for Minecraft: Java Edition.$\r$\n$\r$\n-  Separate instances for every version and modpack$\r$\n-  Browse and install mods from Modrinth in one click$\r$\n-  FPS Boost, PvP HUD and a radial in-game menu$\r$\n$\r$\nNo cheats, no ads. Click Next to continue."
   !define MUI_PAGE_CUSTOMFUNCTION_SHOW SnowballHideLines
   !insertmacro MUI_PAGE_WELCOME
   ; Applies to the next page: "Choose Installation Options".
@@ -61,10 +61,10 @@
     ${StdUtils.ExecShellAsUser} $0 "$launchLink" "open" "$1"
   FunctionEnd
 
-  !define MUI_FINISHPAGE_TITLE "Snowball Client is ready"
+  !define MUI_FINISHPAGE_TITLE "LUCID is ready"
   !define MUI_FINISHPAGE_TEXT "Sign in with your Microsoft account, create an instance and press Play. The launcher downloads Minecraft, Java and your mods for you.$\r$\n$\r$\nPress Right Shift in game to open the Snowball menu."
   !define MUI_FINISHPAGE_RUN
-  !define MUI_FINISHPAGE_RUN_TEXT "Open Snowball Client now"
+  !define MUI_FINISHPAGE_RUN_TEXT "Open LUCID now"
   !define MUI_FINISHPAGE_RUN_FUNCTION "StartApp"
   !define MUI_PAGE_CUSTOMFUNCTION_SHOW SnowballFinishShow
   !insertmacro MUI_PAGE_FINISH
@@ -80,9 +80,9 @@
 !macroend
 
 !macro customUnWelcomePage
-  !define MUI_WELCOMEPAGE_TITLE "Uninstall Snowball Client"
-  !define MUI_WELCOMEPAGE_TEXT "This removes the Snowball Client launcher from this PC.$\r$\n$\r$\nYour instances, worlds, screenshots and settings in %APPDATA%\SnowballClientLauncher are kept, so everything is still there if you install it again.$\r$\n$\r$\nClick Next to continue."
-  !define MUI_FINISHPAGE_TITLE "Snowball Client was removed"
+  !define MUI_WELCOMEPAGE_TITLE "Uninstall LUCID"
+  !define MUI_WELCOMEPAGE_TEXT "This removes the LUCID launcher from this PC.$\r$\n$\r$\nYour instances, worlds, screenshots and settings in %APPDATA%\SnowballClientLauncher are kept, so everything is still there if you install it again.$\r$\n$\r$\nClick Next to continue."
+  !define MUI_FINISHPAGE_TITLE "LUCID was removed"
   !define MUI_FINISHPAGE_TEXT "Thanks for playing. Your game data was kept."
   !define MUI_PAGE_CUSTOMFUNCTION_SHOW un.SnowballHideLines
   !insertmacro MUI_UNPAGE_WELCOME

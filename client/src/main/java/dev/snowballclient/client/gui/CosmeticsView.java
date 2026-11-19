@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The cape picker: every cape Snowball ships, side by side, the one you wear outlined. Snowball+
+ * The cape picker: every cape LUCID ships, side by side, the one you wear outlined. LUCID+
  * players also get their own design here, and the way into the cape studio.
  */
 public final class CosmeticsView extends PanelView {
 	private static final int TILE_W = 46;
 	private static final int TILE_H = 74;
 	private static final int GAP = 6;
-	// Seven a row keeps all the capes (free, Snowball+ and your own) in two rows, so the picker fits
+	// Seven a row keeps all the capes (free, LUCID+ and your own) in two rows, so the picker fits
 	// short screens: the panel is never taller than the window.
 	private static final int PER_ROW = 7;
 
@@ -32,7 +32,7 @@ public final class CosmeticsView extends PanelView {
 	/** Name colour swatches, "none" first, beside the others' capes button so the panel is no taller. */
 	private static final int SWATCH = 14;
 	private final UiTexture[] previews;
-	/** Someone clicked a + cape without Snowball+: the line under the capes says where it comes from. */
+	/** Someone clicked a + cape without LUCID+: the line under the capes says where it comes from. */
 	private boolean lockedHint;
 
 	public CosmeticsView(SnowballClient client, Cosmetics cosmetics) {
@@ -75,7 +75,7 @@ public final class CosmeticsView extends PanelView {
 		return new int[]{x, y};
 	}
 
-	/** A Snowball+ cape you cannot wear yet: it shows dimmed, marked +, and says where to get it. */
+	/** A LUCID+ cape you cannot wear yet: it shows dimmed, marked +, and says where to get it. */
 	private static boolean locked(String id) {
 		return Looks.PLUS_CAPES.contains(id) && !plus();
 	}
@@ -117,7 +117,7 @@ public final class CosmeticsView extends PanelView {
 			button(c, panelX + 12, y, 96, 16, "CAPE STUDIO", false, mouseX, mouseY);
 			drawWrapped(c, customLine(), panelX + 116, y, panelW - 130, theme.mutedText());
 		} else {
-			String hint = lockedHint ? "Things marked + come with Snowball+: snowball.krakensmp.xyz/store.html" : "Your own cape, the + capes and name colours come with Snowball+";
+			String hint = lockedHint ? "Things marked + come with LUCID+: snowball.krakensmp.xyz/store.html" : "Your own cape, the + capes and name colours come with LUCID+";
 			UiText.draw(c, UiText.fit(c, hint, UiText.DETAIL, panelW - 24), UiText.DETAIL, panelX + 12, y + 5, lockedHint ? theme.text() : theme.mutedText());
 		}
 		boolean others = cosmetics.showOthers.isOn();
@@ -185,7 +185,7 @@ public final class CosmeticsView extends PanelView {
 		return panelX + 214 + i * (SWATCH + 3);
 	}
 
-	/** The name colour a Snowball+ player shows on their nametag and in the launcher's chat. */
+	/** The name colour a LUCID+ player shows on their nametag and in the launcher's chat. */
 	private void drawColours(Canvas c, int y, int mouseX, int mouseY) {
 		UiText.draw(c, "NAME +", UiText.DETAIL, panelX + 172, y + 3, plus() ? theme.text() : theme.mutedText());
 		String picked = cosmetics.nameColour.get();

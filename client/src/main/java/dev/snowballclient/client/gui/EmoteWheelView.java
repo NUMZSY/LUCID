@@ -28,7 +28,7 @@ import static dev.snowballclient.client.gui.ToggleWidget.scaleAlpha;
 /**
  * The emote wheel: a dark ring of eight emotes, each shown as a little player striking its pose,
  * with more on further pages. Point at one and click (or press its number) and your player does
- * it, for you in third person and for every Snowball player who can see you. The one under the
+ * it, for you in third person and for every LUCID player who can see you. The one under the
  * mouse plays in its slot so you can see it before you pick it; the middle stops an emote in
  * progress. The game keeps running behind it.
  */
@@ -232,7 +232,7 @@ public final class EmoteWheelView extends View {
 		drawPagePill(c, cx, a);
 		Emote under = slot(hovered);
 		int below = cy + r + 6;
-		String name = under != null ? under.label() + (locked(under) ? "  ·  comes with Snowball+" : "") : Emotes.playingSelf() ? "Click the middle to stop" : "Point at an emote";
+		String name = under != null ? under.label() + (locked(under) ? "  ·  comes with LUCID+" : "") : Emotes.playingSelf() ? "Click the middle to stop" : "Point at an emote";
 		UiText.drawCentered(c, name, UiText.TITLE_SMALL, cx, below, scaleAlpha(under != null ? 0xFFFFFFFF : theme.mutedText(), a));
 		String hint = pages() > 1 ? "Scroll for the next page  ·  1-8 to pick" : "1-8 to pick";
 		UiText.drawCentered(c, hint, UiText.DETAIL, cx, below + 13, scaleAlpha(Theme.withAlpha(theme.mutedText(), 0.85f), a));
@@ -373,7 +373,7 @@ public final class EmoteWheelView extends View {
 
 	// ---- Input ----
 
-	/** A Snowball+ emote you cannot do yet; it shows dimmed and says so under the wheel. */
+	/** A LUCID+ emote you cannot do yet; it shows dimmed and says so under the wheel. */
 	private static boolean locked(Emote e) {
 		return e.plus() && !SnowballPlayers.can(Permission.PLUS_FEATURES);
 	}

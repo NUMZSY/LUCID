@@ -70,22 +70,22 @@ public final class InterfaceSettings extends Module {
 		glassQuality = setting(new ChoiceSetting("glass_quality", "Glass quality", "Full refracts, Lite blurs, Off is solid", factory.glassQuality, Theme.GLASS_QUALITIES));
 		glassLevel = setting(new NumberSetting("glass_level", "Transparency", "Clear (0) to tinted (100), always readable", factory.glassLevel(), 0, 100, 5));
 		hudGlass = setting(new ChoiceSetting("hud_glass", "HUD glass", "Auto matches menus; Lite with FPS Boost", factory.hudGlass, Theme.HUD_GLASS));
-		blurBehind = setting(new BooleanSetting("blur_behind", "Blur behind menus", "Blur the world behind Snowball's menus", true));
+		blurBehind = setting(new BooleanSetting("blur_behind", "Blur behind menus", "Blur the world behind LUCID's menus", true));
 		font = setting(new ChoiceSetting("font", "Font", "Menu text: Minecraft's font or Inter", factory.font, Theme.FONTS));
-		menuColor = setting(new ColorSetting("menu_color", "Menu colour", "Highlights, sliders and switches in every Snowball menu", factory.accentColor));
-		panelColor = setting(new ColorSetting("panel_color", "Panel colour", "The tint behind Snowball's menus", factory.surfaceColor).presets(PANEL_PRESETS));
+		menuColor = setting(new ColorSetting("menu_color", "Menu colour", "Highlights, sliders and switches in every LUCID menu", factory.accentColor));
+		panelColor = setting(new ColorSetting("panel_color", "Panel colour", "The tint behind LUCID's menus", factory.surfaceColor).presets(PANEL_PRESETS));
 		scale = setting(new NumberSetting("scale", "Menu scale", "", theme.scale, Theme.MIN_SCALE, Theme.MAX_SCALE, 0.05));
 		highContrast = setting(new BooleanSetting("high_contrast", "High contrast", "Stronger borders and a yellow focus accent", theme.highContrast));
 		backgroundOpacity = setting(new NumberSetting("background_opacity", "Background dim", "", theme.backgroundOpacity, 0, 1, 0.05));
 		reduceMotion = setting(new BooleanSetting("reduce_motion", "Reduce motion", "Things appear and fade instead of moving", factory.reduceMotion));
 		animationSpeed = setting(new NumberSetting("animation_speed", "Animation speed", "0 turns animations off", theme.animationSpeed, 0, 3, 0.25));
 		pauseGame = setting(new BooleanSetting("pause_game", "Pause singleplayer in menu", "", clientSettings.pauseGameInMenu));
-		customMainMenu = setting(new BooleanSetting("custom_main_menu", "Snowball main menu", "Use Snowball's main menu instead of Minecraft's title screen", true));
-		customLoadingScreen = setting(new BooleanSetting("custom_loading_screen", "Snowball loading screen", "Show the Snowball loading screen while the game loads its resources", true));
-		tabRanks = setting(new ChoiceSetting("tab_ranks", "Ranks in the player list", "Show a Snowball player's badge next to their name", "badge", java.util.List.of("badge", "off")));
+		customMainMenu = setting(new BooleanSetting("custom_main_menu", "LUCID main menu", "Use LUCID's main menu instead of Minecraft's title screen", true));
+		customLoadingScreen = setting(new BooleanSetting("custom_loading_screen", "LUCID loading screen", "Show the LUCID loading screen while the game loads its resources", true));
+		tabRanks = setting(new ChoiceSetting("tab_ranks", "Ranks in the player list", "Show a LUCID player's badge next to their name", "badge", java.util.List.of("badge", "off")));
 
-		nameTagBadges = setting(new BooleanSetting("name_tag_badges", "Badges above players", "Show a Snowball player's badge on the name floating above their head", true));
-		showMe = setting(new BooleanSetting("show_me", "Show others I use Snowball", "Other Snowball players see your badge while you play with Snowball Client", true));
+		nameTagBadges = setting(new BooleanSetting("name_tag_badges", "Badges above players", "Show a LUCID player's badge on the name floating above their head", true));
+		showMe = setting(new BooleanSetting("show_me", "Show others I use LUCID", "Other LUCID players see your badge while you play with LUCID", true));
 
 		menuColor.onChange(v -> {
 			apply(() -> theme.setAccent(v));

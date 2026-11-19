@@ -17,7 +17,7 @@ import static dev.snowballclient.client.gui.ToggleWidget.scaleAlpha;
  *       light (brightest on the side facing it), a soft sheen across the surface and a faint glow
  *       of the menu colour along the bottom edge.</li>
  *   <li><b>Frosted glass</b>: the same body and a quieter top edge, without the sheen.</li>
- *   <li><b>Classic</b>: the flat panels Snowball always had.</li>
+ *   <li><b>Classic</b>: the flat panels LUCID always had.</li>
  * </ul>
  *
  * With 3D Menus on, panels also show their thickness on the side turned away from you, their

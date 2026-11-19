@@ -110,7 +110,7 @@ public final class SnowballClient implements ClientModInitializer {
 		return instance;
 	}
 
-	/** Whether to draw the Snowball loading screen. Safe before the client has started: the answer is then yes. */
+	/** Whether to draw the LUCID loading screen. Safe before the client has started: the answer is then yes. */
 	public static boolean showLoadingScreen() {
 		return ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.customLoadingScreen.isOn();
 	}
@@ -119,7 +119,7 @@ public final class SnowballClient implements ClientModInitializer {
 	 * How ranks appear in the player list: "badge_tag", "badge", "tag", or "off" for nothing at all.
 	 * The mixin reads this rather than deciding for itself, so the shape stays one setting.
 	 */
-	/** Whether a Snowball badge is drawn on the name above a player's head. */
+	/** Whether a LUCID badge is drawn on the name above a player's head. */
 	private static final java.util.function.Supplier<SnowballPresence.Account> PRESENCE_ACCOUNT = () -> {
 		var user = Minecraft.getInstance().getUser();
 		return user == null ? null : new SnowballPresence.Account(user.getName(), user.getProfileId(), user.getAccessToken());
@@ -264,14 +264,14 @@ public final class SnowballClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::onEndTick);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> saveAll());
-		// Other Snowball players see this player's badge only while this game runs Snowball Client.
+		// Other LUCID players see this player's badge only while this game runs LUCID.
 		SnowballPresence.start(PRESENCE_ACCOUNT, () -> ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.showMe.isOn());
 		SkinHooks.account = PRESENCE_ACCOUNT;
 		SkinHooks.platform = new MinecraftSkinPlatform();
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> SnowballPresence.stop());
 		// The launcher passes the rank the backend granted this account; the client only reads it.
 		SnowballPlayers.setSelfRank(Rank.byId(System.getProperty("snowball.rank", "snowball")));
-		LOGGER.info("Snowball Client initialised with {} modules", modules.all().size());
+		LOGGER.info("LUCID initialised with {} modules", modules.all().size());
 	}
 
 	private static Vec3 closestPoint(AABB box, Vec3 from) {
@@ -332,7 +332,7 @@ public final class SnowballClient implements ClientModInitializer {
 						.filter(java.util.Objects::nonNull)
 						.toList();
 			});
-			// Who is on Snowball is asked of the backend, so other people wear their badge too.
+			// Who is on LUCID is asked of the backend, so other people wear their badge too.
 			dev.snowballclient.client.social.RankLookup.reset();
 			dev.snowballclient.client.social.RankLookup.start(() -> {
 				if (mc.getConnection() == null) return java.util.List.of();
@@ -359,7 +359,7 @@ public final class SnowballClient implements ClientModInitializer {
 		}
 		// Whether other players can see your badge, said once when it changes.
 		String badgeNews = SnowballPresence.takeNews();
-		if (badgeNews != null) NotificationCenter.post("Snowball badge", badgeNews);
+		if (badgeNews != null) NotificationCenter.post("LUCID badge", badgeNews);
 
 		if (--autosaveCountdown <= 0) {
 			autosaveCountdown = AUTOSAVE_TICKS;
@@ -432,6 +432,6 @@ public final class SnowballClient implements ClientModInitializer {
 	private void saveAll() {
 		if (config == null) return;
 		config.saveAll(modules, theme, waypoints);
-		LOGGER.info("Snowball Client settings saved");
+		LOGGER.info("LUCID settings saved");
 	}
 }

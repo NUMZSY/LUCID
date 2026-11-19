@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Puts a Snowball player's cape on their skin, over any cape they already have (a Minecon or
+ * Puts a LUCID player's cape on their skin, over any cape they already have (a Minecon or
  * Migrator cape, or one another mod adds), and a skin you have just equipped on you. Applied early
  * (priority 500) so it runs before other mods' cape hooks, which stop at the first that answers;
  * {@link AvatarSkinMixin} makes sure of what is drawn whatever runs here.

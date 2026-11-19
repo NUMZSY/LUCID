@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, utimesSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PassThrough } from 'node:stream';
 import { describe, expect, it } from 'vitest';
@@ -89,7 +89,10 @@ describe('ProcessManager', () => {
     child.stdout.end();
     child.stderr.end();
     mkdirSync(join(game, 'crash-reports'));
-    writeFileSync(join(game, 'crash-reports', 'crash-1.txt'), '---- Minecraft Crash Report ----');
+    const report = join(game, 'crash-reports', 'crash-1.txt');
+    writeFileSync(report, '---- Minecraft Crash Report ----');
+    const reportTime = new Date(Date.now() + 1000);
+    utimesSync(report, reportTime, reportTime);
     await new Promise((r) => setTimeout(r, 10));
     child.emit('close', 1, null);
     const exit = await exited;

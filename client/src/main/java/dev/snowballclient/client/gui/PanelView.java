@@ -12,7 +12,7 @@ import java.util.Locale;
 
 import static dev.snowballclient.client.gui.ToggleWidget.scaleAlpha;
 
-/** Shared frame for secondary Snowball screens: dimmed backdrop, centred themed panel, buttons, back navigation. */
+/** Shared frame for secondary LUCID screens: dimmed backdrop, centred themed panel, buttons, back navigation. */
 public abstract class PanelView extends View {
 	protected static final int HEADER_H = 30;
 	protected final SnowballClient client;

@@ -20,7 +20,7 @@ export interface FabricApiInfo {
 const FABRIC_API: FabricApiInfo = { id: 'fabric-api', slug: 'fabric-api', name: 'Fabric API', modrinthLoader: 'fabric' };
 const LEGACY_FABRIC_API: FabricApiInfo = { id: 'legacy-fabric-api', slug: 'legacy-fabric-api', name: 'Legacy Fabric API', modrinthLoader: 'legacy-fabric' };
 
-/** The API Fabric mods (and Snowball Client) need on a Minecraft version. */
+/** The API Fabric mods (and LUCID) need on a Minecraft version. */
 export function fabricApiFor(minecraftVersion: string): FabricApiInfo {
   return usesLegacyFabric(minecraftVersion) ? LEGACY_FABRIC_API : FABRIC_API;
 }

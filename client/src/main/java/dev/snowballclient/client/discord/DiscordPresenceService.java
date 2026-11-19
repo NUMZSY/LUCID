@@ -21,7 +21,7 @@ public final class DiscordPresenceService {
 	private static final long MIN_UPDATE_MS = 4_000;
 
 	/**
-	 * @param details the line the player chose, such as "Playing with Snowball Client"
+	 * @param details the line the player chose, such as "Playing with LUCID"
 	 * @param state   where they are playing; always taken from the game, never from a setting
 	 */
 	public record Presence(String details, String state, long startSeconds, String largeImage, String largeText) {
@@ -56,7 +56,7 @@ public final class DiscordPresenceService {
 	public void start() {
 		if (!configured() || running || status == Status.REJECTED) return;
 		running = true;
-		worker = new Thread(this::run, "Snowball Discord presence");
+		worker = new Thread(this::run, "LUCID Discord presence");
 		worker.setDaemon(true);
 		worker.start();
 	}

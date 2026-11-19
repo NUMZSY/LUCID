@@ -30,7 +30,7 @@ public interface Host {
 		return null;
 	}
 
-	/** True when the key press being handled is the key bound to open the Snowball menu. */
+	/** True when the key press being handled is the key bound to open the LUCID menu. */
 	boolean isMenuKey(int key);
 
 	boolean isControlDown();

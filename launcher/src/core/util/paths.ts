@@ -85,7 +85,7 @@ export interface LauncherPaths {
   runtimes: string;
   cache: string;
   logs: string;
-  /** Verified Snowball Client jars the launcher loads into instances (never copied into mods folders). */
+  /** Verified LUCID jars the launcher loads into instances (never copied into mods folders). */
   client: string;
   /** The skin library shared with the game (design/skins.md). */
   skins: string;

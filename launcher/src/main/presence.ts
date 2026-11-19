@@ -4,14 +4,14 @@ import type { Launcher, LaunchPhaseEvent } from '../core/Launcher.js';
 import type { GameExit } from '../core/process/ProcessManager.js';
 import { DiscordRpc, type Presence } from '../core/social/DiscordRpc.js';
 
-const ICON = { largeImageKey: 'snowball', largeImageText: 'Snowball Client' };
+const ICON = { largeImageKey: 'snowball', largeImageText: 'LUCID' };
 
 /**
  * What Discord shows while the launcher runs, worked out from what the launcher is doing: browsing,
  * preparing, launching, playing. Only names the launcher already shows - an instance, a Minecraft
  * version - never an account, a path or a server address.
  *
- * While the game runs with Snowball Client's own Discord module switched on, the game shows the
+ * While the game runs with LUCID's own Discord module switched on, the game shows the
  * presence (it knows the world you are in) and the launcher's is cleared, so only one appears.
  */
 export class LauncherPresence {
@@ -57,7 +57,7 @@ export class LauncherPresence {
       .map((s) => ({ config: s.config, phase: this.launcher.launchPhase(s.config.id) ?? (this.launcher.processes.isRunning(s.config.id) ? 'running' : null) }))
       .filter((a) => a.phase !== null);
     const current = active.find((a) => a.phase === 'running') ?? active[0];
-    if (!current) return { details: 'Using Snowball Launcher', state: 'Browsing instances', ...ICON };
+    if (!current) return { details: 'Using LUCID Launcher', state: 'Browsing instances', ...ICON };
 
     const { config, phase } = current;
     const where = `${config.name} - Minecraft ${config.minecraftVersion}`;
@@ -67,13 +67,13 @@ export class LauncherPresence {
     const snowball = this.launcher.snowballSupport(config.minecraftVersion, config.loader).supported;
     return {
       details: `Playing Minecraft ${config.minecraftVersion}`,
-      state: snowball ? `${config.name} - Snowball Client` : config.name,
+      state: snowball ? `${config.name} - LUCID` : config.name,
       startTimestamp: this.started.get(config.id),
       ...ICON,
     };
   }
 
-  /** Whether Snowball Client's Discord module is on in this instance: then the game owns the presence. */
+  /** Whether LUCID's Discord module is on in this instance: then the game owns the presence. */
   private async gameShowsItsOwn(instanceId: string): Promise<boolean> {
     try {
       const file = join(this.launcher.instances.gameDir(instanceId), 'config', 'snowballclient', 'modules.json');

@@ -44,7 +44,7 @@ describe('game output parsing', () => {
     expect(messages).toEqual([
       'info: Loading Minecraft 1.21.11 with Fabric Loader 0.19.5',
       'info: Loading 3 mods',
-      'success: Snowball Client 1.1.0 loaded',
+      'success: LUCID 1.1.0 loaded',
       'error: Minecraft ran out of memory. Give this instance more memory in Edit > Java & Memory.',
       'success: Minecraft is ready',
       'warn: Minecraft reported an error: Exception in thread "main" something',
@@ -61,7 +61,7 @@ describe('game output parsing', () => {
     expect(run(record('Incompatible mods found!\n - Mod iris requires sodium 0.8.x\n - Remove optifabric', { level: 'ERROR' }))).toEqual(["Some mods can't run together: Mod iris requires sodium 0.8.x; Remove optifabric"]);
     expect(run(record('Texture missing', { level: 'ERROR', time: 10_000 }))).toEqual(['Minecraft reported an error: Texture missing']);
     expect(run(record('Texture missing again', { level: 'ERROR', time: 11_000 }))).toEqual([]);
-    expect(run(record('Config broke', { level: 'ERROR', logger: 'SnowballClient/Config', time: 20_000 }))).toEqual(['Snowball Client reported an error: Config broke']);
+    expect(run(record('Config broke', { level: 'ERROR', logger: 'SnowballClient/Config', time: 20_000 }))).toEqual(['LUCID reported an error: Config broke']);
     expect(run(record('Stopping!'))).toEqual(['Closing Minecraft']);
   });
 

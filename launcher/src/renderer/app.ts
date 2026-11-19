@@ -1,5 +1,5 @@
 /// <reference path="../shared/api.d.ts" />
-// Renderer for the Snowball Client launcher. Plain DOM + the preload bridge; no Node access.
+// Renderer for the LUCID launcher. Plain DOM + the preload bridge; no Node access.
 
 (() => {
   const api = window.snowball;
@@ -263,12 +263,12 @@
     const [p, q] = [minecraftOrder(x), minecraftOrder(y)];
     return p[0] - q[0] || p[1] - q[1] || p[2] - q[2];
   };
-  /** Why an instance runs without Snowball Client, naming the versions that do have it. */
+  /** Why an instance runs without LUCID, naming the versions that do have it. */
   const clientUnavailable = (loader: Snowball.LoaderId, minecraftVersion: string, works: string) => {
     const versions = [...new Set(ui.state!.snowballBuilds.flatMap((b) => b.minecraft.split(/,\s*/)).filter(Boolean))].sort(byMinecraftVersion);
     const list = versions.length > 1 ? `${versions.slice(0, -1).join(', ')} and ${versions[versions.length - 1]}` : versions[0];
     const where = loader === 'fabric' ? `Minecraft ${minecraftVersion}` : `${LOADER_NAMES[loader]} on Minecraft ${minecraftVersion}`;
-    return `Snowball Client isn't available for ${where} yet${list ? ` - it runs with Fabric on ${list}` : ''}. ${works}`;
+    return `LUCID isn't available for ${where} yet${list ? ` - it runs with Fabric on ${list}` : ''}. ${works}`;
   };
   const fmtMemory = (mb: number) => (mb >= 1024 ? `${(mb / 1024).toFixed(mb % 1024 ? 1 : 0)} GB` : `${mb} MB`);
   const fmtDuration = (ms: number) => {
@@ -326,25 +326,25 @@
 
   // ---------- layout ----------
   /** The ranks, their short tags and their colours: one table the whole launcher reads from. */
-  // Every rank above Snowball+ wears the flying snowball (an 11x7 picture, not a square one), its
+  // Every rank above LUCID+ wears the flying snowball (an 11x7 picture, not a square one), its
   // trail in the rank's colour. Staff, Developer and Owner are shown by that icon alone, as in the game.
   const RANKS: { id: string; tag: string; name: string; color: string; flying?: boolean; iconOnly?: boolean }[] = [
-    { id: 'snowball', tag: 'Snowball', name: 'Snowball', color: '#c7d2dd' },
-    { id: 'plus', tag: 'Snowball+', name: 'Snowball Plus', color: '#9fd8ff' },
-    { id: 'tester', tag: 'Tester', name: 'Snowball Tester', color: '#5cd6a8', flying: true },
-    { id: 'bug_hunter', tag: 'Bug Hunter', name: 'Snowball Bug Hunter', color: '#ffd166', flying: true },
-    { id: 'partner', tag: 'Partner', name: 'Snowball Partner', color: '#ffa24d', flying: true },
-    { id: 'staff', tag: 'Staff', name: 'Snowball Staff', color: '#5c8cff', flying: true, iconOnly: true },
-    { id: 'developer', tag: 'Developer', name: 'Snowball Developer', color: '#b57bff', flying: true, iconOnly: true },
-    { id: 'owner', tag: 'Owner', name: 'Snowball Owner', color: '#7fcbff', flying: true, iconOnly: true },
+    { id: 'snowball', tag: 'LUCID', name: 'LUCID', color: '#c7d2dd' },
+    { id: 'plus', tag: 'LUCID+', name: 'LUCID Plus', color: '#9fd8ff' },
+    { id: 'tester', tag: 'Tester', name: 'LUCID Tester', color: '#5cd6a8', flying: true },
+    { id: 'bug_hunter', tag: 'Bug Hunter', name: 'LUCID Bug Hunter', color: '#ffd166', flying: true },
+    { id: 'partner', tag: 'Partner', name: 'LUCID Partner', color: '#ffa24d', flying: true },
+    { id: 'staff', tag: 'Staff', name: 'LUCID Staff', color: '#5c8cff', flying: true, iconOnly: true },
+    { id: 'developer', tag: 'Developer', name: 'LUCID Developer', color: '#b57bff', flying: true, iconOnly: true },
+    { id: 'owner', tag: 'Owner', name: 'LUCID Owner', color: '#7fcbff', flying: true, iconOnly: true },
   ];
 
   const rankInfo = (id: string | undefined) => RANKS.find((r) => r.id === id) ?? RANKS[0];
 
   /** What each rank adds, in plain words, for the Ranks tab. Mirrors PERMISSIONS in the chat worker. */
   const RANK_ABILITIES: Record<string, string> = {
-    snowball: 'Wears the Snowball badge in game and can report bugs.',
-    plus: 'Snowball+ features, such as painting a custom cape.',
+    snowball: 'Wears the LUCID badge in game and can report bugs.',
+    plus: 'LUCID+ features, such as painting a custom cape.',
     tester: 'Gets beta builds before everyone else.',
     bug_hunter: 'Can sort bug reports in the Bugs tab.',
     partner: 'Partner features.',
@@ -419,7 +419,7 @@
     const timer = window.setTimeout(() => {
       if (waitingFor.get(action)?.line !== line) return;
       waitingFor.delete(action);
-      say(line, 'Sent, but the Snowball server did not confirm it. Its worker may need updating.', 'bad');
+      say(line, 'Sent, but the LUCID server did not confirm it. Its worker may need updating.', 'bad');
     }, 6000);
     waitingFor.set(action, { line, timer });
   }
@@ -460,7 +460,7 @@
   function render(): void {
     if (ui.view !== 'skins') skinsOpen = false;
     const nav = document.getElementById('nav')!;
-    // Admin only appears for an account the Snowball server says may use it.
+    // Admin only appears for an account the LUCID server says may use it.
     const entries = NAV.filter(([view]) => view !== 'admin' || canAdminister());
     // An icon rail: the label is the tooltip and the accessible name, so the rail stays narrow
     // and the page gets the width instead.
@@ -494,7 +494,7 @@
   }
 
   /**
-   * The Snowball team's message of the day, when there is one. It comes over the chat socket once
+   * The LUCID team's message of the day, when there is one. It comes over the chat socket once
    * you have joined, and from the public stats endpoint before that — an announcement is for
    * everyone, so it should not wait until somebody opens Chat.
    */
@@ -600,9 +600,9 @@
       return {
         title: 'Java could not be found',
         message: automatic
-          ? 'This version of Minecraft needs a Java runtime that Snowball could not find, and downloading it did not work.'
+          ? 'This version of Minecraft needs a Java runtime that LUCID could not find, and downloading it did not work.'
           : 'This version of Minecraft needs a Java runtime that is not installed, and automatic Java downloads are turned off.',
-        hints: automatic ? ['Check your internet connection, then try again.'] : ['Snowball can download the exact Java Minecraft asks for.'],
+        hints: automatic ? ['Check your internet connection, then try again.'] : ['LUCID can download the exact Java Minecraft asks for.'],
         fixes: automatic
           ? [retry, go('java', 'Open the Java page')]
           : [{ label: 'Fix automatically', primary: true, run: async () => {
@@ -634,17 +634,17 @@
     if (/download|http|network|econn|etimedout|enotfound|fetch failed|socket/.test(text)) {
       return {
         title: 'Some game files could not be downloaded',
-        message: 'Snowball could not fetch everything Minecraft needs, so it stopped rather than starting a broken game.',
+        message: 'LUCID could not fetch everything Minecraft needs, so it stopped rather than starting a broken game.',
         hints: ['Check your internet connection. Files that did arrive are kept, so trying again picks up where it stopped.'],
         fixes: [retry, go('home', 'Verify files')],
       };
     }
     if (/eacces|eperm|ebusy|access is denied|permission|in use/.test(text)) {
       return {
-        title: 'A file Snowball needed was blocked',
+        title: 'A file LUCID needed was blocked',
         message: 'A game file could not be written or read, usually because antivirus, another program or folder permissions got in the way.',
-        hints: ['Check whether your antivirus quarantined something in the Snowball folder, then try again.'],
-        fixes: [retry, { label: 'Open the Snowball folder', run: () => void guard(() => api.openLauncherFolder('root')) }],
+        hints: ['Check whether your antivirus quarantined something in the LUCID folder, then try again.'],
+        fixes: [retry, { label: 'Open the LUCID folder', run: () => void guard(() => api.openLauncherFolder('root')) }],
       };
     }
     if (/mod|fabric|quilt|forge|neoforge|mixin|cannot start/.test(text)) {
@@ -667,12 +667,12 @@
   function updateLine(state: Snowball.UpdateState): string {
     switch (state.status) {
       case 'checking': return 'Looking for a new version';
-      case 'downloading': return `Downloading Snowball Client ${state.newVersion}`;
-      case 'verifying': return `Checking Snowball Client ${state.newVersion}`;
-      case 'ready': return `Snowball Client ${state.newVersion} is ready`;
-      case 'installing': return 'Restarting Snowball';
-      case 'up-to-date': return 'Snowball is up to date';
-      case 'manual': return state.newVersion ? `Snowball Client ${state.newVersion} is available` : 'Updates are handled manually in this build';
+      case 'downloading': return `Downloading LUCID ${state.newVersion}`;
+      case 'verifying': return `Checking LUCID ${state.newVersion}`;
+      case 'ready': return `LUCID ${state.newVersion} is ready`;
+      case 'installing': return 'Restarting LUCID';
+      case 'up-to-date': return 'LUCID is up to date';
+      case 'manual': return state.newVersion ? `LUCID ${state.newVersion} is available` : 'Updates are handled manually in this build';
       case 'error': return state.title ?? 'The update could not be checked';
       default: return 'No update has been checked for yet';
     }
@@ -715,7 +715,7 @@
           ? h('div', { class: 'muted', style: 'font-size:12px' }, `${fmtBytes(state.transferred ?? 0)} of ${fmtBytes(state.total)}${state.bytesPerSecond ? ` · ${fmtBytes(state.bytesPerSecond)}/s` : ''}`)
           : null,
         state.status === 'ready'
-          ? h('p', { class: 'muted', style: 'font-size:13px;margin:0' }, 'Snowball restarts to finish, which takes a few seconds. Your instances, mods and worlds are untouched.')
+          ? h('p', { class: 'muted', style: 'font-size:13px;margin:0' }, 'LUCID restarts to finish, which takes a few seconds. Your instances, mods and worlds are untouched.')
           : null,
         state.status === 'manual' && state.downloadUrl
           ? h('p', { class: 'muted', style: 'font-size:13px;margin:0' }, state.message ?? '')
@@ -728,7 +728,7 @@
     if (state.status === 'ready') actions.push({ label: 'Restart now', kind: 'primary', onClick: (c) => { c(); void api.installUpdate(); } });
     else if ((state.status === 'manual' || state.status === 'error') && state.downloadUrl) actions.push({ label: 'Open the download page', kind: 'primary', onClick: () => void api.openDownloadPage() });
     else if (state.status === 'up-to-date' || state.status === 'idle') actions.push({ label: 'Check again', kind: 'primary', onClick: () => void retryUpdate() });
-    modal('Snowball Client update', body, actions);
+    modal('LUCID update', body, actions);
   }
 
   /** Shown across the top while an update is in flight, or when one needs a decision. */
@@ -740,7 +740,7 @@
       return h('div', { class: 'update-bar ready' },
         h('div', { class: 'update-dot' }),
         h('div', { class: 'grow' },
-          h('div', {}, `Updated to Snowball Client ${state.version}`),
+          h('div', {}, `Updated to LUCID ${state.version}`),
           h('div', { class: 'muted', style: 'font-size:12px' }, `You were on ${state.justUpdatedFrom}.`)),
         h('button', { class: 'btn small', onClick: () => whatsNewDialog(state.version) }, "See what's new"),
         h('button', { class: 'btn small ghost', onClick: () => { if (ui.update) ui.update = { ...ui.update, justUpdatedFrom: undefined }; render(); } }, 'Dismiss'));
@@ -771,7 +771,7 @@
     if (state.status === 'error' && state.title) {
       return h('div', { class: 'update-bar failed' },
         h('div', { class: 'update-dot' }),
-        h('div', { class: 'grow' }, h('div', {}, state.title), h('div', { class: 'muted', style: 'font-size:12px' }, 'Snowball is still working normally.')),
+        h('div', { class: 'grow' }, h('div', {}, state.title), h('div', { class: 'muted', style: 'font-size:12px' }, 'LUCID is still working normally.')),
         h('button', { class: 'btn small', onClick: () => updateDialog() }, 'What happened?'));
     }
     return null;
@@ -788,7 +788,7 @@
     void api.releaseNotes(version).then((result) => {
       const notes = Array.isArray(result) ? result : result ? [result] : [];
       if (!notes.length) {
-        body.replaceChildren(h('p', { class: 'muted' }, 'This build does not carry its release notes. The full list is on the Snowball website.'));
+        body.replaceChildren(h('p', { class: 'muted' }, 'This build does not carry its release notes. The full list is on the LUCID website.'));
         return;
       }
       body.replaceChildren(...notes.map((note) =>
@@ -809,7 +809,7 @@
       h('img', { src: 'assets/logo.png', alt: '' }),
       h('div', { class: 'boot-name' }, 'UPDATING'),
       h('div', { class: 'boot-bar' }, h('div', {})),
-      h('div', { class: 'boot-sub' }, 'Restarting Snowball'));
+      h('div', { class: 'boot-sub' }, 'Restarting LUCID'));
     document.body.append(el);
   }
 
@@ -958,7 +958,7 @@
   function homeView(): Node {
     const state = ui.state!;
     const inst = selected();
-    if (!inst) return h('div', {}, header('HOME', 'Welcome to Snowball Client'), emptyState('Create an instance to install and play Minecraft.'));
+    if (!inst) return h('div', {}, header('HOME', 'Welcome to LUCID'), emptyState('Create an instance to install and play Minecraft.'));
 
     const picker = h('select', { class: 'input picker', onChange: (e: Event) => select((e.target as HTMLSelectElement).value) },
       ...state.instances.map((i) => h('option', { value: i.id, selected: i.id === inst.id }, i.name)));
@@ -1028,13 +1028,13 @@
     return h('div', { class: 'welcome' },
       h('div', { class: 'welcome-text' },
         h('div', { class: 'welcome-hello' },
-          account ? `Welcome back, ${account.name}` : 'Welcome to Snowball',
+          account ? `Welcome back, ${account.name}` : 'Welcome to LUCID',
           rank && rank !== 'snowball' ? rankChip(rank) : null),
         h('div', { class: 'welcome-sub' }, account ? 'Pick an instance and press play.' : 'Add a Microsoft account in Settings to get started.')),
       h('div', { class: 'spacer' }),
       picker,
       online
-        ? h('div', { class: 'welcome-online', title: 'People using Snowball right now' },
+        ? h('div', { class: 'welcome-online', title: 'People using LUCID right now' },
             h('span', { class: 'count-dot' }),
             h('span', {}, `${online.toLocaleString()} online`))
         : null);
@@ -1055,7 +1055,7 @@
           h('div', { class: 'hero-tags' },
             h('span', { class: 'tag' }, inst.minecraftVersion),
             h('span', { class: 'tag' }, inst.loaderName),
-            inst.snowball.supported ? h('span', { class: 'tag accent' }, `SNOWBALL ${inst.snowball.version ?? ''}`) : null,
+            inst.snowball.supported ? h('span', { class: 'tag accent' }, `LUCID ${inst.snowball.version ?? ''}`) : null,
             inst.running ? h('span', { class: 'tag running' }, 'RUNNING') : null))),
       h('div', { class: 'stats' },
         stat('Minecraft', inst.minecraftVersion),
@@ -1070,7 +1070,7 @@
         verifyButton),
       progressBar(inst.id));
   }
-  /** What this build of Snowball is, and whether anything newer is waiting. */
+  /** What this build of LUCID is, and whether anything newer is waiting. */
   function snowballCard(inst: Snowball.Instance): HTMLElement {
     const update = ui.update;
     const updateText =
@@ -1108,7 +1108,7 @@
   }
 
   /**
-   * How many people are on Snowball, counted by the Snowball server itself. It is hidden when this
+   * How many people are on Snowball, counted by the LUCID server itself. It is hidden when this
    * build has no server set, and when the server cannot be reached, rather than showing a zero.
    */
   function playerCount(): HTMLElement | null {
@@ -1117,7 +1117,7 @@
     const number = (value: number, label: string) => h('div', { class: 'count-item grow' },
       h('div', { class: 'n' }, value.toLocaleString()), h('div', { class: 'l' }, label));
     return h('div', { class: 'mini-card count-card' },
-      h('div', { class: 'section-title' }, 'SNOWBALL PLAYERS'),
+      h('div', { class: 'section-title' }, 'LUCID PLAYERS'),
       h('div', { class: 'count-now' },
         h('div', { class: 'count-dot' }),
         h('div', { class: 'count-value' }, stats.online.toLocaleString())),
@@ -1143,7 +1143,7 @@
 
   function activityRow(e: Snowball.ActivityEvent): HTMLElement {
     const time = new Date(e.time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    return h('div', { class: `act ${e.level}` }, h('span', { class: 'act-time' }, time), h('span', { class: 'act-tag' }, '[Snowball]'), h('span', { class: 'act-msg' }, e.message));
+    return h('div', { class: `act ${e.level}` }, h('span', { class: 'act-time' }, time), h('span', { class: 'act-tag' }, '[LUCID]'), h('span', { class: 'act-msg' }, e.message));
   }
 
   function techRow(l: Snowball.GameLog): HTMLElement {
@@ -1155,7 +1155,7 @@
   function fillLog(view: HTMLElement, id: string): void {
     if (ui.logMode === 'activity') {
       const events = (ui.activity.get(id) ?? []).slice(-300);
-      view.replaceChildren(...(events.length ? events.map(activityRow) : [h('span', { class: 'muted' }, 'Press Play and Snowball shows each step here.')]));
+      view.replaceChildren(...(events.length ? events.map(activityRow) : [h('span', { class: 'muted' }, 'Press Play and LUCID shows each step here.')]));
     } else {
       const lines = (ui.logs.get(id) ?? []).slice(-300);
       view.replaceChildren(...(lines.length ? lines.map(techRow) : [h('span', { class: 'muted' }, 'Game output appears here while the instance is running.')]));
@@ -1244,7 +1244,7 @@
         : null;
       return h('div', { class: `issue row${i.severity === 'warning' ? ' warning' : ''}` }, h('span', { class: 'issue-text' }, i.message), action);
     };
-    // Snowball Client status with Verify / Repair; protection itself is enforced by the launcher core.
+    // LUCID status with Verify / Repair; protection itself is enforced by the launcher core.
     const coreEl = h('div', {});
     const loadCore = async () => {
       if (inst.loader === 'vanilla') return;
@@ -1262,7 +1262,7 @@
           repair.disabled = true;
           repair.textContent = healthy ? 'Checking...' : 'Repairing...';
           const r = await guard(() => api.repairCore(inst.id));
-          if (r) toast(healthy ? 'Snowball Client verified' : 'Snowball Client repaired');
+          if (r) toast(healthy ? 'LUCID verified' : 'LUCID repaired');
           await load();
           await loadCore();
         },
@@ -1270,7 +1270,7 @@
       coreEl.replaceChildren(h('div', { class: 'card core-card' },
         h('img', { class: 'core-logo', src: 'assets/logo.png', alt: '' }),
         h('div', { class: 'grow-1' },
-          h('div', { class: 'core-title' }, `SNOWBALL CLIENT ${report.build?.version ?? ''}`),
+          h('div', { class: 'core-title' }, `LUCID CLIENT ${report.build?.version ?? ''}`),
           h('div', { class: 'muted' }, healthy ? `Loaded by the launcher for Minecraft ${report.build?.minecraft}, not a mod file. Checked before every launch.` : `${report.problems.join('. ')}. It is repaired automatically when you press Play.`)),
         h('span', { class: `tag${healthy ? ' accent' : ' warn'}` }, healthy ? 'VERIFIED' : 'NEEDS REPAIR'),
         repair));
@@ -1286,10 +1286,10 @@
       const rank = (m: Snowball.Mod) => (m.protection === 'required' ? 0 : 1);
       listEl.replaceChildren(...[...result.mods].sort((a, b) => rank(a) - rank(b)).map((m) => {
         const locked = m.protection === 'required';
-        const note = locked ? ' - needed by Snowball Client' : m.managed ? ' - managed by performance profile' : '';
+        const note = locked ? ' - needed by LUCID' : m.managed ? ' - managed by performance profile' : '';
         return h('div', { class: 'list-row' },
           locked
-            ? h('span', { class: 'lock', title: 'Required by Snowball Client' }, icon('lock'))
+            ? h('span', { class: 'lock', title: 'Required by LUCID' }, icon('lock'))
             : toggle(m.enabled, async (value) => { await guard(() => api.setModEnabled(inst.id, m.fileName, value)); await load(); }, engaged(inst)),
           h('div', { class: 'grow' },
             h('div', { class: 'truncate' }, m.name, m.version ? h('span', { class: 'muted' }, `  ${m.version}`) : null),
@@ -2122,7 +2122,7 @@
     const state = ui.chat;
     if (!state || !state.configured) {
       return h('div', { class: 'stack' },
-        header('CHAT', 'Talk to other Snowball players'),
+        header('CHAT', 'Talk to other LUCID players'),
         h('div', { class: 'card empty' },
           h('h2', { class: 'page-title' }, 'CHAT IS NOT SWITCHED ON'),
           h('p', { class: 'muted' }, 'This build has no chat server set, so there is nothing to join yet.')));
@@ -2185,11 +2185,11 @@
       title.value = '';
       detail.value = '';
       steps.value = '';
-      toast('Thank you - the report went straight to the Snowball team.');
+      toast('Thank you - the report went straight to the LUCID team.');
     };
     return h('div', { class: 'card' },
       h('div', { class: 'section-title' }, 'REPORT A BUG'),
-      h('p', { class: 'muted', style: 'font-size:12px;margin:0 0 10px' }, 'Your Minecraft version, Snowball version and loader are attached automatically.'),
+      h('p', { class: 'muted', style: 'font-size:12px;margin:0 0 10px' }, 'Your Minecraft version, LUCID version and loader are attached automatically.'),
       h('div', { class: 'stack' }, title, detail, steps),
       h('div', { class: 'row', style: 'margin-top:10px' },
         h('div', { class: 'spacer' }),
@@ -2204,23 +2204,23 @@
     const state = ui.chat;
     if (!state?.configured) {
       return h('div', { class: 'stack' },
-        header('ADMIN', 'Snowball owner tools'),
+        header('ADMIN', 'LUCID owner tools'),
         h('div', { class: 'card empty' },
-          h('h2', { class: 'page-title' }, 'NO SNOWBALL SERVER'),
-          h('p', { class: 'muted' }, 'This build has no Snowball server set, so there is nothing to administer.')));
+          h('h2', { class: 'page-title' }, 'NO LUCID SERVER'),
+          h('p', { class: 'muted' }, 'This build has no LUCID server set, so there is nothing to administer.')));
     }
     if (!canAdminister()) {
       return h('div', { class: 'stack' },
-        header('ADMIN', 'Snowball staff tools'),
+        header('ADMIN', 'LUCID staff tools'),
         h('div', { class: 'card empty' },
           h('h2', { class: 'page-title' }, state.status === 'online' ? 'Not your rank' : 'Join chat first'),
           h('p', { class: 'muted' }, state.status === 'online'
-            ? 'Your account does not hold a rank that can administer Snowball.'
-            : 'Join chat so the Snowball server can confirm which account you are, then come back.'),
+            ? 'Your account does not hold a rank that can administer LUCID.'
+            : 'Join chat so the LUCID server can confirm which account you are, then come back.'),
           state.status === 'online' ? null : h('button', { class: 'btn primary', onClick: () => void guard(() => api.joinChat()) }, 'Join chat')));
     }
     return h('div', { class: 'stack' },
-      header('ADMIN', `Snowball staff tools  \u00b7  ${state.online} online`),
+      header('ADMIN', `LUCID staff tools  \u00b7  ${state.online} online`),
       adminCard());
   }
 
@@ -2421,7 +2421,7 @@
                     class: 'btn small danger',
                     onClick: () => confirmDialog(
                       `Take ${found.name}'s rank away?`,
-                      `${found.name} goes back to plain Snowball and loses everything that rank allowed. You can give it back at any time.`,
+                      `${found.name} goes back to plain LUCID and loses everything that rank allowed. You can give it back at any time.`,
                       'Revoke it',
                       async () => { await applyRank(found.uuid!, 'snowball', line); }),
                   }, 'Revoke')
@@ -2455,7 +2455,7 @@
                   onClick: () => { search.value = person.name; void find(); },
                 }, 'Change')
               : null)))
-      : h('p', { class: 'muted', style: 'margin:0' }, 'Nobody holds a rank above Snowball yet, or the list is still coming.');
+      : h('p', { class: 'muted', style: 'margin:0' }, 'Nobody holds a rank above LUCID yet, or the list is still coming.');
 
     return h('div', { class: 'admin-body' },
       line,
@@ -2480,7 +2480,7 @@
     const result = await guard(() => api.setRank(uuid, rank));
     if (result && !result.ok) toast(result.reason ?? 'That rank was not changed.', 'error');
   }
-  /** Everyone the Snowball server has seen, newest first, with a filter for finding one. */
+  /** Everyone the LUCID server has seen, newest first, with a filter for finding one. */
   function peopleList(): HTMLElement {
     const line = statusLine();
     const list = h('div', { class: 'list' });
@@ -2501,12 +2501,12 @@
           can('ranks.manage')
             ? h('button', {
                 class: 'btn small',
-                'aria-label': `${person.rank === 'snowball' ? 'Give Snowball+ to' : 'Remove the rank from'} ${person.name}`,
+                'aria-label': `${person.rank === 'snowball' ? 'Give LUCID+ to' : 'Remove the rank from'} ${person.name}`,
                 onClick: async () => {
                   await applyRank(person.uuid, person.rank === 'snowball' ? 'plus' : 'snowball', line);
                   setTimeout(() => void api.chatAdmin('people'), 400);
                 },
-              }, person.rank === 'snowball' ? 'Give Snowball+' : 'Remove rank')
+              }, person.rank === 'snowball' ? 'Give LUCID+' : 'Remove rank')
             : null,
           can('chat.moderate')
             ? h('button', {
@@ -2551,7 +2551,7 @@
         h('p', { style: 'margin:0 0 8px;white-space:pre-wrap' }, bug.detail),
         bug.steps ? h('div', { class: 'muted', style: 'font-size:12px;white-space:pre-wrap' }, `Steps: ${bug.steps}`) : null,
         h('div', { class: 'muted', style: 'font-size:11px;margin-top:8px' },
-          [bug.minecraft && `Minecraft ${bug.minecraft}`, bug.loader, bug.snowball && `Snowball ${bug.snowball}`].filter(Boolean).join(' \u00b7 ')));
+          [bug.minecraft && `Minecraft ${bug.minecraft}`, bug.loader, bug.snowball && `LUCID ${bug.snowball}`].filter(Boolean).join(' \u00b7 ')));
       detail.hidden = true;
 
       const toggle = h('button', {
@@ -2590,14 +2590,14 @@
     return h('div', { class: 'admin-body admin-wide' }, summary, line, h('div', { class: 'admin-cards admin-cards-wide' }, ...rows));
   }
   /**
-   * Snowball+ cape designs waiting for a decision. Each shows as the player will wear it, larger
+   * LUCID+ cape designs waiting for a decision. Each shows as the player will wear it, larger
    * and pixel-sharp, so it can be judged properly; nothing is worn by anyone until it is approved.
    */
   function capeList(): HTMLElement {
     const line = statusLine();
     if (!ui.capes.length) {
       return h('div', { class: 'admin-body' },
-        h('p', { class: 'muted' }, 'No capes waiting. Snowball+ players send designs from the cape studio in the game.'));
+        h('p', { class: 'muted' }, 'No capes waiting. LUCID+ players send designs from the cape studio in the game.'));
     }
     const summary = h('div', { class: 'muted', style: 'font-size:12px' },
       `${ui.capes.length} design${ui.capes.length === 1 ? '' : 's'} waiting for a decision`);
@@ -2653,7 +2653,7 @@
     const known: [string, string][] = [
       ['chat', 'Global chat'],
       ['bug_reports', 'Bug reporting'],
-      ['snowball_plus', 'Snowball+ features'],
+      ['snowball_plus', 'LUCID+ features'],
       ['beta', 'Beta builds'],
     ];
     const flags = ui.chat?.flags ?? {};
@@ -2698,7 +2698,7 @@
     view.scrollTop = view.scrollHeight;
   }
 
-  /** Snowball+ name colours; the same ids and colours as the client's Looks.COLOURS and the worker. */
+  /** LUCID+ name colours; the same ids and colours as the client's Looks.COLOURS and the worker. */
   const NAME_COLOURS: Record<string, string> = {
     ice: '#7fcbff', snow: '#eaf6ff', mint: '#6ff2c8', gold: '#ffd166', ember: '#ff8a4d', rose: '#ff7fb0', violet: '#b794ff',
   };
@@ -2888,7 +2888,7 @@
         h('div', { class: 'list-row' },
           h('div', { class: 'grow' },
             h('div', {}, 'Update automatically'),
-            h('div', { class: 'muted', style: 'font-size:13px' }, 'Snowball updates itself when it starts, so you never run the installer again. It waits if a game is running.')),
+            h('div', { class: 'muted', style: 'font-size:13px' }, 'LUCID updates itself when it starts, so you never run the installer again. It waits if a game is running.')),
           toggle(s.updates.automatic, (v) => void update({ updates: { ...s.updates, automatic: v } }))),
         h('div', { class: 'list-row' },
           h('div', { class: 'grow' }, h('div', {}, 'This launcher'), h('div', { class: 'muted', style: 'font-size:13px' }, ui.version ? `Version ${ui.version}` : 'Reading the version...')),
@@ -3096,11 +3096,11 @@
 
   /** How Discord Rich Presence stands, in a sentence. */
   function discordLine(d: Snowball.AppState['discord']): string {
-    if (!d.configured) return 'This build of Snowball has no Discord application yet, so there is nothing Discord can show.';
+    if (!d.configured) return 'This build of LUCID has no Discord application yet, so there is nothing Discord can show.';
     switch (d.status) {
       case 'connected': return 'Discord shows what you are doing: browsing, starting a game or playing.';
       case 'connecting': return 'Connecting to Discord...';
-      case 'unavailable': return 'Discord is not running. Snowball connects by itself as soon as it opens.';
+      case 'unavailable': return 'Discord is not running. LUCID connects by itself as soon as it opens.';
       case 'rejected': return 'Discord did not accept this build\'s application, so nothing is shown.';
       default: return 'Switched off.';
     }
@@ -3139,7 +3139,7 @@
         h('div', { class: 'section-title' }, 'LAUNCHER'),
         h('div', { class: 'list' },
           settingRow('Reduce motion', 'Turn off interface animations.', toggle(s.appearance.reduceMotion, (v) => void update({ appearance: { ...s.appearance, reduceMotion: v } }))),
-          settingRow('Keeps going in the background', 'Launching, downloads and updates carry on when you switch to another app or minimise Snowball. Nothing waits for this window.', h('span', { class: 'tag' }, 'ALWAYS')),
+          settingRow('Keeps going in the background', 'Launching, downloads and updates carry on when you switch to another app or minimise LUCID. Nothing waits for this window.', h('span', { class: 'tag' }, 'ALWAYS')),
           settingRow('Minimise when Minecraft starts', 'Once the game window is up, the launcher steps out of the way.', toggle(s.game.minimizeOnLaunch, (v) => void update({ game: { ...s.game, minimizeOnLaunch: v } }))),
           settingRow('Show on Discord', discordLine(state.discord), toggle(s.discord.enabled && state.discord.configured, (v) => void update({ discord: { enabled: v } }), !state.discord.configured)),
           settingRow('Close when Minecraft starts', 'The launcher closes its window and finishes when Minecraft does. If the game crashes, it comes back to tell you why.', toggle(s.game.closeLauncherOnLaunch, (v) => void update({ game: { ...s.game, closeLauncherOnLaunch: v } }))),
@@ -3151,7 +3151,7 @@
         h('div', { class: 'section-title' }, 'DATA'),
         h('div', { class: 'list' },
           settingRow('Launcher folder', state.dataRoot, h('button', { class: 'btn', onClick: () => void guard(() => api.openLauncherFolder('root')) }, 'Open')),
-          settingRow('Logs', 'Everything Snowball did, with account tokens always redacted.',
+          settingRow('Logs', 'Everything LUCID did, with account tokens always redacted.',
             h('button', {
               class: 'btn',
               onClick: async (e: MouseEvent) => {
@@ -3168,13 +3168,13 @@
               },
             }, 'Copy'),
             h('button', { class: 'btn', onClick: () => void guard(() => api.openLauncherFolder('logs')) }, 'Open folder')),
-          settingRow('Snowball Client', state.snowballBuilds.length ? state.snowballBuilds.map((b) => `${b.version} for Fabric ${b.minecraft}`).join(', ') : 'Not bundled in this build', h('span', { class: `tag${state.snowballBuilds.length ? ' accent' : ''}` }, state.snowballBuilds.length ? 'BUILT IN' : 'MISSING')))));
+          settingRow('LUCID', state.snowballBuilds.length ? state.snowballBuilds.map((b) => `${b.version} for Fabric ${b.minecraft}`).join(', ') : 'Not bundled in this build', h('span', { class: `tag${state.snowballBuilds.length ? ' accent' : ''}` }, state.snowballBuilds.length ? 'BUILT IN' : 'MISSING')))));
   }
 
   // ---------- dialogs ----------
   function createInstanceDialog(): void {
     const state = ui.state!;
-    const name = h('input', { class: 'input', value: 'Snowball', maxlength: '64' }) as HTMLInputElement;
+    const name = h('input', { class: 'input', value: 'LUCID', maxlength: '64' }) as HTMLInputElement;
     const version = h('select', { class: 'input' }, h('option', {}, 'Loading...')) as HTMLSelectElement;
     const snapshots = h('input', { type: 'checkbox' }) as HTMLInputElement;
     const loader = h('select', { class: 'input' }, ...(['fabric', 'vanilla', 'quilt', 'forge', 'neoforge'] as Snowball.LoaderId[]).map((l) => h('option', { value: l }, LOADER_NAMES[l]))) as HTMLSelectElement;
@@ -3208,7 +3208,7 @@
       void api.snowballSupport(version.value, loader.value as Snowball.LoaderId).then((s) => {
         if (check !== supportCheck) return;
         clientNote.textContent = s.supported
-          ? `Snowball Client ${s.version} and ${s.fabricApi} are set up automatically.`
+          ? `LUCID ${s.version} and ${s.fabricApi} are set up automatically.`
           : clientUnavailable(loader.value as Snowball.LoaderId, version.value, 'The instance works without it.');
         if (!s.performanceProfiles) {
           profile.disabled = true;
@@ -3250,7 +3250,7 @@
           ui.selectedId = created.id;
           ui.view = 'home';
           await refresh();
-          toast(created.snowball.supported ? `Created ${created.name} with Snowball Client ${created.snowball.version}. Press Play to start.` : `Created ${created.name}. Press Play to install and launch.`);
+          toast(created.snowball.supported ? `Created ${created.name} with LUCID ${created.snowball.version}. Press Play to start.` : `Created ${created.name}. Press Play to install and launch.`);
         },
       },
     ]);
@@ -3288,7 +3288,7 @@
         h('label', { class: 'field' }, 'Minecraft version', version),
         h('label', { class: 'field' }, 'Mod loader', loader),
         h('label', { class: 'field' }, 'Loader version', loaderVersion),
-        h('div', { class: 'muted core-note' }, inst.snowball.supported ? `Snowball Client ${inst.snowball.version} is built in and checked before every launch.` : "Snowball Client isn't available for this Minecraft version and loader yet.")),
+        h('div', { class: 'muted core-note' }, inst.snowball.supported ? `LUCID ${inst.snowball.version} is built in and checked before every launch.` : "LUCID isn't available for this Minecraft version and loader yet.")),
       'Java & Memory': h('div', { class: 'form-grid' },
         h('label', { class: 'field full' }, 'Java executable', h('div', { class: 'row' }, javaPath, h('button', { class: 'btn', onClick: async () => { const p = await guard(() => api.browseJava()); if (p) javaPath.value = p; } }, 'Browse'), h('button', { class: 'btn ghost', onClick: () => (javaPath.value = '') }, 'Auto'))),
         h('label', { class: 'field full' }, 'Maximum memory', maxMem),
@@ -3355,7 +3355,7 @@
     }
     const close = modal('SIGN IN WITH MICROSOFT', h('div', {},
       h('p', {}, 'A Microsoft sign-in window has opened.'),
-      h('p', { class: 'muted' }, 'Enter your email and password there. They go straight to Microsoft; Snowball Client never sees your password.'),
+      h('p', { class: 'muted' }, 'Enter your email and password there. They go straight to Microsoft; LUCID never sees your password.'),
       h('div', { class: 'progress indeterminate' }, h('div', {}))), []);
     void api.signInMicrosoft()
       .then(async (account) => {
@@ -3368,7 +3368,7 @@
 
   function microsoftSetupDialog(): void {
     // Players never configure anything; the developer ships the app ID in app-config.json (see README).
-    modal('SIGN-IN UNAVAILABLE', h('p', { class: 'muted' }, 'Microsoft sign-in is not enabled in this build of Snowball Client yet. Please update to the latest version.'), [
+    modal('SIGN-IN UNAVAILABLE', h('p', { class: 'muted' }, 'Microsoft sign-in is not enabled in this build of LUCID yet. Please update to the latest version.'), [
       { label: 'OK', kind: 'primary', onClick: (close) => close() },
     ]);
   }

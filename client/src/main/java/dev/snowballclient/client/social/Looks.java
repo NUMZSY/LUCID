@@ -6,19 +6,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
- * What Snowball players wear. Your own comes straight from your settings, so a change shows at
+ * What LUCID players wear. Your own comes straight from your settings, so a change shows at
  * once; everybody else's comes from the backend, which only passes on capes the client ships.
  */
 public final class Looks {
 	/** Capes in the order the picker shows them; ids must match the backend's list. */
 	public static final java.util.List<String> CAPES = java.util.List.of("snowball", "aurora", "northern_lights", "frost", "ember", "sakura", "midnight", "void", "glacier", "comet", "prism");
-	/** The capes only Snowball+ may wear. Everyone sees them on a Snowball+ player's back. */
+	/** The capes only LUCID+ may wear. Everyone sees them on a LUCID+ player's back. */
 	public static final java.util.List<String> PLUS_CAPES = java.util.List.of("glacier", "comet", "prism");
-	/** A Snowball+ player's own approved design; drawn from the backend as "custom:version". */
+	/** A LUCID+ player's own approved design; drawn from the backend as "custom:version". */
 	public static final String CUSTOM = "custom";
 
 	/**
-	 * Name colours Snowball+ players can pick, id to RGB, in the order the picker shows them. The ids
+	 * Name colours LUCID+ players can pick, id to RGB, in the order the picker shows them. The ids
 	 * must match the backend's list, and the launcher's chat uses the same colours.
 	 */
 	public static final Map<String, Integer> COLOURS = orderedColours();
@@ -80,7 +80,7 @@ public final class Looks {
 		return wearable(own) ? own : "";
 	}
 
-	/** A cape you may wear yourself: one the client ships, and a Snowball+ one only with Snowball+. */
+	/** A cape you may wear yourself: one the client ships, and a LUCID+ one only with LUCID+. */
 	private static boolean wearable(String cape) {
 		if (!CAPES.contains(cape)) return false;
 		return !PLUS_CAPES.contains(cape) || SnowballPlayers.can(Permission.PLUS_FEATURES);
@@ -102,7 +102,7 @@ public final class Looks {
 		return rgb == null ? -1 : rgb;
 	}
 
-	/** The name colour to tell the backend about, or empty: one from the list, and only with Snowball+. */
+	/** The name colour to tell the backend about, or empty: one from the list, and only with LUCID+. */
 	public static String selfColour() {
 		String own = selfColour.get();
 		return COLOURS.containsKey(own) && SnowballPlayers.can(Permission.PLUS_FEATURES) ? own : "";

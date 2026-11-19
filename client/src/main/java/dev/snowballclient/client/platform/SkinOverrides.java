@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.PlayerSkin;
 import java.util.UUID;
 
 /**
- * What Snowball changes about how a player looks. A Snowball cape is worn over any other cape (a
+ * What LUCID changes about how a player looks. A LUCID cape is worn over any other cape (a
  * Minecon or Migrator cape, or one another mod adds), and a skin you have just equipped shows on
  * you before Minecraft has fetched it again. Everything that draws a player asks through here, so
  * the tab list, the player itself and its elytra always agree. Render thread.
@@ -27,7 +27,7 @@ public final class SkinOverrides {
 		selfSlim = slim;
 	}
 
-	/** {@code skin} as Snowball shows it for {@code id}; the same instance when nothing changes. */
+	/** {@code skin} as LUCID shows it for {@code id}; the same instance when nothing changes. */
 	public static PlayerSkin apply(UUID id, PlayerSkin skin) {
 		if (skin == null || id == null) return skin;
 		ClientAsset.Texture body = skin.body();
@@ -42,7 +42,7 @@ public final class SkinOverrides {
 		}
 		ClientAsset.Texture snowballCape = CapeTextures.forPlayer(id);
 		if (snowballCape != null) {
-			// No elytra texture of its own, so the wings take the Snowball cape too, never the cape it covers.
+			// No elytra texture of its own, so the wings take the LUCID cape too, never the cape it covers.
 			cape = snowballCape;
 			elytra = null;
 			changed = true;

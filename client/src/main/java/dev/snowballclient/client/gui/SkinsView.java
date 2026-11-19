@@ -66,8 +66,8 @@ public final class SkinsView extends PanelView {
 	/** Radians a second the preview turns by itself, and per GUI unit dragged. */
 	private static final float TURN_SPEED = 0.6f;
 	private static final float DRAG_TURN = 0.03f;
-	private static final ExecutorService WORKER = daemon("Snowball Client skins");
-	private static final ExecutorService PAINTER = daemon("Snowball Client skin preview");
+	private static final ExecutorService WORKER = daemon("LUCID skins");
+	private static final ExecutorService PAINTER = daemon("LUCID skin preview");
 	/**
 	 * What the worker found for a panel that has since closed, applied by the next panel shown, so
 	 * a skin Mojang accepts after you closed the panel still shows on you once it is opened again.
@@ -424,7 +424,7 @@ public final class SkinsView extends PanelView {
 	private void drawStatus(Canvas c) {
 		int x = panelX + 12;
 		int room = panelW - 24;
-		String shown = status.isEmpty() ? "Your saved skins are shared with the Snowball launcher." : status;
+		String shown = status.isEmpty() ? "Your saved skins are shared with the LUCID launcher." : status;
 		int colour = status.isEmpty() || statusColour == 0 ? theme.mutedText() : statusColour;
 		int line = Math.round(UiText.lineHeight(c, UiText.DETAIL)) + 1;
 		List<String> lines = wrap(c, shown, room, 2);

@@ -25,9 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Tells the Snowball backend that this game is running Snowball Client, so other Snowball players
- * see this player's badge - and only while that is true. Somebody who used Snowball once and now
- * plays on another client gets no badge, because only a game running Snowball Client says so.
+ * Tells the LUCID backend that this game is running LUCID, so other LUCID players
+ * see this player's badge - and only while that is true. Somebody who used LUCID once and now
+ * plays on another client gets no badge, because only a game running LUCID says so.
  *
  * <p>The account is proved the way the launcher's chat proves it: Mojang issues the player a key pair
  * (the one Minecraft signs chat with), and the game signs a one-time code from the backend with it.
@@ -181,7 +181,7 @@ public final class SnowballPresence {
 		HttpResponse<String> nonceAnswer = send("GET", "/nonce", null);
 		String nonce = group(NONCE, nonceAnswer.body());
 		if (nonceAnswer.statusCode() != 200 || nonce == null) {
-			backOff("the Snowball server did not answer", "the server did not answer");
+			backOff("the LUCID server did not answer", "the server did not answer");
 			return;
 		}
 
@@ -213,7 +213,7 @@ public final class SnowballPresence {
 		HttpResponse<String> proved = send("POST", "/presence", body);
 		String issued = group(TICKET, proved.body());
 		if (proved.statusCode() != 200 || issued == null) {
-			backOff("the Snowball server did not accept the account (" + proved.statusCode() + ")", "server refused it (" + proved.statusCode() + ")");
+			backOff("the LUCID server did not accept the account (" + proved.statusCode() + ")", "server refused it (" + proved.statusCode() + ")");
 			return;
 		}
 		ticket = issued;
@@ -224,7 +224,7 @@ public final class SnowballPresence {
 		}
 		if (!announced) {
 			announced = true;
-			LOGGER.info("Snowball players can see your badge while you play with Snowball Client");
+			LOGGER.info("LUCID players can see your badge while you play with LUCID");
 		}
 	}
 
@@ -242,7 +242,7 @@ public final class SnowballPresence {
 	private static void backOff(String why, String brief) {
 		quietUntil = System.currentTimeMillis() + BACK_OFF_MS;
 		visible = false;
-		LOGGER.info("Not showing your Snowball badge to others for now: {}", why);
+		LOGGER.info("Not showing your LUCID badge to others for now: {}", why);
 		// Said once per reason, so a server that is down does not nag every few minutes.
 		if (!brief.equals(lastProblem)) {
 			lastProblem = brief;

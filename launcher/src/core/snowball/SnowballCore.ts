@@ -13,7 +13,7 @@ import { SNOWBALL_MARKER, SNOWBALL_MOD_FILE, SNOWBALL_MOD_ID } from './protectio
 
 const log = getLogger('snowball');
 
-/** One Snowball Client jar shipped with the launcher, built for a range of Minecraft versions. */
+/** One LUCID jar shipped with the launcher, built for a range of Minecraft versions. */
 export interface ClientBuild {
   path: string;
   version: string;
@@ -47,7 +47,7 @@ async function readIdentity(path: string): Promise<JarIdentity | null> {
 }
 
 /**
- * The Snowball Client builds this launcher ships. Builds are discovered from their own metadata, so
+ * The LUCID builds this launcher ships. Builds are discovered from their own metadata, so
  * supporting another Minecraft version means adding its jar to the client folder, not changing code.
  */
 export class ClientBuildRegistry {
@@ -72,11 +72,11 @@ export class ClientBuildRegistry {
       }
     }
     const unique = [...new Map(found.map((b) => [b.sha1, b])).values()].sort((a, b) => compareVersions(b.version, a.version));
-    log.info('Snowball Client builds', { builds: unique.map((b) => `${b.version} for Minecraft ${b.label} (${basename(b.path)})`) });
+    log.info('LUCID builds', { builds: unique.map((b) => `${b.version} for Minecraft ${b.label} (${basename(b.path)})`) });
     return new ClientBuildRegistry(unique);
   }
 
-  /** Newest build that runs on this Minecraft version and loader, or null when Snowball Client is not available. */
+  /** Newest build that runs on this Minecraft version and loader, or null when LUCID is not available. */
   find(minecraftVersion: string, loader: LoaderId): ClientBuild | null {
     if (loader !== 'fabric') return null;
     return this.builds.find((b) => matchesFabricPredicate(minecraftVersion, b.minecraft)) ?? null;
@@ -119,7 +119,7 @@ interface ModFile {
 }
 
 /**
- * Snowball Client is not a mod in the instance: the launcher keeps a verified copy of each build in its
+ * LUCID is not a mod in the instance: the launcher keeps a verified copy of each build in its
  * own folder and loads it into the game at launch (Fabric Loader's fabric.addMods). This class keeps that
  * copy valid, keeps copies out of mods folders (they would load twice) and makes sure the Fabric API the
  * client needs is present. inspect() only reads; ensure() repairs and then verifies.
@@ -150,7 +150,7 @@ export class SnowballCore {
     if (!build) {
       // A client built for another version would stop the game from starting, so it is set aside.
       for (const f of strays) await rename(join(dir, f.fileName), freePath(dir, `${stripDisabled(f.fileName)}.unsupported`));
-      if (strays.length) report('warn', `Snowball Client isn't available for Minecraft ${target.minecraftVersion} yet, so the copy in the mods folder was set aside`);
+      if (strays.length) report('warn', `LUCID isn't available for Minecraft ${target.minecraftVersion} yet, so the copy in the mods folder was set aside`);
       await rm(join(target.gameDir, SNOWBALL_MARKER), { force: true });
       return this.inspect(target);
     }
@@ -159,16 +159,16 @@ export class SnowballCore {
     // Copies in the mods folder would load a second time next to the launcher's copy. They are renamed, not deleted.
     for (const f of strays) await rename(join(dir, f.fileName), freePath(dir, `${stripDisabled(f.fileName)}.duplicate`));
     if (strays.length) {
-      report('warn', `Moved ${strays.length === 1 ? 'an old copy' : `${strays.length} old copies`} of Snowball Client out of the mods folder; it now loads from the launcher`);
+      report('warn', `Moved ${strays.length === 1 ? 'an old copy' : `${strays.length} old copies`} of LUCID out of the mods folder; it now loads from the launcher`);
     }
 
     if (before.client === 'ok') {
-      report('info', `Snowball Client ${build.version} detected`);
+      report('info', `LUCID ${build.version} detected`);
     } else {
       report('warn', before.problems[0]);
-      report('info', 'Repairing Snowball Client...');
+      report('info', 'Repairing LUCID...');
       await this.installBuild(build);
-      report('success', 'Snowball Client restored');
+      report('success', 'LUCID restored');
     }
     await writeJsonAtomic(join(target.gameDir, SNOWBALL_MARKER), { schemaVersion: 1, client: build.version, minecraft: build.label });
 
@@ -177,14 +177,14 @@ export class SnowballCore {
       await mkdir(dir, { recursive: true });
       const off = files.find((f) => f.id === api.id && !f.enabled)!;
       await rename(join(dir, off.fileName), freePath(dir, stripDisabled(off.fileName)));
-      report('warn', `${api.name} was turned off; it was turned back on because Snowball Client needs it`);
+      report('warn', `${api.name} was turned off; it was turned back on because LUCID needs it`);
     } else if (before.fabricApi === 'missing') {
       report('info', `Installing ${api.name}...`);
       try {
         await this.fabricApi.ensure(target.gameDir, target.minecraftVersion, signal);
       } catch (err) {
         if (signal?.aborted) throw err;
-        const message = `Snowball Client needs ${api.name}, which could not be installed: ${(err as Error).message}`;
+        const message = `LUCID needs ${api.name}, which could not be installed: ${(err as Error).message}`;
         report('error', message);
         throw new CoreRepairError(message);
       }
@@ -193,7 +193,7 @@ export class SnowballCore {
 
     const after = await this.inspect(target);
     if (after.problems.length) {
-      const message = `Snowball Client could not be verified: ${after.problems.join('; ')}`;
+      const message = `LUCID could not be verified: ${after.problems.join('; ')}`;
       report('error', message);
       throw new CoreRepairError(message);
     }
@@ -211,7 +211,7 @@ export class SnowballCore {
         client: 'unsupported',
         clientJar: null,
         fabricApi: 'not-needed',
-        problems: strays ? [`Snowball Client isn't available for Minecraft ${target.minecraftVersion} yet, but a copy is in the mods folder`] : [],
+        problems: strays ? [`LUCID isn't available for Minecraft ${target.minecraftVersion} yet, but a copy is in the mods folder`] : [],
       };
     }
     const problems: string[] = [];
@@ -219,12 +219,12 @@ export class SnowballCore {
     let client: ClientState = 'ok';
     if (!existsSync(jar)) {
       client = 'missing';
-      problems.push('Snowball Client is missing');
+      problems.push('LUCID is missing');
     } else if ((await sha1File(jar)) !== build.sha1) {
       client = 'damaged';
-      problems.push('Snowball Client is damaged');
+      problems.push('LUCID is damaged');
     }
-    if (strays) problems.push(`${strays === 1 ? 'An old copy' : `${strays} old copies`} of Snowball Client ${strays === 1 ? 'is' : 'are'} in the mods folder`);
+    if (strays) problems.push(`${strays === 1 ? 'An old copy' : `${strays} old copies`} of LUCID ${strays === 1 ? 'is' : 'are'} in the mods folder`);
     const api = fabricApiFor(target.minecraftVersion);
     const apis = files.filter((f) => f.id === api.id);
     const fabricApi = apis.some((f) => f.enabled) ? 'ok' : apis.length ? 'disabled' : 'missing';
@@ -256,11 +256,11 @@ export class SnowballCore {
     await copyFile(build.path, part);
     if ((await sha1File(part)) !== build.sha1) {
       await rm(part, { force: true });
-      throw new CoreRepairError('The Snowball Client files bundled with the launcher are damaged. Reinstall the launcher.');
+      throw new CoreRepairError('The LUCID files bundled with the launcher are damaged. Reinstall the launcher.');
     }
     await rm(dest, { force: true });
     await rename(part, dest);
-    log.info(`Installed Snowball Client ${build.version}`, { path: dest });
+    log.info(`Installed LUCID ${build.version}`, { path: dest });
   }
 }
 

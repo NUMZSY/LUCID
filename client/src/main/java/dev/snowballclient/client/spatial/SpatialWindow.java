@@ -3,7 +3,7 @@ package dev.snowballclient.client.spatial;
 import dev.snowballclient.client.ui.View;
 
 /**
- * A Snowball menu as a pane of glass standing in the world: where it is, which way it faces, how
+ * A LUCID menu as a pane of glass standing in the world: where it is, which way it faces, how
  * big it is, and what the crosshair is pointing at on it. The view inside draws in its usual GUI
  * units over a {@code width} by {@code height} page; the page is mapped onto the pane. The view's
  * panel (its {@linkplain #setFrame frame}) is what the crosshair can point at; below it sit a grab

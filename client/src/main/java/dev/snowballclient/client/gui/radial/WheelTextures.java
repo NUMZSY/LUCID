@@ -20,7 +20,7 @@ import static dev.snowballclient.client.gui.radial.WheelGeometry.*;
 public final class WheelTextures {
 	private static final Logger LOGGER = LogManager.getLogger("SnowballClient");
 	private static final ExecutorService WORKER = Executors.newSingleThreadExecutor(r -> {
-		Thread t = new Thread(r, "Snowball Client wheel rasteriser");
+		Thread t = new Thread(r, "LUCID wheel rasteriser");
 		t.setDaemon(true);
 		return t;
 	});

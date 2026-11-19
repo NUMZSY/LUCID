@@ -24,7 +24,7 @@ export type VerifyCodeSignature = (publisherNames: string[], file: string) => Pr
 /**
  * Asks for a signed update only from a copy that is signed itself.
  *
- * Snowball has no code-signing certificate yet, so no installer is signed, and 1.7.0 to 1.8.1
+ * LUCID has no code-signing certificate yet, so no installer is signed, and 1.7.0 to 1.8.1
  * insisted on a signature anyway: every one of them refused every update. An unsigned copy now
  * takes an unsigned update, which electron-updater has already checked against the SHA-512 in the
  * release feed. From the first signed release on, the copy is signed, and an update has to be
@@ -48,8 +48,8 @@ export function describeUpdateFailure(raw: unknown): { title: string; message: s
     return {
       ...of(
         "This update can't install itself",
-        'Snowball downloaded the new version, but it is not signed the way this copy expects, so it was not installed. Your launcher is unchanged.',
-        ['Download the new version from the Snowball website and run it once. Your instances, mods and worlds stay where they are.'],
+        'LUCID downloaded the new version, but it is not signed the way this copy expects, so it was not installed. Your launcher is unchanged.',
+        ['Download the new version from the LUCID website and run it once. Your instances, mods and worlds stay where they are.'],
         false,
       ),
       manualInstall: true,
@@ -58,7 +58,7 @@ export function describeUpdateFailure(raw: unknown): { title: string; message: s
   if (/err_internet_disconnected|enotfound|eai_again|getaddrinfo|err_name_not_resolved/.test(text)) {
     return of(
       'No internet connection',
-      'Snowball could not reach the update server, so it carried on with the version you already have.',
+      'LUCID could not reach the update server, so it carried on with the version you already have.',
       ['Check your internet connection.', 'If you are on a school or work network, it may be blocking GitHub.', 'Press Retry once you are back online.'],
     );
   }
@@ -72,15 +72,15 @@ export function describeUpdateFailure(raw: unknown): { title: string; message: s
   if (/sha512|checksum|integrity|hash mismatch|file size|size mismatch/.test(text)) {
     return of(
       'The download was damaged',
-      'The update arrived incomplete or altered, so Snowball refused to install it. Your current version is untouched.',
-      ['Press Retry to download it again.', 'If this keeps happening, download the installer from the Snowball website instead.'],
+      'The update arrived incomplete or altered, so LUCID refused to install it. Your current version is untouched.',
+      ['Press Retry to download it again.', 'If this keeps happening, download the installer from the LUCID website instead.'],
     );
   }
   if (/eacces|eperm|access is denied|permission denied|operation not permitted/.test(text)) {
     return of(
-      "Snowball couldn't write the update",
+      "LUCID couldn't write the update",
       'Windows refused the file change, usually because the launcher is installed somewhere that needs administrator rights, or another copy is still running.',
-      ['Close any other Snowball windows and press Retry.', 'If it still fails, download the installer from the Snowball website and run it once.'],
+      ['Close any other LUCID windows and press Retry.', 'If it still fails, download the installer from the LUCID website and run it once.'],
     );
   }
   if (/enospc|no space|disk full/.test(text)) {
@@ -93,7 +93,7 @@ export function describeUpdateFailure(raw: unknown): { title: string; message: s
   if (/404|not found|cannot find|no published versions|latest\.yml/.test(text)) {
     return of(
       'No update was published',
-      'The update server answered, but it has no release Snowball can read. This is usually temporary while a release is being published.',
+      'The update server answered, but it has no release LUCID can read. This is usually temporary while a release is being published.',
       ['Try again in a few minutes.', 'The version you have keeps working in the meantime.'],
     );
   }

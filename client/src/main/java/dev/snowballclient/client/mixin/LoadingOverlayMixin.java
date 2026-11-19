@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Draws the Snowball loading screen over Minecraft's own. Minecraft keeps doing its own work - the
+ * Draws the LUCID loading screen over Minecraft's own. Minecraft keeps doing its own work - the
  * reload, the timings, the fades - and this only covers the picture, with the same fade so the two
  * never show through each other.
  */
@@ -64,7 +64,7 @@ public class LoadingOverlayMixin {
 		return SnowballClient.showLoadingScreen() ? 0.0F : alpha;
 	}
 
-	/** Minecraft's progress bar, for the same reason: Snowball draws its own. */
+	/** Minecraft's progress bar, for the same reason: LUCID draws its own. */
 	//? if >=26.1 {
 	@Inject(method = "extractProgressBar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIIF)V", at = @At("HEAD"), cancellable = true)
 	//?} else {

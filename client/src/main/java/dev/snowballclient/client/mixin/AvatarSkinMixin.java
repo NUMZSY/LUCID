@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * The last word on how a player is drawn: once Minecraft (and any other mod) has filled in what it
- * will draw of them, the Snowball cape and a just-equipped skin go on top. Other mods' cape hooks
+ * will draw of them, the LUCID cape and a just-equipped skin go on top. Other mods' cape hooks
  * on the skin lookup can no longer win just by running first.
  */
 @Mixin(AvatarRenderer.class)

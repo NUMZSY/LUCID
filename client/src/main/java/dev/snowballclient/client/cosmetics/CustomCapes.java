@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Snowball+ custom capes: the design you are drawing, sending it for approval, what staff decided,
+ * LUCID+ custom capes: the design you are drawing, sending it for approval, what staff decided,
  * and the approved capes of everyone around you.
  *
  * <p>A cape only shows on anybody once staff have approved it in the launcher's admin panel. The
@@ -134,11 +134,11 @@ public final class CustomCapes {
 		saveDraft(frames);
 		String ticket = SnowballPresence.currentTicket();
 		if (!available()) {
-			message = "This build has no Snowball server";
+			message = "This build has no LUCID server";
 			return;
 		}
 		if (ticket == null) {
-			message = "Join a world first, so Snowball knows it is you";
+			message = "Join a world first, so LUCID knows it is you";
 			return;
 		}
 		message = "Sending...";
@@ -152,10 +152,10 @@ public final class CustomCapes {
 					reason = "";
 					message = "Sent to staff. It shows on you once they approve it";
 				} else {
-					message = error(answer.body(), "The Snowball server said no (" + answer.statusCode() + ")");
+					message = error(answer.body(), "The LUCID server said no (" + answer.statusCode() + ")");
 				}
 			} catch (Exception e) {
-				message = "Could not reach the Snowball server";
+				message = "Could not reach the LUCID server";
 			}
 		});
 	}

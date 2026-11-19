@@ -20,7 +20,7 @@ public final class GlassGui extends Module {
 
 	public final ChoiceSetting look = setting(new ChoiceSetting("look", "Look", "Clear sees straight through; glass adds a tint; blur keeps Minecraft's blur", GLASS, List.of(CLEAR, GLASS, BLUR)));
 	public final NumberSetting tint = setting(new NumberSetting("tint", "Tint", "How much the glass darkens what is behind it", 0.25, 0, 0.9, 0.05));
-	public final NumberSetting panels = setting(new NumberSetting("panels", "Snowball panels", "How solid Snowball's own panels stay", 0.8, 0.2, 1, 0.05));
+	public final NumberSetting panels = setting(new NumberSetting("panels", "LUCID panels", "How solid LUCID's own panels stay", 0.8, 0.2, 1, 0.05));
 	public final BooleanSetting inWorldOnly = setting(new BooleanSetting("in_world_only", "Only in a world", "Leave the title screen and its menus alone", true));
 
 	public GlassGui() {
@@ -43,7 +43,7 @@ public final class GlassGui extends Module {
 		return (alpha << 24) | 0x040810;
 	}
 
-	/** Multiplier applied to Snowball's own panel opacity while the glass look is on. */
+	/** Multiplier applied to LUCID's own panel opacity while the glass look is on. */
 	public float panelFactor() {
 		return isEnabled() ? panels.floatValue() : 1f;
 	}

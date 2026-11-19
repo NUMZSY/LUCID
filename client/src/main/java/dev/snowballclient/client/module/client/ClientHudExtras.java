@@ -13,15 +13,15 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
-/** HUD elements that say something about Snowball itself, or about what you are looking at. */
+/** HUD elements that say something about LUCID itself, or about what you are looking at. */
 public final class ClientHudExtras {
 	private ClientHudExtras() {
 	}
 
-	/** The Snowball mark, in the corner, the way a client signs its own screenshots. */
+	/** The LUCID mark, in the corner, the way a client signs its own screenshots. */
 	public static final class Watermark extends HudModule {
 		private static final int PADDING = 4;
-		private final BooleanSetting showEdition = setting(new BooleanSetting("edition", "Show edition", "Write Snowball+ when you have it", true));
+		private final BooleanSetting showEdition = setting(new BooleanSetting("edition", "Show edition", "Write LUCID+ when you have it", true));
 
 		public Watermark() {
 			super("watermark", "Watermark", "Snowball's mark on screen", ModuleCategory.CLIENT, 0.0, 0.0, false);
@@ -29,7 +29,7 @@ public final class ClientHudExtras {
 
 		private String text(Minecraft mc) {
 			// The rank comes from the backend; the watermark only writes down what it was told.
-			return showEdition.isOn() ? SnowballPlayers.selfRank().rankName() : "Snowball";
+			return showEdition.isOn() ? SnowballPlayers.selfRank().rankName() : "LUCID";
 		}
 
 		@Override
@@ -55,7 +55,7 @@ public final class ClientHudExtras {
 
 	/** Whatever the player wants on screen: a name, a server, a reminder. */
 	public static final class CustomText extends TextHudModule {
-		private final StringSetting text = setting(new StringSetting("text", "Text", "What this element says", "Snowball", 48));
+		private final StringSetting text = setting(new StringSetting("text", "Text", "What this element says", "LUCID", 48));
 
 		public CustomText() {
 			super("custom_text", "Custom Text", "Your own words on screen", ModuleCategory.CLIENT, 0.02, 0.35);

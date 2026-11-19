@@ -1,8 +1,8 @@
 {
-  "name": "snowball-client-launcher",
-  "productName": "Snowball Client Launcher",
+  "name": "lucid-launcher",
+  "productName": "LUCID Launcher",
   "version": "2.1.0",
-  "description": "Instance-based Minecraft launcher for Snowball Client",
+  "description": "Instance-based Minecraft launcher for LUCID",
   "license": "MIT",
   "main": "dist/main/main.js",
   "private": true,
@@ -15,10 +15,11 @@
     "dist": "npm run build:client && npm run build && electron-builder --win --publish never",
     "dist:store": "npm run build:client && npm run build && electron-builder --win appx --publish never",
     "verify:signature": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-signature.ps1",
-    "dist:verify": "npm run dist && npm run verify:signature"
+    "dist:verify": "npm run dist && npm run verify:signature",
+    "dist:linux": "npm run build:client && npm run build && electron-builder --linux AppImage deb --publish never"
   },
   "build": {
-    "appId": "dev.snowballclient.launcher",
+    "appId": "dev.lucid.launcher",
     "directories": {
       "output": "release"
     },
@@ -59,20 +60,20 @@
           ]
         }
       ],
-      "artifactName": "SnowballClient-${version}-win.${ext}",
+      "artifactName": "LUCID-${version}-win.${ext}",
       "signAndEditExecutable": true,
       "signtoolOptions": {
         "publisherName": [
-          "Snowball Client"
+          "LUCID"
         ]
       },
       "verifyUpdateCodeSignature": true
     },
     "portable": {
-      "artifactName": "SnowballClient-${version}-portable.exe"
+      "artifactName": "LUCID-${version}-portable.exe"
     },
     "nsis": {
-      "artifactName": "SnowballClient-${version}-setup.exe",
+      "artifactName": "LUCID-${version}-setup.exe",
       "oneClick": false,
       "allowToChangeInstallationDirectory": false,
       "installerIcon": "build-resources/installer/icon.ico",
@@ -107,38 +108,56 @@
       ],
       "category": "public.app-category.games",
       "icon": "build-resources/icon.png",
-      "artifactName": "SnowballClient-${version}-mac-${arch}.${ext}",
+      "artifactName": "LUCID-${version}-mac-${arch}.${ext}",
       "identity": "-",
       "hardenedRuntime": false,
       "gatekeeperAssess": false,
       "darkModeSupport": true
     },
     "linux": {
-      "target": "AppImage"
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Game",
+      "maintainer": "LUCID contributors",
+      "artifactName": "LUCID-${version}-linux-${arch}.${ext}",
+      "executableName": "lucid",
+      "syncDesktopName": true
     },
     "appx": {
-      "identityName": "SnowballClient.Launcher",
+      "identityName": "LUCID.Launcher",
       "publisher": "CN=00000000-0000-0000-0000-000000000000",
-      "publisherDisplayName": "Snowball Client",
-      "applicationId": "SnowballClient",
-      "displayName": "Snowball Client",
+      "publisherDisplayName": "LUCID",
+      "applicationId": "LUCID",
+      "displayName": "LUCID",
       "backgroundColor": "#05070a",
       "languages": [
         "en-US"
       ],
-      "artifactName": "SnowballClient-${version}.${ext}"
+      "artifactName": "LUCID-${version}.${ext}"
     },
     "publish": [
       {
         "provider": "github",
-        "owner": "met4a",
-        "repo": "snowball-website",
+        "owner": "NUMZSY",
+        "repo": "LUCID",
         "releaseType": "release"
       }
     ],
     "dmg": {
-      "title": "Snowball Client ${version}",
-      "artifactName": "SnowballClient-${version}-mac-${arch}.${ext}"
+      "title": "LUCID ${version}",
+      "artifactName": "LUCID-${version}-mac-${arch}.${ext}"
     }
   },
   "devDependencies": {
@@ -152,7 +171,8 @@
     "electron-updater": "^6.8.9"
   },
   "author": {
-    "name": "Snowball Client",
-    "email": "ataghvaei@outlook.com"
-  }
+    "name": "LUCID contributors"
+  },
+  "homepage": "https://github.com/NUMZSY/LUCID",
+  "desktopName": "LUCID"
 }

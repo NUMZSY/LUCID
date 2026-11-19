@@ -20,7 +20,7 @@ import java.util.Optional;
  * your name is matched as a whole name only, never inside a longer one.
  */
 public final class NickHider extends Module {
-	public final ChoiceSetting nickname = setting(new ChoiceSetting("nickname", "Show as", "The name shown instead of yours", "You", List.of("You", "Player", "Snowball")));
+	public final ChoiceSetting nickname = setting(new ChoiceSetting("nickname", "Show as", "The name shown instead of yours", "You", List.of("You", "Player", "LUCID")));
 	public final BooleanSetting nameTag = setting(new BooleanSetting("name_tag", "Above your head", "The name over you in third person", true));
 	public final BooleanSetting tabList = setting(new BooleanSetting("tab_list", "Player list", "Your line in the Tab list", true));
 	public final BooleanSetting scoreboard = setting(new BooleanSetting("scoreboard", "Scoreboard", "Your name on the sidebar", true));

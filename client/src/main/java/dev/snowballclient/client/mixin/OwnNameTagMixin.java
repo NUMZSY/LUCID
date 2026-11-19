@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Draws your own name above your own head in third person.
  *
  * Minecraft deliberately hides it - you always know who you are - so without this you would see
- * everybody else's Snowball badge and never your own, which is the view screenshots get taken in.
+ * everybody else's LUCID badge and never your own, which is the view screenshots get taken in.
  *
  * <p>It has to hook {@link LivingEntityRenderer} rather than EntityRenderer: LivingEntityRenderer
  * overrides shouldShowName and never calls the version above it, so an injection on the parent

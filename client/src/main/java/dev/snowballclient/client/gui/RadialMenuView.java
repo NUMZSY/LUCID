@@ -125,7 +125,7 @@ public final class RadialMenuView extends View {
 	private boolean cachedExpanded;
 
 	public RadialMenuView(SnowballClient client) {
-		super("Snowball Client");
+		super("LUCID");
 		this.client = client;
 		this.theme = client.theme();
 		this.layout = client.radialLayout();

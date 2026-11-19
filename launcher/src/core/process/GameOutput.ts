@@ -131,7 +131,7 @@ export class GameActivityInterpreter {
     if ((m = /^Loading Minecraft (\S+) with (Fabric|Quilt) Loader (\S+)/.exec(msg))) once('loading', 'info', `Loading Minecraft ${m[1]} with ${m[2]} Loader ${m[3]}`);
     else if (/^Setting user: /.test(msg)) once('loading', 'info', `Loading Minecraft ${this.context.minecraftVersion}`);
     if ((m = /^Loading (\d+) mods:/.exec(msg))) once('mods', 'info', `Loading ${m[1]} mods`);
-    if ((m = /(?:^|\n)\s*- snowballclient (\S+)/.exec(msg))) once('client', 'success', `Snowball Client ${m[1]} loaded`);
+    if ((m = /(?:^|\n)\s*- snowballclient (\S+)/.exec(msg))) once('client', 'success', `LUCID ${m[1]} loaded`);
     if (/^Reloading ResourceManager:/.test(msg)) once('resources', 'info', 'Loading resources');
     if (/^Sound engine started/.test(msg)) once('ready', 'success', 'Minecraft is ready');
     if (/^Starting integrated minecraft server version/.test(msg)) {
@@ -157,7 +157,7 @@ export class GameActivityInterpreter {
       if (record.time - this.lastErrorAt >= ERROR_GAP_MS) {
         this.lastErrorAt = record.time;
         this.errorLines++;
-        const source = record.logger.startsWith('SnowballClient') ? 'Snowball Client' : 'Minecraft';
+        const source = record.logger.startsWith('SnowballClient') ? 'LUCID' : 'Minecraft';
         const first = msg.split('\n')[0].trim().slice(0, 160) || record.throwable?.split('\n')[0].slice(0, 160) || 'an error';
         out.push({ level: 'warn', message: this.errorLines === MAX_ERROR_LINES ? 'More errors were logged; open the technical log for details' : `${source} reported an error: ${first}` });
       }

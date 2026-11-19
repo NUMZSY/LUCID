@@ -111,7 +111,7 @@ export async function installProfile(gameDir: string, previouslyManaged: string[
   for (const old of previouslyManaged) {
     if (keep.has(old)) continue;
     for (const candidate of [old, old + '.disabled']) {
-      // Snowball Client and the Fabric API it needs are never removed by a profile change.
+      // LUCID and the Fabric API it needs are never removed by a profile change.
       if (protectedFiles.has(candidate)) continue;
       const path = safeJoin(modsDir, candidate);
       if (existsSync(path)) await rm(path);

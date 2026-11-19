@@ -1,7 +1,7 @@
 package dev.snowballclient.client.ui;
 
 /**
- * Everything the Snowball main menu needs from the game it replaces the title screen of: the buttons
+ * Everything the LUCID main menu needs from the game it replaces the title screen of: the buttons
  * open Minecraft's own screens, so each version provides them.
  */
 public interface TitleActions {
@@ -37,7 +37,7 @@ public interface TitleActions {
 
 	void quit();
 
-	/** Shows Minecraft's own title screen again (used when the player turns the Snowball menu off). */
+	/** Shows Minecraft's own title screen again (used when the player turns the LUCID menu off). */
 	void showVanillaTitle();
 
 	String minecraftVersion();

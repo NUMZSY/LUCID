@@ -21,7 +21,7 @@ export interface LauncherSettings {
    * it runs in the main process and carries on minimised, hidden or behind other apps.
    */
   game: { closeLauncherOnLaunch: boolean; minimizeOnLaunch: boolean; showLogsOnLaunch: boolean };
-  /** rank is written only from what the Snowball backend reports for the signed-in account. */
+  /** rank is written only from what the LUCID backend reports for the signed-in account. */
   accounts: { microsoftClientId: string; selectedAccountId: string | null; rank: string };
   updates: { channel: 'stable' | 'beta'; automatic: boolean };
   /** installMods: let a performance profile download its optimisation mods. Off by default: profiles then

@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 /**
  * Who is doing which emote, and since when. Your own emote starts here at once and goes out to the
- * other Snowball players who can see you; theirs arrive over the live channel. Everything else in
+ * other LUCID players who can see you; theirs arrive over the live channel. Everything else in
  * the game only asks {@link #pose}.
  */
 public final class Emotes {

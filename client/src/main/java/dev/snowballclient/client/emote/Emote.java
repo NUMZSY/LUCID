@@ -173,7 +173,7 @@ public enum Emote {
 		}
 	},
 
-	// ---- Snowball+ emotes: everyone with Snowball sees them, only Snowball+ can do them.
+	// ---- LUCID+ emotes: everyone with LUCID sees them, only LUCID+ can do them.
 
 	THROW("throw", "Snowball Throw", 1.8f, true) {
 		@Override
@@ -246,7 +246,7 @@ public enum Emote {
 		this.plus = plus;
 	}
 
-	/** Whether only Snowball+ players can do it. Everyone sees it done. */
+	/** Whether only LUCID+ players can do it. Everyone sees it done. */
 	public boolean plus() {
 		return plus;
 	}

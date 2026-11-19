@@ -175,7 +175,7 @@ public final class FpsBoost extends Module {
 	}
 
 	private void apply() {
-		// A Boost switched on by an older Snowball has not saved these yet.
+		// A Boost switched on by an older LUCID has not saved these yet.
 		snapshotMore();
 		Options o = Minecraft.getInstance().options;
 		// Start from your own settings, so moving from Max FPS to Quality gives back what Max FPS took.

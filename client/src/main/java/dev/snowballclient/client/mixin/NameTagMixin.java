@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Puts a Snowball player's badge on the name floating above their head, so it shows in third
+ * Puts a LUCID player's badge on the name floating above their head, so it shows in third
  * person and on everyone else in the world - not only in the player list. Your own name there is
  * swapped first when Nick Hider is on.
  *
@@ -36,7 +36,7 @@ public class NameTagMixin {
 		Component shown = original;
 		if (entity == Minecraft.getInstance().player && ModuleRegistry.NICK_HIDER != null) shown = ModuleRegistry.NICK_HIDER.nameTag(shown);
 		Rank rank = SnowballClient.nameTagBadges() ? SnowballPlayers.rank(entity.getUUID()) : null;
-		// A Snowball+ name colour; the backend only passes one on for Snowball+ players.
+		// A LUCID+ name colour; the backend only passes one on for LUCID+ players.
 		int colour = rank == null ? -1 : Looks.colour(entity.getUUID());
 		if (colour >= 0) shown = shown.copy().withColor(colour);
 		if (rank != null) shown = Component.empty().append(RankText.prefix(rank)).append(shown);

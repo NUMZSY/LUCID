@@ -77,7 +77,7 @@ public final class SmoothText {
 		return enabled;
 	}
 
-	/** Set by every Snowball screen as it opens. */
+	/** Set by every LUCID screen as it opens. */
 	public static void use(Textures source) {
 		if (source == textures) return;
 		// Textures of another source cannot be released through this one: start afresh.
@@ -87,7 +87,7 @@ public final class SmoothText {
 		textures = source;
 	}
 
-	/** Called as each frame of a Snowball screen begins. */
+	/** Called as each frame of a LUCID screen begins. */
 	public static void frameStarted() {
 		frame++;
 		if (RETIRED.isEmpty() || textures == null) return;

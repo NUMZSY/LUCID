@@ -12,7 +12,7 @@ import java.util.function.IntPredicate;
 
 import static dev.snowballclient.client.gui.ToggleWidget.scaleAlpha;
 
-/** Single-line text box in the Snowball theme: click to focus, type, Backspace to delete, Ctrl+V to paste. */
+/** Single-line text box in the LUCID theme: click to focus, type, Backspace to delete, Ctrl+V to paste. */
 public final class TextField {
 	private final int maxLength;
 	private final String hint;

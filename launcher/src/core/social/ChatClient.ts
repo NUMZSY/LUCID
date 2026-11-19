@@ -11,13 +11,13 @@ export interface ChatMessage {
   uuid: string;
   text: string;
   at: string;
-  /** Set on messages from the Snowball team. */
+  /** Set on messages from the LUCID team. */
   staff?: boolean;
   /** Set on the launcher's own notes, e.g. "you are muted". */
   system?: boolean;
   /** The sender's rank, for the tag before their name. */
   rank?: string;
-  /** A Snowball+ name colour id (see NAME_COLOURS in the renderer). */
+  /** A LUCID+ name colour id (see NAME_COLOURS in the renderer). */
   colour?: string;
 }
 
@@ -87,7 +87,7 @@ function describeJoinFailure(status: number, body: string): string {
   if (text.includes('insufficientprivileges') || text.includes('multiplayer')) {
     return 'This Microsoft account is not allowed to play multiplayer, so Minecraft will not vouch for it. Turn multiplayer on in the Xbox privacy settings for the account and try again.';
   }
-  if (text.includes('userbanned')) return 'This account is banned from Minecraft multiplayer, so it cannot join Snowball chat.';
+  if (text.includes('userbanned')) return 'This account is banned from Minecraft multiplayer, so it cannot join LUCID chat.';
   if (status === 401 || text.includes('invalid token') || text.includes('forbiddenoperation')) {
     return 'Minecraft did not accept the sign-in. Sign out of the account in Settings and sign in again.';
   }
@@ -296,7 +296,7 @@ export class ChatClient extends EventEmitter {
     return { ok: true };
   }
 
-  /** Snowball+ is a rank like any other; this keeps the older wording working. */
+  /** LUCID+ is a rank like any other; this keeps the older wording working. */
   setPlus(uuid: string, on: boolean): { ok: boolean; reason?: string } {
     return this.setRank(uuid, on ? 'plus' : 'snowball');
   }
@@ -360,7 +360,7 @@ export class ChatClient extends EventEmitter {
     });
     if (!ticketed.ok) {
       const body = (await ticketed.json().catch(() => ({}))) as { error?: string };
-      throw new Error(`Snowball could not confirm the account: ${body.error ?? ticketed.status}.`);
+      throw new Error(`LUCID could not confirm the account: ${body.error ?? ticketed.status}.`);
     }
     const { ticket } = (await ticketed.json()) as { ticket?: string };
     if (!ticket) throw new Error('The chat server did not hand out a ticket.');

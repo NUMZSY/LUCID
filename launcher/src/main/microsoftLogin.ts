@@ -13,7 +13,7 @@ export function openMicrosoftLogin(parent: BrowserWindow, request: Authorization
       modal: true,
       width: 1000,
       height: 720,
-      title: 'Sign in to Snowball Client',
+      title: 'Sign in to LUCID',
       autoHideMenuBar: true,
       backgroundColor: '#ffffff',
       webPreferences: {

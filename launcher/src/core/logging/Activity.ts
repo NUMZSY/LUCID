@@ -16,7 +16,7 @@ export interface ActivityEvent {
 const same = (a: string, b: string) => a.replace(/[.\s]+$/, '').toLowerCase() === b.replace(/[.\s]+$/, '').toLowerCase();
 
 /**
- * The readable per-instance timeline ("[Snowball] Starting Minecraft..."), kept apart from the technical
+ * The readable per-instance timeline ("[LUCID] Starting Minecraft..."), kept apart from the technical
  * game log. Every event is also written to the launcher log file.
  */
 export class ActivityLog extends EventEmitter {
@@ -32,7 +32,7 @@ export class ActivityLog extends EventEmitter {
     list.push(event);
     if (list.length > MAX_EVENTS) list.splice(0, list.length - MAX_EVENTS);
     this.events.set(instanceId, list);
-    const line = `[Snowball] ${message}`;
+    const line = `[LUCID] ${message}`;
     if (level === 'error') log.error(line, { instanceId });
     else if (level === 'warn') log.warn(line, { instanceId });
     else log.info(line, { instanceId });

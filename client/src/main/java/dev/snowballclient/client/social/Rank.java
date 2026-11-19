@@ -3,7 +3,7 @@ package dev.snowballclient.client.social;
 import java.util.Locale;
 
 /**
- * What a Snowball account is: the rank the backend says it holds, the badge it wears in the player
+ * What a LUCID account is: the rank the backend says it holds, the badge it wears in the player
  * list, and what it is allowed to do. The client never decides a rank - it only ever displays the
  * one the server sent - so editing these files gives nobody anything.
  *
@@ -11,17 +11,17 @@ import java.util.Locale;
  */
 public enum Rank {
 	// Each badge is a glyph of Snowball's own icon font, published by client/tools/make-rank-badges.mjs
-	// in this order: a glass chip with a mark in it. Snowball wears the logo's snowball on dark glass,
-	// Snowball+ the snowball and a plus on ice blue, and every rank above them its own mark on its own
+	// in this order: a glass chip with a mark in it. LUCID wears the logo's snowball on dark glass,
+	// LUCID+ the snowball and a plus on ice blue, and every rank above them its own mark on its own
 	// colour.
-	SNOWBALL("snowball", "Snowball", "Snowball", '\uE000', 0xFFC7D2DD),
-	PLUS("plus", "Snowball+", "Snowball+", '\uE001', 0xFF9FD8FF),
-	TESTER("tester", "Snowball Tester", "Tester", '\uE002', 0xFF5CD6A8),
-	BUG_HUNTER("bug_hunter", "Snowball Bug Hunter", "Bug Hunter", '\uE003', 0xFFFFD166),
-	PARTNER("partner", "Snowball Partner", "Partner", '\uE004', 0xFFFFA24D),
-	STAFF("staff", "Snowball Staff", "Staff", '\uE005', 0xFF5C8CFF),
-	DEVELOPER("developer", "Snowball Developer", "Developer", '\uE006', 0xFFB57BFF),
-	OWNER("owner", "Snowball Owner", "Owner", '\uE007', 0xFF7FCBFF);
+	SNOWBALL("snowball", "LUCID", "LUCID", '\uE000', 0xFFC7D2DD),
+	PLUS("plus", "LUCID+", "LUCID+", '\uE001', 0xFF9FD8FF),
+	TESTER("tester", "LUCID Tester", "Tester", '\uE002', 0xFF5CD6A8),
+	BUG_HUNTER("bug_hunter", "LUCID Bug Hunter", "Bug Hunter", '\uE003', 0xFFFFD166),
+	PARTNER("partner", "LUCID Partner", "Partner", '\uE004', 0xFFFFA24D),
+	STAFF("staff", "LUCID Staff", "Staff", '\uE005', 0xFF5C8CFF),
+	DEVELOPER("developer", "LUCID Developer", "Developer", '\uE006', 0xFFB57BFF),
+	OWNER("owner", "LUCID Owner", "Owner", '\uE007', 0xFF7FCBFF);
 
 	/** What the backend calls this rank. */
 	private final String id;
@@ -61,7 +61,7 @@ public enum Rank {
 		return color;
 	}
 
-	/** Snowball+ features belong to Plus and to every rank above it. */
+	/** LUCID+ features belong to Plus and to every rank above it. */
 	public boolean hasPlus() {
 		return ordinal() >= PLUS.ordinal();
 	}

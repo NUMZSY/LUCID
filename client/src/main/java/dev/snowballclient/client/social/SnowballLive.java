@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The live channel to the Snowball backend: your emotes go out to the Snowball players who can see
+ * The live channel to the LUCID backend: your emotes go out to the LUCID players who can see
  * you, and theirs, and their new capes, come in as they happen. It opens with the ticket the
  * presence heartbeat already holds (so the account is proved the same way) and only while you are
  * in a world; it says which players you can see every so often, and nobody else's emotes are sent
@@ -145,7 +145,7 @@ public final class SnowballLive {
 			case "gone" -> {
 				SnowballPlayers.remove(player);
 				Emotes.stopped(player);
-				// A Snowball cape covers the player's own; with them gone from Snowball, theirs is back.
+				// A LUCID cape covers the player's own; with them gone from Snowball, theirs is back.
 				Looks.setCape(player, null, 0);
 				Looks.setColour(player, null);
 			}

@@ -90,9 +90,9 @@ public final class SkyboxRenderer {
 		*///?}
 		GpuBuffer indexBuffer = indices.getBuffer(QUADS * 6);
 		//? if >=26.1 {
-		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Snowball custom sky", color, Optional.empty(), depth, OptionalDouble.empty())) {
+		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "LUCID custom sky", color, Optional.empty(), depth, OptionalDouble.empty())) {
 		//?} else {
-		/*try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Snowball custom sky", color, OptionalInt.empty(), depth, OptionalDouble.empty())) {
+		/*try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "LUCID custom sky", color, OptionalInt.empty(), depth, OptionalDouble.empty())) {
 		*///?}
 			pass.setPipeline(RenderPipelines.END_SKY);
 			RenderSystem.bindDefaultUniforms(pass);
@@ -138,7 +138,7 @@ public final class SkyboxRenderer {
 				}
 			}
 			try (MeshData mesh = builder.buildOrThrow()) {
-				return RenderSystem.getDevice().createBuffer(() -> "Snowball custom sky", GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer());
+				return RenderSystem.getDevice().createBuffer(() -> "LUCID custom sky", GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer());
 			}
 		}
 	}
