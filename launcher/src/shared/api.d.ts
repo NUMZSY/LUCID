@@ -94,7 +94,7 @@ declare namespace Snowball {
     offset: number;
   }
 
-  interface ModSearchHit {
+	interface ModSearchHit {
     projectId: string;
     slug: string;
     title: string;
@@ -106,10 +106,13 @@ declare namespace Snowball {
     updated: string;
     loaders: string[];
     gameVersions: string[];
-    versionRange: string;
-  }
+		versionRange: string;
+	}
 
-  interface ModUpdate {
+	/** Modpacks are browse-only in LUCID; their contents can be inspected but not installed. */
+	interface ModpackSearchHit extends ModSearchHit {}
+
+	interface ModUpdate {
     fileName: string;
     projectId: string;
     currentVersion: string;
@@ -443,7 +446,7 @@ declare namespace Snowball {
 
   type EventName = 'progress' | 'game-log' | 'game-exit' | 'launch-error' | 'launcher-log' | 'state' | 'activity' | 'update' | 'chat-state' | 'chat-message' | 'chat-history' | 'chat-people' | 'chat-bugs' | 'chat-bug-filed' | 'chat-lookup' | 'chat-rank-set' | 'chat-history-ranks' | 'chat-capes' | 'chat-ranked' | 'chat-admin-result';
 
-  interface Api {
+	interface Api {
     getState(): Promise<AppState>;
     listMinecraftVersions(includeSnapshots: boolean): Promise<MinecraftVersion[]>;
     listLoaderVersions(loader: LoaderId, minecraftVersion: string): Promise<LoaderVersion[]>;
@@ -456,8 +459,10 @@ declare namespace Snowball {
     setModEnabled(id: string, fileName: string, enabled: boolean): Promise<void>;
     removeMod(id: string, fileName: string): Promise<void>;
     addMods(id: string): Promise<{ added: number; errors: string[] }>;
-    searchMods(options: ModSearchOptions): Promise<{ hits: ModSearchHit[]; total: number; offset: number }>;
-    installMod(id: string, projectId: string): Promise<{ installed: string[] }>;
+		searchMods(options: ModSearchOptions): Promise<{ hits: ModSearchHit[]; total: number; offset: number }>;
+		searchModpacks(options: ModSearchOptions): Promise<{ hits: ModpackSearchHit[]; total: number; offset: number }>;
+		modpackMods(projectId: string, gameVersion: string | null, loader: string | null): Promise<ModSearchHit[]>;
+		installMod(id: string, projectId: string): Promise<{ installed: string[] }>;
     installedModProjects(id: string): Promise<string[]>;
     checkModUpdates(id: string): Promise<ModUpdate[]>;
     updateMod(id: string, fileName: string): Promise<{ oldFile: string; newFile: string; version: string }>;

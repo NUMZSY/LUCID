@@ -352,7 +352,7 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
     return { gameDir: launcher.instances.gameDir(iid), minecraftVersion: config.minecraftVersion, loader: config.loader };
   };
 
-  handle('browse:search', async (raw: Snowball.ModSearchOptions) => {
+	handle('browse:search', async (raw: Snowball.ModSearchOptions) => {
     const offset = Number.isInteger(raw?.offset) ? Math.min(Math.max(raw.offset, 0), 10_000) : 0;
     return launcher.modrinth.search({
       query: typeof raw?.query === 'string' ? str(raw.query, 'search text', 200) : '',
@@ -362,9 +362,27 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
       offset,
       limit: 20,
     });
-  });
+	  });
 
-  handle('browse:install', async (id: unknown, projectId: unknown) => {
+	handle('browse:search-modpacks', async (raw: Snowball.ModSearchOptions) => {
+		const offset = Number.isInteger(raw?.offset) ? Math.min(Math.max(raw.offset, 0), 10_000) : 0;
+		return launcher.modrinth.searchModpacks({
+			query: typeof raw?.query === 'string' ? str(raw.query, 'search text', 200) : '',
+			loader: typeof raw?.loader === 'string' && MOD_LOADERS.includes(raw.loader) ? raw.loader : null,
+			gameVersion: raw?.gameVersion ? str(raw.gameVersion, 'Minecraft version', 64) : null,
+			sort: SEARCH_SORTS.includes(raw?.sort) ? raw.sort : 'relevance',
+			offset,
+			limit: 20,
+		});
+	});
+
+	handle('browse:modpack-mods', async (projectId: unknown, gameVersion: unknown, loader: unknown) => {
+		const project = str(projectId, 'project id', 64);
+		if (!/^[A-Za-z0-9]+$/.test(project)) throw new Error('Invalid project id');
+		return launcher.modrinth.modpackMods(project, gameVersion ? str(gameVersion, 'Minecraft version', 64) : null, loader && MOD_LOADERS.includes(loader as never) ? String(loader) : null);
+	});
+
+	handle('browse:install', async (id: unknown, projectId: unknown) => {
     const iid = await instanceId(id);
     if (launcher.processes.isRunning(iid) || launcher.launchPhase(iid)) throw new Error('Stop the game before installing mods.');
     const project = str(projectId, 'project id', 64);

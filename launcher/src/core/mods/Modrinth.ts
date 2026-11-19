@@ -59,6 +59,8 @@ export interface SearchOptions {
   limit: number;
 }
 
+export type BrowseProjectType = 'mod' | 'modpack';
+
 export interface SearchHit {
   projectId: string;
   slug: string;
@@ -188,16 +190,39 @@ export class ModrinthService {
 
   constructor(private readonly http: Http, private readonly mods: ModManager) {}
 
-  async search(options: SearchOptions): Promise<{ hits: SearchHit[]; total: number; offset: number }> {
-    const facets: string[][] = [['project_type:mod']];
-    if (options.loader) facets.push([`categories:${options.loader}`]);
+	async search(options: SearchOptions): Promise<{ hits: SearchHit[]; total: number; offset: number }> {
+		return this.searchProjects(options, 'mod');
+	}
+
+	async searchModpacks(options: SearchOptions): Promise<{ hits: SearchHit[]; total: number; offset: number }> {
+		return this.searchProjects(options, 'modpack');
+	}
+
+	private async searchProjects(options: SearchOptions, projectType: BrowseProjectType): Promise<{ hits: SearchHit[]; total: number; offset: number }> {
+		const facets: string[][] = [[`project_type:${projectType}`]];
+		if (options.loader) facets.push([`categories:${options.loader}`]);
     if (options.gameVersion) facets.push([`versions:${options.gameVersion}`]);
     const params = new URLSearchParams({ query: options.query, index: options.sort, offset: String(options.offset), limit: String(options.limit), facets: JSON.stringify(facets) });
     const raw = await this.http.fetchJson<{ hits?: unknown; total_hits?: unknown }>(`${API}/search?${params}`);
     if (!raw || !Array.isArray(raw.hits)) throw new ModInstallError('Modrinth returned an unexpected search response. Try again in a moment.');
     const hits = raw.hits.map((h) => (h && typeof h === 'object' ? toHit(h as Record<string, unknown>) : null)).filter((h): h is SearchHit => h !== null);
-    return { hits, total: count(raw.total_hits), offset: options.offset };
-  }
+		return { hits, total: count(raw.total_hits), offset: options.offset };
+	}
+
+	/** Returns the projects referenced by the newest compatible modpack version; never downloads or installs anything. */
+	async modpackMods(projectId: string, gameVersion: string | null, loader: string | null): Promise<SearchHit[]> {
+		const params = new URLSearchParams({ limit: '1' });
+		if (gameVersion) params.set('game_versions', JSON.stringify([gameVersion]));
+		if (loader) params.set('loaders', JSON.stringify([loader]));
+		const versions = await this.http.fetchJson<unknown>(`${API}/project/${encodeURIComponent(projectId)}/version?${params}`);
+		const version = Array.isArray(versions) ? (versions[0] as Record<string, unknown> | undefined) : undefined;
+		const dependencies = Array.isArray(version?.dependencies) ? version.dependencies : [];
+		const ids = [...new Set(dependencies.map((d) => d && typeof d === 'object' ? text((d as Record<string, unknown>).project_id, 64) : '').filter((id) => /^[A-Za-z0-9]+$/.test(id)))];
+		if (!ids.length) return [];
+		const raw = await this.http.fetchJson<unknown>(`${API}/projects?ids=${encodeURIComponent(JSON.stringify(ids))}`);
+		if (!Array.isArray(raw)) return [];
+		return raw.map((p) => p && typeof p === 'object' ? toHit(p as Record<string, unknown>) : null).filter((p): p is SearchHit => p !== null);
+	}
 
   /** Mods in the instance that Modrinth recognises, with the project and version they came from. */
   async installedProjects(gameDir: string): Promise<InstalledProject[]> {

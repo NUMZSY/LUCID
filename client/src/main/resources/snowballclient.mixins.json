@@ -19,6 +19,8 @@
     "GameRendererMixin",
     "GuiRendererMixin",
     "GuiStateAccessor",
+    "ItemEntityMixin",
+    "ItemEntityRendererMixin",
     "ItemStackMixin",
     "LevelRendererMixin",
     "LightmapRenderStateExtractorMixin",

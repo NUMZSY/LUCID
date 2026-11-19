@@ -52,6 +52,7 @@ import dev.snowballclient.client.module.render.Fullbright;
 import dev.snowballclient.client.module.render.GlassGui;
 import dev.snowballclient.client.module.render.CrystalGlow;
 import dev.snowballclient.client.module.render.HitColor;
+import dev.snowballclient.client.module.render.ItemPhysics;
 import dev.snowballclient.client.module.render.PotionHud;
 import dev.snowballclient.client.module.render.ParticleChanger;
 import dev.snowballclient.client.module.render.LightOverlay;
@@ -112,6 +113,7 @@ public final class ModuleRegistry {
 	public static EmotesModule EMOTES;
 	public static FpsBoost FPS_BOOST;
 	public static HitColor HIT_COLOR;
+public static ItemPhysics ITEM_PHYSICS;
 	public static CustomSky CUSTOM_SKY;
 	public static LyricsModule LYRICS;
 	public static CrystalGlow CRYSTAL_GLOW;
@@ -187,6 +189,7 @@ public final class ModuleRegistry {
 		m.register(new LightOverlay());
 		m.register(new Waila());
 		HIT_COLOR = m.register(new HitColor());
+		ITEM_PHYSICS = m.register(new ItemPhysics());
 		CRYSTAL_GLOW = m.register(new CrystalGlow());
 		NO_HURT_SHAKE = m.register(new VisualModules.NoHurtShake());
 		LOW_FIRE = m.register(new VisualModules.LowFire());
@@ -235,7 +238,7 @@ public final class ModuleRegistry {
 
 		m.order(ModuleCategory.CLIENT, "client_hud", "presets", "hud_layout", "interface", "cosmetics", "skins", "menu_3d", "watermark", "fps_counter", "ping_display", "coordinates",
 				"direction_hud", "custom_text", "memory_usage", "pack_display", "anti_crash");
-		m.order(ModuleCategory.RENDER, "fps_boost", "fov_settings", "potion_hud", "particle_changer", "light_overlay", "waila", "block_outline", "no_hurt_shake", "low_fire", "third_person",
+		m.order(ModuleCategory.RENDER, "fps_boost", "fov_settings", "potion_hud", "particle_changer", "item_physics", "light_overlay", "waila", "block_outline", "no_hurt_shake", "low_fire", "third_person",
 				"time_changer", "custom_sky", "weather_effects");
 		m.order(ModuleCategory.PVP, "crosshair", "armor_hud", "cps_counter", "combo_counter", "reach_display", "target_info");
 		m.order(ModuleCategory.MOVEMENT, "toggle_sprint", "toggle_sneak", "speed_display");

@@ -14,10 +14,11 @@
     logs: new Map<string, Snowball.GameLog[]>(),
     launcherLogs: [] as Snowball.LauncherLog[],
     busy: new Set<string>(),
-    /** Mod browser state survives re-renders so results and filters are not lost. */
-    browse: {
-      instanceId: null as string | null,
-      query: '',
+	  /** Mod browser state survives re-renders so results and filters are not lost. */
+	  browse: {
+		  instanceId: null as string | null,
+		  mode: 'mods' as 'mods' | 'modpacks',
+		  query: '',
       sort: 'relevance',
       loader: '',
       version: '',
@@ -28,10 +29,18 @@
       error: null as string | null,
       installed: new Set<string>(),
       installing: new Set<string>(),
-      versions: [] as string[],
-      seq: 0,
-      paint: () => {},
-    },
+		  versions: [] as string[],
+		  seq: 0,
+		  paint: () => {},
+		  packHits: [] as Snowball.ModpackSearchHit[],
+		  packTotal: 0,
+		  packLoading: false,
+		  packSearched: false,
+		  packError: null as string | null,
+		  packMods: new Map<string, Snowball.ModSearchHit[]>(),
+		  packSelected: null as string | null,
+		  packSeq: 0,
+	  },
     updates: new Map<string, Map<string, Snowball.ModUpdate>>(),
     activity: new Map<string, Snowball.ActivityEvent[]>(),
     logMode: 'activity' as 'activity' | 'technical',
@@ -1419,15 +1428,103 @@
   const SORTS: Array<[string, string]> = [['relevance', 'Relevance'], ['downloads', 'Downloads'], ['follows', 'Popularity'], ['updated', 'Recently updated'], ['newest', 'Newest'], ['name', 'Name (A-Z)']];
   const MOD_LOADERS: Array<[string, string]> = [['fabric', 'Fabric'], ['legacy-fabric', 'Legacy Fabric'], ['quilt', 'Quilt'], ['forge', 'Forge'], ['neoforge', 'NeoForge']];
 
+  function modpackBrowseView(inst: Snowball.Instance): Node {
+    const b = ui.browse;
+    const results = h('div', { class: 'list' });
+    const footer = h('div', { style: 'margin-top:12px' });
+    const dropdown = (options: Array<[string, string]>, value: string, onChange: (v: string) => void): HTMLSelectElement => {
+      const el = h('select', { class: 'input' }, ...options.map(([v, label]) => h('option', { value: v, selected: v === value }, label))) as HTMLSelectElement;
+      el.addEventListener('change', () => onChange(el.value));
+      return el;
+    };
+    const search = h('input', { class: 'input', placeholder: 'Search Modrinth modpacks...', value: b.query, maxlength: '100' }) as HTMLInputElement;
+    let timer = 0;
+    search.addEventListener('input', () => {
+      b.query = search.value;
+      clearTimeout(timer);
+      timer = window.setTimeout(() => void runPackSearch(false), 300);
+    });
+    const loaderSelect = dropdown([['', 'Any loader'], ...MOD_LOADERS], b.loader, (v) => { b.loader = v; void runPackSearch(false); });
+    const versionOptions = (): Array<[string, string]> => [['', 'Any version'], ...[...new Set([inst.minecraftVersion, ...b.versions])].map((v): [string, string] => [v, v])];
+    const versionSelect = dropdown(versionOptions(), b.version, (v) => { b.version = v; void runPackSearch(false); });
+    const runPackSearch = async (append: boolean) => {
+      const seq = ++b.packSeq;
+      b.packLoading = true;
+      b.packError = null;
+      if (!append) { b.packHits = []; b.packTotal = 0; b.packSelected = null; }
+      b.paint();
+      try {
+        const r = await api.searchModpacks({ query: b.query.trim(), sort: (b.sort === 'name' ? 'relevance' : b.sort) as Snowball.ModSort, loader: b.loader || null, gameVersion: b.version || null, offset: append ? b.packHits.length : 0 });
+        if (seq !== b.packSeq) return;
+        b.packHits = append ? [...b.packHits, ...r.hits] : r.hits;
+        b.packTotal = r.total;
+      } catch (err) {
+        if (seq !== b.packSeq) return;
+        b.packError = errorMessage(err);
+      }
+      b.packLoading = false;
+      b.packSearched = true;
+      b.paint();
+    };
+    const viewMods = async (pack: Snowball.ModpackSearchHit) => {
+      b.packSelected = pack.projectId;
+      if (!b.packMods.has(pack.projectId)) {
+        b.packLoading = true;
+        b.paint();
+        const mods = await guard(() => api.modpackMods(pack.projectId, b.version || inst.minecraftVersion, b.loader || inst.modLoaders[0] || null));
+        if (mods) b.packMods.set(pack.projectId, mods);
+        b.packLoading = false;
+      }
+      b.paint();
+    };
+    const modpackRow = (pack: Snowball.ModpackSearchHit): HTMLElement => {
+      const placeholder = h('div', { class: 'mod-icon placeholder' }, pack.title.slice(0, 1).toUpperCase());
+      let iconEl: HTMLElement = placeholder;
+      if (pack.iconUrl) {
+        const img = h('img', { class: 'mod-icon', src: pack.iconUrl, alt: '', loading: 'lazy' });
+        img.addEventListener('error', () => img.replaceWith(placeholder));
+        iconEl = img;
+      }
+      return h('div', { class: 'mod-row' }, iconEl, h('div', { class: 'grow' },
+        h('div', { class: 'truncate' }, h('span', { class: 'mod-title' }, pack.title), pack.author ? h('span', { class: 'muted' }, `  by ${pack.author}`) : null),
+        h('div', { class: 'muted mod-desc' }, pack.description),
+        h('div', { class: 'row mod-meta' }, pack.versionRange ? h('span', { class: 'muted' }, `MC ${pack.versionRange}`) : null)),
+        h('div', { class: 'mod-side' }, h('div', { class: 'muted' }, `${fmtCount(pack.downloads)} downloads`),
+          h('button', { class: 'btn small primary', onClick: () => void viewMods(pack) }, b.packSelected === pack.projectId ? 'Viewing mods' : 'View mods')));
+    };
+    const containedRow = (mod: Snowball.ModSearchHit): HTMLElement => h('div', { class: 'mod-row' },
+      h('div', { class: 'mod-icon placeholder' }, mod.title.slice(0, 1).toUpperCase()),
+      h('div', { class: 'grow' }, h('div', { class: 'mod-title' }, mod.title), h('div', { class: 'muted mod-desc' }, mod.description),
+        h('div', { class: 'row mod-meta' }, ...mod.loaders.map((l) => h('span', { class: 'tag' }, MOD_LOADERS.find(([id]) => id === l)?.[1] ?? l)))),
+      h('div', { class: 'mod-side' }, h('div', { class: 'muted' }, `${fmtCount(mod.downloads)} downloads`)));
+    const paint = () => {
+      if (b.packError) { results.replaceChildren(h('div', { class: 'issue' }, `Could not load modpacks from Modrinth: ${b.packError}`, h('button', { class: 'btn small', onClick: () => void runPackSearch(false) }, 'Retry'))); footer.replaceChildren(); return; }
+      const selected = b.packSelected ? b.packHits.find((p) => p.projectId === b.packSelected) : null;
+      if (selected) {
+        const mods = b.packMods.get(selected.projectId) ?? [];
+        results.replaceChildren(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { class: 'section-title' }, `${selected.title} — contained mods`), h('div', { class: 'spacer' }), h('button', { class: 'btn small ghost', onClick: () => { b.packSelected = null; paint(); } }, 'Back to packs')), h('p', { class: 'muted' }, 'Read-only view. LUCID will not install this modpack or any of its mods.'), b.packLoading ? h('div', { class: 'muted' }, 'Loading contained mods...') : mods.length ? h('div', { class: 'list' }, ...mods.map(containedRow)) : h('div', { class: 'muted' }, 'No compatible mods were listed for this version.'))); footer.replaceChildren(); return;
+      }
+      if (!b.packHits.length) { results.replaceChildren(h('div', { class: 'muted' }, b.packLoading || !b.packSearched ? 'Searching...' : 'No modpacks match these filters.')); footer.replaceChildren(); return; }
+      results.replaceChildren(...b.packHits.map(modpackRow));
+      footer.replaceChildren(h('div', { class: 'row' }, h('span', { class: 'muted' }, `Showing ${b.packHits.length} of ${fmtCount(b.packTotal)}`), h('div', { class: 'spacer' }), b.packHits.length < b.packTotal ? h('button', { class: 'btn', disabled: b.packLoading, onClick: () => void runPackSearch(true) }, b.packLoading ? 'Loading...' : 'Load more') : null));
+    };
+    b.paint = paint;
+    if (!b.packSearched && !b.packLoading) void runPackSearch(false); else paint();
+    return h('div', { class: 'stack' },
+      header('MODPACKS', `Browse-only modpack search for ${inst.minecraftVersion} ${inst.loaderName}`, h('button', { class: 'btn ghost', onClick: () => { b.mode = 'mods'; b.packSelected = null; render(); } }, 'Browse mods')),
+      h('div', { class: 'browse-toolbar' }, search, loaderSelect, versionSelect), h('div', { class: 'card' }, results, footer));
+  }
+
   function browseView(): Node {
     const state = ui.state!;
     const inst = selected();
     if (!inst) return h('div', {}, header('BROWSE', 'Find and install mods'), emptyState('Create an instance first.'));
-    const b = ui.browse;
-    if (b.instanceId !== inst.id) {
+	    const b = ui.browse;
+	    if (b.instanceId !== inst.id) {
       // Filters start at the instance's own version and loader so every result can be installed.
-      Object.assign(b, { instanceId: inst.id, version: inst.minecraftVersion, loader: inst.modLoaders[0] ?? '', hits: [], total: 0, error: null, searched: false, installed: new Set<string>() });
-    }
+	      Object.assign(b, { instanceId: inst.id, version: inst.minecraftVersion, loader: inst.modLoaders[0] ?? '', hits: [], total: 0, error: null, searched: false, installed: new Set<string>() });
+	    }
+	    if (b.mode === 'modpacks') return modpackBrowseView(inst);
     const compatible = inst.modLoaders;
 
     const picker = h('select', { class: 'input picker', onChange: (e: Event) => select((e.target as HTMLSelectElement).value) },
@@ -1563,7 +1660,8 @@
 
     return h('div', { class: 'stack' },
       header('BROWSE', `Mods from Modrinth for ${inst.minecraftVersion} ${inst.loaderName}`, picker,
-        h('button', { class: 'btn ghost', onClick: () => { ui.view = 'mods'; render(); } }, 'Installed mods')),
+	        h('button', { class: 'btn ghost', onClick: () => { b.mode = 'modpacks'; b.packSearched = false; render(); } }, 'Browse modpacks'),
+	        h('button', { class: 'btn ghost', onClick: () => { ui.view = 'mods'; render(); } }, 'Installed mods')),
       inst.loader === 'vanilla' ? h('div', { class: 'issue warning' }, 'This instance has no mod loader. Choose Fabric, Quilt, Forge or NeoForge in the instance editor to install mods.') : null,
       h('div', { class: 'browse-toolbar' }, search, sortSelect, loaderSelect, versionSelect),
       h('div', { class: 'card' }, results, footer));
