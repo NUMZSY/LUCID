@@ -13,5 +13,6 @@ public abstract class ParticleEngineMixin {
 	@Inject(method = "add", at = @At("HEAD"), cancellable = true)
 	private void snowballclient$limitParticles(Particle particle, CallbackInfo ci) {
 		if (ModuleRegistry.PARTICLES != null && ModuleRegistry.PARTICLES.shouldDrop()) ci.cancel();
+		if (ModuleRegistry.PARTICLE_CHANGER != null && ModuleRegistry.PARTICLE_CHANGER.shouldDrop(particle)) ci.cancel();
 	}
 }

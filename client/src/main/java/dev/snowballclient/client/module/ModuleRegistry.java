@@ -53,9 +53,12 @@ import dev.snowballclient.client.module.render.GlassGui;
 import dev.snowballclient.client.module.render.CrystalGlow;
 import dev.snowballclient.client.module.render.HitColor;
 import dev.snowballclient.client.module.render.PotionHud;
+import dev.snowballclient.client.module.render.ParticleChanger;
+import dev.snowballclient.client.module.render.LightOverlay;
 import dev.snowballclient.client.module.render.RenderDistance;
 import dev.snowballclient.client.module.render.VisualModules;
 import dev.snowballclient.client.module.render.WeatherEffects;
+import dev.snowballclient.client.module.render.Waila;
 import dev.snowballclient.client.module.storage.ContainerPreview;
 import dev.snowballclient.client.module.storage.ContainerSearch;
 import dev.snowballclient.client.module.storage.ItemCounter;
@@ -91,6 +94,7 @@ public final class ModuleRegistry {
 	public static Fullbright FULLBRIGHT;
 	public static InactiveFpsLimiter INACTIVE_FPS;
 	public static ParticleLimiter PARTICLES;
+	public static ParticleChanger PARTICLE_CHANGER;
 	public static AnimationOptimization ANIMATIONS;
 	public static EntityRenderDistance ENTITY_DISTANCE;
 	public static SmartCulling CULLING;
@@ -179,6 +183,9 @@ public final class ModuleRegistry {
 		ENTITY_DISTANCE = m.register(new EntityRenderDistance());
 		WEATHER = m.register(new WeatherEffects());
 		m.register(new PotionHud());
+		PARTICLE_CHANGER = m.register(new ParticleChanger());
+		m.register(new LightOverlay());
+		m.register(new Waila());
 		HIT_COLOR = m.register(new HitColor());
 		CRYSTAL_GLOW = m.register(new CrystalGlow());
 		NO_HURT_SHAKE = m.register(new VisualModules.NoHurtShake());
@@ -228,7 +235,7 @@ public final class ModuleRegistry {
 
 		m.order(ModuleCategory.CLIENT, "client_hud", "presets", "hud_layout", "interface", "cosmetics", "skins", "menu_3d", "watermark", "fps_counter", "ping_display", "coordinates",
 				"direction_hud", "custom_text", "memory_usage", "pack_display", "anti_crash");
-		m.order(ModuleCategory.RENDER, "fps_boost", "fov_settings", "potion_hud", "block_outline", "no_hurt_shake", "low_fire", "third_person",
+		m.order(ModuleCategory.RENDER, "fps_boost", "fov_settings", "potion_hud", "particle_changer", "light_overlay", "waila", "block_outline", "no_hurt_shake", "low_fire", "third_person",
 				"time_changer", "custom_sky", "weather_effects");
 		m.order(ModuleCategory.PVP, "crosshair", "armor_hud", "cps_counter", "combo_counter", "reach_display", "target_info");
 		m.order(ModuleCategory.MOVEMENT, "toggle_sprint", "toggle_sneak", "speed_display");
