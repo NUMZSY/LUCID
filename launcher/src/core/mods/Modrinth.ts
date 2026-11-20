@@ -72,6 +72,9 @@ export interface SearchHit {
   loaders: string[];
   gameVersions: string[];
   versionRange: string;
+  provider?: 'modrinth' | 'curseforge';
+  webUrl?: string;
+  installable?: boolean;
 }
 
 export interface InstanceTarget {

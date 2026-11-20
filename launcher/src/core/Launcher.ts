@@ -17,6 +17,7 @@ import { usesLwjgl2, VersionManager } from './minecraft/VersionManager.js';
 import { ModLoaderRegistry } from './modloader/ModLoaderRegistry.js';
 import { ModManager } from './mods/ModManager.js';
 import { ModrinthService } from './mods/Modrinth.js';
+import { CurseForgeService } from './mods/CurseForge.js';
 import { createModrinthPackDownloader, inspectModrinthPack, installModrinthPackFiles } from './mods/ModrinthPack.js';
 import { getProfile, installProfile, PERFORMANCE_PROFILES, resolveProfile } from './performance/PerformanceProfiles.js';
 import { scanJars, type ScanReport } from './security/ModScanner.js';
@@ -113,6 +114,7 @@ export class Launcher extends EventEmitter {
     readonly instances: InstanceManager,
     readonly mods: ModManager,
     readonly modrinth: ModrinthService,
+    readonly curseforge: CurseForgeService,
     readonly core: SnowballCore,
     readonly loaders: ModLoaderRegistry,
     readonly auth: AuthManager,
@@ -144,6 +146,7 @@ export class Launcher extends EventEmitter {
     const instances = new InstanceManager(paths.instances);
     const mods = new ModManager();
     const modrinth = new ModrinthService(downloads, mods);
+    const curseforge = new CurseForgeService(process.env.LUCID_CURSEFORGE_API_KEY ?? process.env.CURSEFORGE_API_KEY);
     const core = new SnowballCore(
       await ClientBuildRegistry.discover(options.clientBuildDirs),
       { ensure: (gameDir, minecraftVersion, signal) => modrinth.ensureFabricApi(gameDir, minecraftVersion, signal) },
@@ -155,7 +158,7 @@ export class Launcher extends EventEmitter {
     const processes = new ProcessManager();
     const skins = new SkinService(new SkinLibrary(paths.skins, options.skinDecoder), auth);
 
-    const launcher = new Launcher(paths, settings, downloads, versions, java, instances, mods, modrinth, core, loaders, auth, processes, skins, options);
+    const launcher = new Launcher(paths, settings, downloads, versions, java, instances, mods, modrinth, curseforge, core, loaders, auth, processes, skins, options);
     processes.on('record', ({ instanceId, record }: GameRecordEvent) => {
       for (const line of launcher.interpreters.get(instanceId)?.interpret(record) ?? []) launcher.activity.add(instanceId, line.level, line.message);
       if (launcher.phases.get(instanceId) === 'launching' && WINDOW_UP.test(record.message)) launcher.setPhase(instanceId, 'running');

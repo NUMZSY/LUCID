@@ -19,6 +19,7 @@ const api = {
   removeMod: invoke('mods:remove'),
   addMods: invoke('mods:add'),
   searchMods: invoke('browse:search'),
+  curseForgeStatus: invoke('browse:curseforge-status'),
   installMod: invoke('browse:install'),
   installedModProjects: invoke('mods:installed-projects'),
   checkModUpdates: invoke('mods:check-updates'),

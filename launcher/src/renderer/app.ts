@@ -17,6 +17,8 @@
     /** Mod browser state survives re-renders so results and filters are not lost. */
     browse: {
       instanceId: null as string | null,
+      provider: 'modrinth' as Snowball.ModProvider,
+      curseForgeConfigured: false,
       query: '',
       sort: 'relevance',
       loader: '',
@@ -1040,7 +1042,8 @@
             h('div', { class: 'empty-launch-title' }, 'Your next world starts here'),
             h('div', { class: 'empty-launch-copy' }, 'Create a Minecraft instance to add a version, choose a loader, and start playing.'),
             h('button', { class: 'btn primary', onClick: () => { ui.view = 'instances'; render(); } }, 'CREATE AN INSTANCE'),
-            h('button', { class: 'btn', style: 'margin-top:10px', onClick: (e: MouseEvent) => void importModrinthPack(e.currentTarget as HTMLButtonElement) }, 'IMPORT MODRINTH PACK'))),
+            h('div', { class: 'muted import-note' }, 'Imports always create a separate isolated instance.'),
+            h('button', { class: 'btn', style: 'margin-top:10px', onClick: (e: MouseEvent) => void importModrinthPack(e.currentTarget as HTMLButtonElement) }, 'IMPORT AS NEW INSTANCE'))),
         h('aside', { class: 'home-aside' }, featuredPanel())));
   }
 
@@ -1248,14 +1251,14 @@
     ui.selectedId = imported.id;
     ui.view = 'home';
     await refresh();
-    toast(`Imported ${imported.name}. Press Play to finish downloading Minecraft and start the pack.`);
+    toast(`Imported ${imported.name} as a new isolated instance. Press Play to finish downloading Minecraft and start the pack.`);
   }
 
   function instancesView(): Node {
     const state = ui.state!;
     const newButton = h('button', { class: 'btn primary', onClick: () => createInstanceDialog() }, '+ New instance');
     const importButton = h('button', { class: 'btn', onClick: () => importDialog() }, 'Import from another launcher');
-    const packButton = h('button', { class: 'btn', onClick: (e: MouseEvent) => void importModrinthPack(e.currentTarget as HTMLButtonElement) }, 'Import Modrinth pack');
+    const packButton = h('button', { class: 'btn', onClick: (e: MouseEvent) => void importModrinthPack(e.currentTarget as HTMLButtonElement) }, 'Import as new instance');
     if (state.instances.length === 0) return h('div', {}, header('INSTANCES', 'Isolated game installations', packButton, newButton), emptyState('Create an instance or import a Modrinth modpack to get started.'));
     return h('div', {},
       header('INSTANCES', `${state.instances.length} isolated installation${state.instances.length === 1 ? '' : 's'}`, packButton, importButton, newButton),
@@ -1474,7 +1477,18 @@
       el.addEventListener('change', () => onChange(el.value));
       return el;
     };
-    const search = h('input', { class: 'input', placeholder: 'Search Modrinth...', value: b.query, maxlength: '100' }) as HTMLInputElement;
+    const providerSelect = dropdown([['modrinth', 'Modrinth'], ['curseforge', 'CurseForge']], b.provider, (v) => {
+      b.provider = v as Snowball.ModProvider;
+      b.hits = [];
+      b.searched = false;
+      b.error = null;
+      if (b.provider === 'curseforge' && !b.curseForgeConfigured) {
+        void api.curseForgeStatus().then((status) => { b.curseForgeConfigured = status.configured; render(); }).catch(() => undefined);
+      }
+      paint();
+      if (b.provider === 'modrinth' || b.curseForgeConfigured) void runSearch(false);
+    });
+    const search = h('input', { class: 'input', placeholder: `Search ${b.provider === 'curseforge' ? 'CurseForge' : 'Modrinth'}...`, value: b.query, maxlength: '100' }) as HTMLInputElement;
     let timer = 0;
     search.addEventListener('input', () => {
       b.query = search.value;
@@ -1502,7 +1516,7 @@
       }
       b.paint();
       try {
-        const r = await api.searchMods({ query: b.query.trim(), sort: (b.sort === 'name' ? 'relevance' : b.sort) as Snowball.ModSort, loader: b.loader || null, gameVersion: b.version || null, offset: append ? b.hits.length : 0 });
+        const r = await api.searchMods({ provider: b.provider, query: b.query.trim(), sort: (b.sort === 'name' ? 'relevance' : b.sort) as Snowball.ModSort, loader: b.loader || null, gameVersion: b.version || null, offset: append ? b.hits.length : 0 });
         if (seq !== b.seq) return;
         b.hits = append ? [...b.hits, ...r.hits] : r.hits;
         b.total = r.total;
@@ -1543,7 +1557,11 @@
       const installed = b.installed.has(hit.projectId);
       const installing = b.installing.has(`${inst.id}:${hit.projectId}`);
       const why = inst.loader === 'vanilla' ? 'This instance has no mod loader' : `No ${inst.loaderName} version for Minecraft ${inst.minecraftVersion}`;
-      const button = h('button', {
+      const isCurseForge = hit.provider === 'curseforge';
+      const pageUrl = hit.webUrl;
+      const button = isCurseForge
+        ? h('button', { class: 'btn small', disabled: !pageUrl, onClick: () => { if (pageUrl) void guard(() => api.openExternalLink(pageUrl)); } }, 'Open page')
+        : h('button', {
         class: `btn small${installed || !fits ? '' : ' primary'}`,
         disabled: installed || installing || !fits || engaged(inst),
         title: fits ? '' : why,
@@ -1573,7 +1591,7 @@
     const paint = () => {
       if (b.error) {
         results.replaceChildren(h('div', { class: 'issue' },
-          h('div', {}, `Could not load mods from Modrinth: ${b.error}`),
+          h('div', {}, `Could not load mods from ${b.provider === 'curseforge' ? 'CurseForge' : 'Modrinth'}: ${b.error}`),
           h('button', { class: 'btn small', style: 'margin-top:8px', onClick: () => void runSearch(false) }, 'Retry')));
         footer.replaceChildren();
         return;
@@ -1595,11 +1613,16 @@
     else paint();
     void loadInstalled();
 
+    const providerNotice = b.provider === 'curseforge' && !b.curseForgeConfigured
+      ? h('div', { class: 'issue warning' },
+          'CurseForge search needs an official API key in the launcher build. Set CURSEFORGE_API_KEY, then restart LUCID. Modrinth search is ready now.')
+      : null;
     return h('div', { class: 'stack' },
-      header('BROWSE', `Mods from Modrinth for ${inst.minecraftVersion} ${inst.loaderName}`, picker,
+      header('BROWSE', `Mods from ${b.provider === 'curseforge' ? 'CurseForge' : 'Modrinth'} for ${inst.minecraftVersion} ${inst.loaderName}`, picker,
         h('button', { class: 'btn ghost', onClick: () => { ui.view = 'mods'; render(); } }, 'Installed mods')),
       inst.loader === 'vanilla' ? h('div', { class: 'issue warning' }, 'This instance has no mod loader. Choose Fabric, Quilt, Forge or NeoForge in the instance editor to install mods.') : null,
-      h('div', { class: 'browse-toolbar' }, search, sortSelect, loaderSelect, versionSelect),
+      providerNotice,
+      h('div', { class: 'browse-toolbar' }, providerSelect, search, sortSelect, loaderSelect, versionSelect),
       h('div', { class: 'card' }, results, footer));
   }
 

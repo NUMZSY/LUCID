@@ -85,8 +85,10 @@ declare namespace Snowball {
   }
 
   type ModSort = 'relevance' | 'downloads' | 'follows' | 'updated' | 'newest';
+  type ModProvider = 'modrinth' | 'curseforge';
 
   interface ModSearchOptions {
+    provider?: ModProvider;
     query: string;
     loader: string | null;
     gameVersion: string | null;
@@ -107,6 +109,9 @@ declare namespace Snowball {
     loaders: string[];
     gameVersions: string[];
     versionRange: string;
+    provider?: ModProvider;
+    webUrl?: string;
+    installable?: boolean;
   }
 
   interface ModUpdate {
@@ -459,6 +464,7 @@ declare namespace Snowball {
     removeMod(id: string, fileName: string): Promise<void>;
     addMods(id: string): Promise<{ added: number; errors: string[] }>;
     searchMods(options: ModSearchOptions): Promise<{ hits: ModSearchHit[]; total: number; offset: number }>;
+    curseForgeStatus(): Promise<{ configured: boolean }>;
     installMod(id: string, projectId: string): Promise<{ installed: string[] }>;
     installedModProjects(id: string): Promise<string[]>;
     checkModUpdates(id: string): Promise<ModUpdate[]>;

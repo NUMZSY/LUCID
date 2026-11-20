@@ -365,15 +365,19 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
 
   handle('browse:search', async (raw: Snowball.ModSearchOptions) => {
     const offset = Number.isInteger(raw?.offset) ? Math.min(Math.max(raw.offset, 0), 10_000) : 0;
-    return launcher.modrinth.search({
+    const options = {
       query: typeof raw?.query === 'string' ? str(raw.query, 'search text', 200) : '',
       loader: typeof raw?.loader === 'string' && MOD_LOADERS.includes(raw.loader) ? raw.loader : null,
       gameVersion: raw?.gameVersion ? str(raw.gameVersion, 'Minecraft version', 64) : null,
       sort: SEARCH_SORTS.includes(raw?.sort) ? raw.sort : 'relevance',
       offset,
       limit: 20,
-    });
+    } as const;
+    if (raw?.provider === 'curseforge') return launcher.curseforge.search(options);
+    return launcher.modrinth.search(options);
   });
+
+  handle('browse:curseforge-status', () => ({ configured: launcher.curseforge.configured }));
 
   handle('browse:install', async (id: unknown, projectId: unknown) => {
     const iid = await instanceId(id);
