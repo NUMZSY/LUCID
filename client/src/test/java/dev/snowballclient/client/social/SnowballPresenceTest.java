@@ -57,6 +57,13 @@ class SnowballPresenceTest {
 		SnowballPresence.reset();
 	}
 
+	@Test
+	void communityFeaturesNeedAConfiguredBackend() {
+		assertTrue(RankLookup.isConfigured());
+		System.setProperty("lucid.apiUrl", "  ");
+		assertFalse(RankLookup.isConfigured());
+	}
+
 	@AfterEach
 	void stop() {
 		server.stop(0);

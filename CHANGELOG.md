@@ -9,6 +9,14 @@ installer once.
 
 ---
 
+## 2.1.3
+
+### What's new
+- **Community features are off for now.** Chat, player lookup, ranks, online counts, presence and community capes are hidden or disabled when no LUCID server is configured.
+- **Normal play stays available.** You can still launch Minecraft, manage mods, and use local skins and bundled capes.
+
+---
+
 ## 2.1.2
 
 ### What's new

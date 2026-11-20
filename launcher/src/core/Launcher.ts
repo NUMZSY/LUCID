@@ -615,8 +615,8 @@ export class Launcher extends EventEmitter {
           ...(prep.clientJar ? [`-Dfabric.addMods=${prep.clientJar}`] : []),
           // The client's Discord presence needs an application id; without one the module stays off.
           ...(this.discordAppId ? [`-Dlucid.discordAppId=${this.discordAppId}`] : []),
-          // The rank the backend granted this account; the client only reads it, never sets it.
-          `-Dlucid.rank=${this.settings.get().accounts.rank}`,
+          // Only pass the backend-granted rank when a community server is configured.
+          ...(this.options.lucidApiUrl ? [`-Dlucid.rank=${this.settings.get().accounts.rank}`] : []),
           // No server is contacted unless the build maintainer supplies a self-hosted LUCID API URL.
           ...(this.options.lucidApiUrl ? [`-Dlucid.apiUrl=${this.options.lucidApiUrl}`] : []),
           // The skin library the Skins page keeps, so the game's Skins panel shows the same skins.

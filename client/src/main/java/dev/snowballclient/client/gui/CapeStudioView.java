@@ -110,7 +110,7 @@ public final class CapeStudioView extends PanelView {
 	protected void renderContent(Canvas c, int mouseX, int mouseY) {
 		if (!SnowballPlayers.can(Permission.PLUS_FEATURES)) {
 			UiText.draw(c, "The cape studio comes with LUCID+.", UiText.UI, panelX + 14, panelY + HEADER_H + 14, theme.text());
-			UiText.draw(c, "Get it at snowball.krakensmp.xyz/store.html", UiText.DETAIL, panelX + 14, panelY + HEADER_H + 28, theme.mutedText());
+			UiText.draw(c, "Ask your LUCID server admin about access.", UiText.DETAIL, panelX + 14, panelY + HEADER_H + 28, theme.mutedText());
 			return;
 		}
 		drawGrid(c, mouseX, mouseY);

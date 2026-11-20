@@ -162,14 +162,19 @@ public final class SnowballClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(this::onEndTick);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> saveAll());
 		// Other Snowball players see this player's badge only while this game runs Snowball Client.
-		SnowballPresence.start(SnowballClient::presenceAccount, () -> ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.showMe.isOn());
+		if (communityFeaturesEnabled()) SnowballPresence.start(SnowballClient::presenceAccount, () -> ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.showMe.isOn());
+		else SnowballPresence.stop();
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> SnowballPresence.stop());
 		// The skin changer wears skins through Mojang with this account. 1.8.9 keeps the skin it
 		// loaded until you rejoin, so SkinHooks.platform stays as it is.
 		SkinHooks.account = SnowballClient::presenceAccount;
 		// The launcher passes the rank the backend granted this account; the client only reads it.
-		SnowballPlayers.setSelfRank(Rank.byId(System.getProperty("lucid.rank", "snowball")));
+		SnowballPlayers.setSelfRank(communityFeaturesEnabled() ? Rank.byId(System.getProperty("lucid.rank", "snowball")) : Rank.SNOWBALL);
 		LOGGER.info("LUCID initialised with {} modules", modules.all().size());
+	}
+
+	public static boolean communityFeaturesEnabled() {
+		return !System.getProperty("lucid.apiUrl", "").trim().isEmpty();
 	}
 
 	/** The signed-in account, as 1.8.9 keeps it: the id comes without dashes. */

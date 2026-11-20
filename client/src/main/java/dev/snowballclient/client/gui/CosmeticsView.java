@@ -39,13 +39,17 @@ public final class CosmeticsView extends PanelView {
 		super("COSMETICS", client, PER_ROW * (TILE_W + GAP) + 26);
 		this.cosmetics = cosmetics;
 		tiles.add(Cosmetics.NONE);
-		tiles.addAll(Looks.CAPES);
-		if (plus()) tiles.add(Looks.CUSTOM);
+		tiles.addAll(Looks.CAPES.stream().filter(id -> community() || !Looks.PLUS_CAPES.contains(id)).toList());
+		if (community() && plus()) tiles.add(Looks.CUSTOM);
 		previews = new UiTexture[tiles.size()];
 	}
 
 	private static boolean plus() {
 		return SnowballPlayers.can(Permission.PLUS_FEATURES);
+	}
+
+	private static boolean community() {
+		return SnowballClient.communityFeaturesEnabled();
 	}
 
 	@Override
@@ -64,7 +68,7 @@ public final class CosmeticsView extends PanelView {
 
 	@Override
 	public void tick() {
-		CustomCapes.refreshStatus();
+		if (community()) CustomCapes.refreshStatus();
 	}
 
 	private int[] tile(int i) {
@@ -106,22 +110,26 @@ public final class CosmeticsView extends PanelView {
 			} else {
 				GuiDraw.roundedOutline(c, px, py, 30, 48, 2, theme.border());
 				c.fill(px + 8, py + 23, px + 22, py + 25, theme.mutedText());
-			}
-			drawLabel(c, label(id), p[0] + TILE_W / 2, p[1] + TILE_H - 14, chosen ? theme.accent() : theme.text());
-			if (chosen) GuiDraw.roundedOutline(c, p[0], p[1], TILE_W, TILE_H, 4, theme.accent());
+				}
+				drawLabel(c, label(id), p[0] + TILE_W / 2, p[1] + TILE_H - 14, chosen ? theme.accent() : theme.text());
+				if (chosen) GuiDraw.roundedOutline(c, p[0], p[1], TILE_W, TILE_H, 4, theme.accent());
 		}
 
 		int y = panelY + panelH - 44;
-		drawColours(c, y + 21, mouseX, mouseY);
-		if (plus()) {
-			button(c, panelX + 12, y, 96, 16, "CAPE STUDIO", false, mouseX, mouseY);
-			drawWrapped(c, customLine(), panelX + 116, y, panelW - 130, theme.mutedText());
+		if (!community()) {
+			UiText.draw(c, "Community capes and badges are off in this build.", UiText.DETAIL, panelX + 12, y + 5, theme.mutedText());
 		} else {
-			String hint = lockedHint ? "Things marked + come with LUCID+: snowball.krakensmp.xyz/store.html" : "Your own cape, the + capes and name colours come with LUCID+";
-			UiText.draw(c, UiText.fit(c, hint, UiText.DETAIL, panelW - 24), UiText.DETAIL, panelX + 12, y + 5, lockedHint ? theme.text() : theme.mutedText());
+			drawColours(c, y + 21, mouseX, mouseY);
+			if (plus()) {
+				button(c, panelX + 12, y, 96, 16, "CAPE STUDIO", false, mouseX, mouseY);
+				drawWrapped(c, customLine(), panelX + 116, y, panelW - 130, theme.mutedText());
+			} else {
+				String hint = lockedHint ? "Plus capes require a LUCID+ rank on your community server." : "Your own cape, the + capes and name colours require LUCID+.";
+				UiText.draw(c, UiText.fit(c, hint, UiText.DETAIL, panelW - 24), UiText.DETAIL, panelX + 12, y + 5, lockedHint ? theme.text() : theme.mutedText());
+			}
+			boolean others = cosmetics.showOthers.isOn();
+			button(c, panelX + 12, y + 20, 150, 16, others ? "OTHERS' CAPES: SHOWN" : "OTHERS' CAPES: HIDDEN", false, mouseX, mouseY);
 		}
-		boolean others = cosmetics.showOthers.isOn();
-		button(c, panelX + 12, y + 20, 150, 16, others ? "OTHERS' CAPES: SHOWN" : "OTHERS' CAPES: HIDDEN", false, mouseX, mouseY);
 	}
 
 	/**
@@ -239,6 +247,7 @@ public final class CosmeticsView extends PanelView {
 			client.saveIfDirty();
 			return true;
 		}
+		if (!community()) return false;
 		int y = panelY + panelH - 44;
 		List<String> ids = colourIds();
 		for (int i = 0; i < ids.size(); i++) {

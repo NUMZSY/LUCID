@@ -74,6 +74,8 @@
   let repaintPeople: (() => void) | null = null;
   /** Whether the Skins page is open, so Mojang is asked which skin is worn once each time it opens. */
   let skinsOpen = false;
+  /** Community stats are polled only when this build has a backend configured. */
+  let communityStatsTimer: number | null = null;
   /** Starts the skin preview turning again when the window comes back into focus. */
   let wakePreview: (() => void) | null = null;
 
@@ -459,9 +461,14 @@
 
   function render(): void {
     if (ui.view !== 'skins') skinsOpen = false;
+    if (!ui.chat?.configured && (ui.view === 'chat' || ui.view === 'admin')) ui.view = 'home';
     const nav = document.getElementById('nav')!;
-    // Admin only appears for an account the LUCID server says may use it.
-    const entries = NAV.filter(([view]) => view !== 'admin' || canAdminister());
+    // Community pages are hidden entirely until a backend is configured; local launcher features remain.
+    const entries = NAV.filter(([view]) => {
+      if (view === 'chat') return Boolean(ui.chat?.configured);
+      if (view === 'admin') return Boolean(ui.chat?.configured) && canAdminister();
+      return true;
+    });
     // An icon rail: the label is the tooltip and the accessible name, so the rail stays narrow
     // and the page gets the width instead.
     nav.replaceChildren(...entries.map(([view, label]) => h('button', {
@@ -1072,8 +1079,8 @@
   function welcomeBar(picker: HTMLElement): HTMLElement {
     const state = ui.state!;
     const account = state.accounts.find((a) => a.id === state.settings.accounts.selectedAccountId) ?? state.accounts[0];
-    const rank = ui.chat?.rank;
-    const online = ui.stats?.online ?? ui.chat?.online ?? 0;
+    const rank = ui.chat?.configured ? ui.chat.rank : undefined;
+    const online = ui.chat?.configured ? ui.stats?.online ?? ui.chat.online : 0;
 
     return h('div', { class: 'welcome home-topbar' },
       h('div', { class: 'welcome-text' },
@@ -1184,6 +1191,7 @@
   }
 
   function refreshStats(): void {
+    if (!ui.chat?.configured) return;
     void api.snowballStats().then((stats) => {
       if (!stats) return;
       const changed = JSON.stringify(stats) !== JSON.stringify(ui.stats);
@@ -1194,6 +1202,12 @@
       ui.stats = stats;
       if (announcementChanged || (changed && ui.view === 'home')) render();
     }).catch(() => undefined);
+  }
+
+  function startCommunityStats(): void {
+    if (!ui.chat?.configured || communityStatsTimer !== null) return;
+    refreshStats();
+    communityStatsTimer = window.setInterval(refreshStats, 20_000);
   }
 
   function activityRow(e: Snowball.ActivityEvent): HTMLElement {
@@ -3515,6 +3529,7 @@
   api.on('chat-state', (state: Snowball.ChatState) => {
     const was = ui.chat;
     ui.chat = state;
+    startCommunityStats();
     // The admin page has half-typed fields, so it is only redrawn when what it offers changed -
     // not every time somebody joins and the online count moves.
     const adminChanged = ui.view === 'admin' && whatAdminShows(was) !== whatAdminShows(state);
@@ -3582,12 +3597,12 @@
     if (state.status === 'installing') installingOverlay();
     render();
   });
-  refreshStats();
-  // Often enough that "playing right now" follows people joining and leaving.
-  setInterval(refreshStats, 20_000);
   void api.chatState().then((state) => {
     ui.chat = state;
-    if (state.configured) render();
+    if (state.configured) {
+      startCommunityStats();
+      render();
+    }
   }).catch(() => {});
   void api.getBackground().then((dataUrl) => {
     ui.background = dataUrl;

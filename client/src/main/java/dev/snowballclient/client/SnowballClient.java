@@ -29,6 +29,7 @@ import dev.snowballclient.client.platform.SnowglassRenderer;
 import dev.snowballclient.client.platform.SpatialGame;
 import dev.snowballclient.client.platform.ViewScreen;
 import dev.snowballclient.client.social.Rank;
+import dev.snowballclient.client.social.RankLookup;
 import dev.snowballclient.client.hud.NotificationCenter;
 import dev.snowballclient.client.social.SnowballPlayers;
 import dev.snowballclient.client.social.SnowballPresence;
@@ -125,11 +126,16 @@ public final class SnowballClient implements ClientModInitializer {
 		return user == null ? null : new SnowballPresence.Account(user.getName(), user.getProfileId(), user.getAccessToken());
 	};
 
+	public static boolean communityFeaturesEnabled() {
+		return RankLookup.isConfigured();
+	}
+
 	public static boolean nameTagBadges() {
-		return ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.nameTagBadges.get();
+		return communityFeaturesEnabled() && (ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.nameTagBadges.get());
 	}
 
 	public static String tabFormat() {
+		if (!communityFeaturesEnabled()) return "";
 		if (ModuleRegistry.INTERFACE == null) return "badge_tag";
 		String format = ModuleRegistry.INTERFACE.tabRanks.get();
 		return "off".equals(format) ? "" : format;
@@ -265,12 +271,13 @@ public final class SnowballClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(this::onEndTick);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> saveAll());
 		// Other LUCID players see this player's badge only while this game runs LUCID.
-		SnowballPresence.start(PRESENCE_ACCOUNT, () -> ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.showMe.isOn());
+		if (communityFeaturesEnabled()) SnowballPresence.start(PRESENCE_ACCOUNT, () -> ModuleRegistry.INTERFACE == null || ModuleRegistry.INTERFACE.showMe.isOn());
+		else SnowballPresence.stop();
 		SkinHooks.account = PRESENCE_ACCOUNT;
 		SkinHooks.platform = new MinecraftSkinPlatform();
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> SnowballPresence.stop());
 		// The launcher passes the rank the backend granted this account; the client only reads it.
-		SnowballPlayers.setSelfRank(Rank.byId(System.getProperty("lucid.rank", "snowball")));
+		SnowballPlayers.setSelfRank(communityFeaturesEnabled() ? Rank.byId(System.getProperty("lucid.rank", "snowball")) : Rank.SNOWBALL);
 		LOGGER.info("LUCID initialised with {} modules", modules.all().size());
 	}
 
@@ -325,6 +332,7 @@ public final class SnowballClient implements ClientModInitializer {
 				Emotes.setSelf(mc.getUser().getProfileId());
 				SelfSkin.prefetch(mc.getUser().getProfileId(), MinecraftTextures.INSTANCE);
 			}
+		if (communityFeaturesEnabled()) {
 			SnowballLive.start(() -> {
 				if (mc.getConnection() == null) return java.util.List.of();
 				return mc.getConnection().getOnlinePlayers().stream()
@@ -332,16 +340,22 @@ public final class SnowballClient implements ClientModInitializer {
 						.filter(java.util.Objects::nonNull)
 						.toList();
 			});
-			// Who is on LUCID is asked of the backend, so other people wear their badge too.
-			dev.snowballclient.client.social.RankLookup.reset();
-			dev.snowballclient.client.social.RankLookup.start(() -> {
+			RankLookup.reset();
+			RankLookup.start(() -> {
 				if (mc.getConnection() == null) return java.util.List.of();
 				return mc.getConnection().getOnlinePlayers().stream()
 						.map(p -> p.getProfile().id())
 						.filter(java.util.Objects::nonNull)
 						.toList();
 			});
+		} else {
+			SnowballLive.stop();
+			RankLookup.stop();
+			SnowballPlayers.forgetOthers();
+			Looks.forgetOthers();
+			CustomCapes.forgetOthers();
 		}
+	}
 		if (!inWorld && wasInWorld) {
 			ModuleRegistry.COMBAT.reset();
 			dev.snowballclient.client.platform.WorldCulling.forget();
@@ -355,10 +369,10 @@ public final class SnowballClient implements ClientModInitializer {
 		wasInWorld = inWorld;
 		if (inWorld) {
 			tickEmote(mc);
-			tickCustomCape();
+			if (communityFeaturesEnabled()) tickCustomCape();
 		}
 		// Whether other players can see your badge, said once when it changes.
-		String badgeNews = SnowballPresence.takeNews();
+		String badgeNews = communityFeaturesEnabled() ? SnowballPresence.takeNews() : null;
 		if (badgeNews != null) NotificationCenter.post("LUCID badge", badgeNews);
 
 		if (--autosaveCountdown <= 0) {

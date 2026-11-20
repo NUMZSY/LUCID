@@ -64,17 +64,20 @@ public final class Looks {
 		if (id.equals(self)) {
 			String own = selfCape.get();
 			if (CUSTOM.equals(own)) {
+				if (!RankLookup.isConfigured()) return null;
 				int version = dev.snowballclient.client.cosmetics.CustomCapes.approvedVersion();
 				return version > 0 ? CUSTOM + ":" + version : null;
 			}
 			return wearable(own) ? own : null;
 		}
+		if (!RankLookup.isConfigured()) return null;
 		if (!showOthers) return null;
 		return CAPE.get(id);
 	}
 
 	/** The cape to tell the backend about: one the client ships, or empty. */
 	public static String selfCape() {
+		if (!RankLookup.isConfigured()) return "";
 		String own = selfCape.get();
 		if (CUSTOM.equals(own)) return dev.snowballclient.client.cosmetics.CustomCapes.approvedVersion() > 0 ? CUSTOM : "";
 		return wearable(own) ? own : "";
@@ -96,7 +99,7 @@ public final class Looks {
 
 	/** The name colour this player picked, as RGB, or -1 for the usual colour. */
 	public static int colour(UUID id) {
-		if (id == null) return -1;
+		if (id == null || !RankLookup.isConfigured()) return -1;
 		String picked = id.equals(self) ? selfColour() : showOthers ? COLOUR.get(id) : null;
 		Integer rgb = picked == null ? null : COLOURS.get(picked);
 		return rgb == null ? -1 : rgb;
@@ -105,7 +108,7 @@ public final class Looks {
 	/** The name colour to tell the backend about, or empty: one from the list, and only with LUCID+. */
 	public static String selfColour() {
 		String own = selfColour.get();
-		return COLOURS.containsKey(own) && SnowballPlayers.can(Permission.PLUS_FEATURES) ? own : "";
+		return RankLookup.isConfigured() && COLOURS.containsKey(own) && SnowballPlayers.can(Permission.PLUS_FEATURES) ? own : "";
 	}
 
 	public static void setColour(UUID id, String colour) {

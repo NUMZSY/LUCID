@@ -65,6 +65,10 @@ public final class RankLookup {
 		return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
 	}
 
+	public static boolean isConfigured() {
+		return !baseUrl().isEmpty();
+	}
+
 	public static void start(java.util.function.Supplier<List<UUID>> visiblePlayers) {
 		if (timer != null || baseUrl().isEmpty()) return;
 		http = HttpClient.newBuilder().connectTimeout(TIMEOUT).build();

@@ -2,6 +2,8 @@ package dev.snowballclient.client.social;
 
 import dev.snowballclient.client.emote.Emotes;
 import dev.snowballclient.client.emote.Pose;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -11,6 +13,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class SnowballLiveTest {
 	private static final String ID = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	private static final UUID PLAYER = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+	private String previousApiUrl;
+
+	@BeforeEach
+	void configureCommunityBackend() {
+		previousApiUrl = System.getProperty("lucid.apiUrl");
+		System.setProperty("lucid.apiUrl", "https://community.test");
+	}
+
+	@AfterEach
+	void restoreCommunityBackend() {
+		if (previousApiUrl == null) System.clearProperty("lucid.apiUrl");
+		else System.setProperty("lucid.apiUrl", previousApiUrl);
+	}
 
 	@Test
 	void backendMessagesBecomeEmotesAndCapes() {
@@ -47,5 +62,13 @@ class SnowballLiveTest {
 		assertEquals("aurora", Looks.cape(PLAYER));
 		SnowballLive.receive("{\"type\":\"gone\",\"uuid\":\"" + ID + "\"}", now);
 		assertNull(Looks.cape(PLAYER), "a Snowball cape would otherwise keep covering their real one");
+	}
+
+	@Test
+	void offlineBuildHidesCommunityCapes() {
+		System.clearProperty("lucid.apiUrl");
+		SnowballLive.receive("{\"type\":\"looks\",\"uuid\":\"" + ID + "\",\"looks\":{\"cape\":\"aurora\"}}", System.currentTimeMillis());
+		assertFalse(RankLookup.isConfigured());
+		assertNull(Looks.cape(PLAYER));
 	}
 }
