@@ -4,7 +4,7 @@
 (() => {
   const api = window.snowball;
 
-  type View = 'home' | 'instances' | 'mods' | 'browse' | 'skins' | 'chat' | 'admin' | 'java' | 'settings';
+  type View = 'home' | 'instances' | 'mods' | 'browse' | 'skins' | 'capes' | 'chat' | 'admin' | 'java' | 'settings';
 
   const ui = {
     state: null as Snowball.AppState | null,
@@ -165,6 +165,7 @@
     mods: '<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/>',
     browse: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
     skins: '<path d="M8 3L3 6l2 5 3-1.5V21h8V9.5l3 1.5 2-5-5-3a4.5 4.5 0 0 1-8 0z"/>',
+    capes: '<path d="M8 4l4 3 4-3 3 3v12l-7 3-7-3V7z"/><path d="M8 4v12M16 4v12"/>',
     star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
     lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     java: '<path d="M6 8h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17M9 2v3M13 2v3"/>',
@@ -456,15 +457,11 @@
   }
 
   const NAV: Array<[View, string]> = [
-    ['home', 'HOME'],
-    ['instances', 'INSTANCES'],
+    ['home', 'PLAY'],
+    ['instances', 'PROFILES'],
     ['mods', 'MODS'],
-    ['browse', 'BROWSE'],
     ['skins', 'SKINS'],
-    ['chat', 'CHAT'],
-    ['admin', 'ADMIN'],
-    ['java', 'JAVA'],
-    ['settings', 'SETTINGS'],
+    ['capes', 'CAPES'],
   ];
 
   function render(): void {
@@ -498,7 +495,7 @@
       content.replaceChildren(h('div', { class: 'empty muted' }, 'Loading...'));
       return;
     }
-    const views: Record<View, () => Node> = { home: homeView, instances: instancesView, mods: modsView, browse: browseView, skins: skinsView, chat: chatView, admin: adminView, java: javaView, settings: settingsView };
+    const views: Record<View, () => Node> = { home: homeView, instances: instancesView, mods: modsView, browse: browseView, skins: skinsView, capes: capesView, chat: chatView, admin: adminView, java: javaView, settings: settingsView };
     const banners = [announcementBanner(), updateBanner()].filter((b): b is HTMLElement => b !== null);
     content.replaceChildren(...banners, views[ui.view]());
   }
@@ -945,25 +942,6 @@
     return true;
   }
 
-  /**
-   * The home card's mod count. Counting reads every mod jar, so a request already on its way is
-   * shared rather than repeated each time home is drawn, and the last count stays up meanwhile.
-   */
-  const modCounts = new Map<string, { text: string; request?: Promise<string> }>();
-  function fillModCount(id: string, into: HTMLElement): void {
-    const entry = modCounts.get(id) ?? { text: '...' };
-    modCounts.set(id, entry);
-    into.textContent = entry.text;
-    entry.request ??= api.listMods(id)
-      .then((r) => `${r.mods.filter((m) => m.enabled).length} enabled`, () => '-')
-      .then((text) => {
-        entry.text = text;
-        entry.request = undefined;
-        return text;
-      });
-    void entry.request.then((text) => (into.textContent = text));
-  }
-
   // ---------- views ----------
   function homeView(): Node {
     const state = ui.state!;
@@ -973,57 +951,10 @@
     const picker = h('select', { class: 'input picker', onChange: (e: Event) => select((e.target as HTMLSelectElement).value) },
       ...state.instances.map((i) => h('option', { value: i.id, selected: i.id === inst.id }, i.name)));
 
-    const modsValue = h('div', { class: 'stat-value' }, '...');
-    if (inst.loader !== 'vanilla') {
-      fillModCount(inst.id, modsValue);
-    } else {
-      modsValue.textContent = 'None';
-    }
-
-    const logView = h('div', { class: 'log-view', id: 'home-log' });
-    const logTabs = h('div', { class: 'log-tabs' });
-    const paintTabs = () => logTabs.replaceChildren(...(['activity', 'technical'] as const).map((mode) =>
-      h('button', { class: `log-tab${ui.logMode === mode ? ' active' : ''}`, onClick: () => { ui.logMode = mode; paintTabs(); fillLog(logView, inst.id); } }, mode === 'activity' ? 'ACTIVITY' : 'TECHNICAL')));
-    paintTabs();
-    fillLog(logView, inst.id);
-    if (!ui.activity.has(inst.id)) {
-      void api.gameActivity(inst.id).then((events) => {
-        if (ui.activity.get(inst.id)?.length) return;
-        ui.activity.set(inst.id, events);
-        fillLog(logView, inst.id);
-      }).catch(() => undefined);
-    }
-    if (inst.running && !ui.logs.get(inst.id)?.length) {
-      void api.gameLogs(inst.id).then((lines) => {
-        ui.logs.set(inst.id, lines);
-        fillLog(logView, inst.id);
-      });
-    }
-
-    const verifyButton = h('button', { class: 'btn ghost', disabled: engaged(inst) }, 'Verify files') as HTMLButtonElement;
-    verifyButton.addEventListener('click', async () => {
-      verifyButton.disabled = true;
-      verifyButton.textContent = 'Checking...';
-      const result = await guard(() => api.verifyGameFiles(inst.id));
-      verifyButton.disabled = engaged(inst);
-      verifyButton.textContent = 'Verify files';
-      if (result) toast('Game files checked. Anything missing or damaged was downloaded again.');
-    });
-
     return h('div', { class: 'page-home' },
       welcomeBar(picker),
-      inst.error ? h('div', { class: 'issue' }, `This instance could not be loaded: ${inst.error}`) : null,
-      h('div', { class: 'home-grid' },
-        h('div', { class: 'home-main' },
-          launchPanel(inst, modsValue, verifyButton),
-          h('div', { class: 'card output-card' },
-            h('div', { class: 'row log-head' }, h('div', { class: 'section-title' }, 'OUTPUT'), h('div', { class: 'spacer' }), logTabs),
-            logView)),
-        h('div', { class: 'home-aside' },
-          featuredPanel(),
-          snowballCard(inst),
-          playerCount(),
-          quickActions(inst))));
+      inst.error ? h('div', { class: 'issue' }, `This profile could not be loaded: ${inst.error}`) : null,
+      h('div', { class: 'play-stage' }, launchPanel(inst)));
   }
 
   function emptyHomeView(): HTMLElement {
@@ -1043,36 +974,7 @@
             h('div', { class: 'empty-launch-title' }, 'Your next world starts here'),
             h('div', { class: 'empty-launch-copy' }, 'Create a Minecraft instance to add a version, choose a loader, and start playing.'),
             h('button', { class: 'btn primary', onClick: () => { ui.view = 'instances'; render(); } }, 'CREATE AN INSTANCE'))),
-        h('aside', { class: 'home-aside' }, featuredPanel())));
-  }
-
-  function featuredPanel(): HTMLElement {
-    return h('section', { class: 'card featured-panel', 'aria-label': 'Featured and promoted content' },
-      h('div', { class: 'featured-heading' },
-        h('div', { class: 'section-title' }, 'FEATURED'),
-        h('span', { class: 'featured-heading-tag' }, 'PROMOTED SPACE')),
-      h('div', { class: 'featured-list' }, ...window.lucidPromotions.map((promotion, index) => {
-        const open = () => {
-          if (promotion.url) {
-            void api.openExternalLink(promotion.url).catch((error: unknown) =>
-              toast(error instanceof Error ? error.message : 'Could not open that promotion link.'));
-          } else {
-            toast('Edit home-promotions.ts to add an HTTPS link and optional local banner.');
-          }
-        };
-        const art = promotion.image
-          ? h('div', { class: 'promo-art has-image' }, h('img', { src: promotion.image, alt: '', loading: 'lazy' }))
-          : h('div', { class: `promo-art tone-${promotion.tone}` },
-              h('span', { class: 'promo-art-mark' }, 'L'),
-              h('span', { class: 'promo-art-caption' }, `SPOTLIGHT / 0${index + 1}`));
-        return h('button', { class: `promo-card tone-${promotion.tone}`, type: 'button', onClick: open },
-          art,
-          h('span', { class: 'promo-copy' },
-            h('span', { class: 'promo-meta' }, h('span', {}, promotion.label), h('span', { class: 'promo-number' }, `0${index + 1}`)),
-            h('strong', { class: 'promo-title' }, promotion.title),
-            h('span', { class: 'promo-description' }, promotion.description),
-            h('span', { class: 'promo-action' }, promotion.action, h('span', { 'aria-hidden': 'true' }, ' ↗'))));
-      })));
+        h('aside', { class: 'home-aside' }, h('div', { class: 'muted' }, 'Create a profile to start playing.'))));
   }
 
   /**
@@ -1104,10 +1006,7 @@
    * The launch. One large panel, because on this page nothing competes with it: the instance it
    * will start, the button, and while it is working, what it is doing.
    */
-  function launchPanel(inst: Snowball.Instance, modsValue: HTMLElement, verifyButton: HTMLElement): HTMLElement {
-    const stat = (label: string, value: Node | string) =>
-      h('div', { class: 'stat' }, h('div', { class: 'stat-label' }, label), typeof value === 'string' ? h('div', { class: 'stat-value' }, value) : value);
-
+  function launchPanel(inst: Snowball.Instance): HTMLElement {
     return h('div', { class: 'card hero-main launch-panel' },
       h('div', { class: 'hero-top' },
         h('div', { class: 'grow' },
@@ -1122,77 +1021,10 @@
         h('div', { class: 'launch-scene-orbit' }),
         h('img', { class: 'launch-scene-mark', src: 'assets/logo.png', alt: '' }),
         h('div', { class: 'launch-scene-copy' }, h('span', {}, 'LUCID / LAUNCHPAD'), h('strong', {}, 'READY WHEN YOU ARE'))),
-      h('div', { class: 'stats' },
-        stat('Minecraft', inst.minecraftVersion),
-        stat('Loader', inst.loader === 'vanilla' ? 'Vanilla' : `${inst.loaderName} ${inst.loaderVersion ?? 'latest'}`),
-        stat('Mods', modsValue),
-        stat('Memory', fmtMemory(inst.memory.maxMb)),
-        stat('Last played', fmtDate(inst.lastPlayed)),
-        stat('Play time', fmtDuration(inst.totalPlayMs))),
       h('div', { class: 'hero-actions' },
-        playButton(inst, true),
-        h('button', { class: 'btn', onClick: () => editInstanceDialog(inst) }, 'Edit'),
-        verifyButton),
+        playButton(inst, true)),
       progressBar(inst.id));
   }
-  /** What this build of LUCID is, and whether anything newer is waiting. */
-  function snowballCard(inst: Snowball.Instance): HTMLElement {
-    const update = ui.update;
-    const updateText =
-      update?.status === 'downloading' ? `Downloading ${update.newVersion}` :
-      update?.status === 'ready' ? `${update.newVersion} ready` :
-      update?.status === 'checking' ? 'Checking...' :
-      update?.status === 'up-to-date' ? 'Up to date' :
-      update?.status === 'error' ? 'Check failed' :
-      update?.status === 'manual' ? 'Manual' : '-';
-    const row = (key: string, value: string, tone = '') =>
-      h('div', { class: 'mini-row' }, h('span', { class: 'k' }, key), h('span', { class: `v${tone ? ' ' + tone : ''}` }, value));
-    return h('div', { class: 'mini-card' },
-      h('div', { class: 'mini-head' },
-        h('img', { class: 'core-logo', src: 'assets/logo.png', alt: '' }),
-        h('div', { class: 'section-title' }, 'LUCID')),
-      row('Client', inst.snowball.supported ? inst.snowball.version ?? 'Bundled' : 'Not on this version', inst.snowball.supported ? '' : 'muted'),
-      row('Launcher', ui.version ? `v${ui.version}` : '-'),
-      row('Updates', updateText, update?.status === 'error' ? 'danger-text' : ''),
-      update?.status === 'ready'
-        ? h('button', { class: 'btn small primary', style: 'width:100%;margin-top:12px', onClick: () => void api.installUpdate() }, 'Restart to finish')
-        : null);
-  }
-
-  /** The four things people actually reach for, as a list rather than loose buttons. */
-  function quickActions(inst: Snowball.Instance): HTMLElement {
-    const action = (name: string, label: string, onClick: () => void, disabled = false) =>
-      h('button', { class: 'mini-action', disabled, onClick }, icon(name), label);
-    return h('div', { class: 'mini-card' },
-      h('div', { class: 'section-title' }, 'QUICK ACTIONS'),
-      h('div', { class: 'mini-actions' },
-        action('folder', 'Open game folder', () => void guard(() => api.openInstanceFolder(inst.id, 'root'))),
-        action('mods', 'Manage mods', () => { ui.view = 'mods'; render(); }),
-        action('admin', 'Check mods for malware', () => scanDialog(inst.id), inst.loader === 'vanilla'),
-        action('refresh', 'Check for updates', () => void guard(() => api.checkForUpdates()))));
-  }
-
-  /**
-   * How many people are on Snowball, counted by the LUCID server itself. It is hidden when this
-   * build has no server set, and when the server cannot be reached, rather than showing a zero.
-   */
-  function playerCount(): HTMLElement | null {
-    const stats = ui.stats;
-    if (!stats || (!stats.online && !stats.week && !stats.total)) return null;
-    const number = (value: number, label: string) => h('div', { class: 'count-item grow' },
-      h('div', { class: 'n' }, value.toLocaleString()), h('div', { class: 'l' }, label));
-    return h('div', { class: 'mini-card count-card' },
-      h('div', { class: 'section-title' }, 'LUCID PLAYERS'),
-      h('div', { class: 'count-now' },
-        h('div', { class: 'count-dot' }),
-        h('div', { class: 'count-value' }, stats.online.toLocaleString())),
-      h('div', { class: 'count-label' }, stats.online === 1 ? 'playing right now' : 'playing right now'),
-      h('div', { class: 'count-split' },
-        number(stats.today, 'Today'),
-        number(stats.week, 'This week'),
-        number(stats.total, 'All time')));
-  }
-
   function refreshStats(): void {
     void api.snowballStats().then((stats) => {
       if (!stats) return;
@@ -1216,25 +1048,13 @@
     return h('div', { class: bad ? 'err' : l.level === 'WARN' ? 'warn' : '' }, l.line);
   }
 
-  /** Activity is the readable timeline; the technical log is the game's own output. */
-  function fillLog(view: HTMLElement, id: string): void {
-    if (ui.logMode === 'activity') {
-      const events = (ui.activity.get(id) ?? []).slice(-300);
-      view.replaceChildren(...(events.length ? events.map(activityRow) : [h('span', { class: 'muted' }, 'Press Play and LUCID shows each step here.')]));
-    } else {
-      const lines = (ui.logs.get(id) ?? []).slice(-300);
-      view.replaceChildren(...(lines.length ? lines.map(techRow) : [h('span', { class: 'muted' }, 'Game output appears here while the instance is running.')]));
-    }
-    view.scrollTop = view.scrollHeight;
-  }
-
   function instancesView(): Node {
     const state = ui.state!;
     const newButton = h('button', { class: 'btn primary', onClick: () => createInstanceDialog() }, '+ New instance');
     const importButton = h('button', { class: 'btn', onClick: () => importDialog() }, 'Import from another launcher');
-    if (state.instances.length === 0) return h('div', {}, header('INSTANCES', 'Isolated game installations'), emptyState('Each instance has its own version, mods, settings and worlds.'));
+    if (state.instances.length === 0) return h('div', {}, header('PROFILES', 'Your Minecraft profiles and modpacks'), emptyState('Create a profile for each modpack, version, or play style.'));
     return h('div', {},
-      header('INSTANCES', `${state.instances.length} isolated installation${state.instances.length === 1 ? '' : 's'}`, importButton, newButton),
+      header('PROFILES', `${state.instances.length} profile${state.instances.length === 1 ? '' : 's'}`, importButton, newButton),
       h('div', { class: 'grid cards' }, ...state.instances.map((inst) =>
         h('div', { class: `card instance-card${inst.id === ui.selectedId ? ' selected' : ''}`, onClick: () => select(inst.id) },
           h('div', { class: 'row' },
@@ -1410,10 +1230,7 @@
     }, 'Check for updates');
 
     return h('div', { class: 'stack' },
-      header('MODS', 'Install, toggle and check compatibility', picker,
-        h('button', { class: 'btn', disabled: engaged(inst) || inst.loader === 'vanilla', onClick: async () => { const r = await guard(() => api.addMods(inst.id)); if (r) { if (r.added) toast(`Added ${r.added} mod${r.added === 1 ? '' : 's'}`); r.errors.forEach((e) => toast(e, 'error')); await load(); } } }, '+ Add mods'),
-        h('button', { class: 'btn', disabled: inst.loader === 'vanilla', onClick: () => scanDialog(inst.id) }, 'Check mods'),
-        h('button', { class: 'btn ghost', onClick: () => void guard(() => api.openInstanceFolder(inst.id, 'mods')) }, 'Open folder')),
+      header('MODS', 'Install and manage mods, modpacks, resource packs, shaders and datapacks', picker),
       h('div', { class: 'card' },
         h('div', { class: 'section-title' }, 'PERFORMANCE PROFILE'),
         h('div', { class: 'row' }, h('div', { style: 'flex:1' }, profileSelect), applyButton),
@@ -1422,7 +1239,7 @@
       issuesEl,
       h('div', { class: 'card' },
         h('div', { class: 'row', style: 'margin-bottom:12px' }, h('div', { class: 'section-title', style: 'margin:0' }, 'INSTALLED MODS'), h('div', { class: 'spacer' }), updatesButton,
-          h('button', { class: 'btn small primary', disabled: inst.loader === 'vanilla', onClick: () => { ui.view = 'browse'; render(); } }, 'Browse mods')),
+          h('button', { class: 'btn small primary', disabled: inst.loader === 'vanilla', onClick: () => { ui.view = 'browse'; render(); } }, 'Open catalog')),
         listEl));
   }
 
@@ -1697,10 +1514,21 @@
     else paint();
     void loadInstalled();
 
+    const contentTabs = h('div', { class: 'catalog-tabs', role: 'tablist', 'aria-label': 'Mod content' },
+      ...(['Mods', 'Modpacks', 'Resource packs', 'Shaders', 'Datapacks'] as const).map((label) => h('button', { class: `catalog-tab${label === 'Mods' || (label === 'Modpacks' && b.mode === 'modpacks') ? ' active' : ''}`, role: 'tab', onClick: () => {
+        if (label === 'Mods') { b.mode = 'mods'; b.packSelected = null; render(); return; }
+        if (label === 'Modpacks') { b.mode = 'modpacks'; b.packSearched = false; render(); return; }
+        toast(`${label} browsing is coming next.`, 'info');
+      } }, label)));
+    const sourceTabs = h('div', { class: 'source-tabs', role: 'tablist', 'aria-label': 'Content source' },
+      h('button', { class: 'source-tab active', role: 'tab' }, 'Modrinth'),
+      h('button', { class: 'source-tab', role: 'tab', onClick: () => toast('CurseForge browsing is coming next.', 'info') }, 'CurseForge'));
+
     return h('div', { class: 'stack' },
       header('BROWSE', `Mods from Modrinth for ${inst.minecraftVersion} ${inst.loaderName}`, picker,
-	        h('button', { class: 'btn ghost', onClick: () => { b.mode = 'modpacks'; b.packSearched = false; render(); } }, 'Browse modpacks'),
-	        h('button', { class: 'btn ghost', onClick: () => { ui.view = 'mods'; render(); } }, 'Installed mods')),
+        h('button', { class: 'btn ghost', onClick: () => { b.mode = 'modpacks'; b.packSearched = false; render(); } }, 'Browse modpacks'),
+        h('button', { class: 'btn ghost', onClick: () => { ui.view = 'mods'; render(); } }, 'Installed mods')),
+      h('div', { class: 'catalog-switcher' }, contentTabs, sourceTabs),
       inst.loader === 'vanilla' ? h('div', { class: 'issue warning' }, 'This instance has no mod loader. Choose Fabric, Quilt, Forge or NeoForge in the instance editor to install mods.') : null,
       h('div', { class: 'browse-toolbar' }, search, sortSelect, loaderSelect, versionSelect),
       h('div', { class: 'card' }, results, footer));
@@ -2308,6 +2136,22 @@
       h('div', { class: 'skins-add' }, input, addButton, importButton),
       status,
       body);
+  }
+
+  function capesView(): Node {
+    const account = ui.state?.accounts.find((a) => a.id === ui.state?.settings.accounts.selectedAccountId) ?? ui.state?.accounts[0];
+    return h('div', { class: 'stack page-capes' },
+      header('CAPES', 'Wear your LUCID style in game.'),
+      h('div', { class: 'cape-hero card' },
+        h('div', { class: 'cape-hero-art', 'aria-hidden': 'true' }, h('div', { class: 'cape-shape' }, 'L')),
+        h('div', { class: 'grow' },
+          h('div', { class: 'section-title' }, 'LUCID CAPES'),
+          h('h2', { class: 'cape-title' }, account ? `Ready for ${account.name}` : 'Sign in to use capes'),
+          h('p', { class: 'muted' }, 'Capes are managed from the LUCID client in Minecraft. Sign in with Microsoft to make sure your cape follows the account you play on.'),
+          account ? h('span', { class: 'tag accent' }, 'ACCOUNT CONNECTED') : h('button', { class: 'btn primary', onClick: () => { ui.view = 'settings'; render(); } }, 'Sign in'))),
+      h('div', { class: 'card empty' },
+        h('h2', { class: 'page-title' }, 'CAPE STUDIO'),
+        h('p', { class: 'muted' }, 'Open Minecraft with LUCID to create, equip, and submit a custom cape. Approved designs will appear here in a future library view.')));
   }
 
   function chatView(): Node {
@@ -3192,98 +3036,6 @@
       list.replaceChildren(...found.map(foundRow));
       filter.hidden = found.length < 7;
     }).catch((err) => list.replaceChildren(h('div', { class: 'muted' }, errorMessage(err))));
-  }
-
-  /**
-   * Snowball's own mod check. Known releases are recognised by fingerprint and set aside, so what
-   * is left on screen is only what was actually read here - and what, if anything, is worth a look.
-   */
-  function scanDialog(instanceId: string): void {
-    const VERDICT_LABELS: Record<Snowball.ScanVerdict, string> = { dangerous: 'Check first', suspicious: 'Worth a look', watch: 'Worth knowing', clean: 'Looks fine', known: 'Known' };
-    const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
-    const body = h('div', { class: 'scan' });
-    const summary = h('p', { class: 'scan-summary' }, 'Checking every mod in this instance...');
-    const content = h('div', { class: 'stack' });
-    const note = h('p', { class: 'muted scan-note' });
-    body.append(summary, content, note);
-    modal('MOD CHECK', body, [{ label: 'Close', kind: 'ghost', onClick: (c) => c() }]);
-
-    const toggle = (label: string, panel: HTMLElement) => {
-      const button = h('button', { class: 'btn small', 'aria-expanded': 'false' }, label) as HTMLButtonElement;
-      button.addEventListener('click', () => {
-        panel.hidden = !panel.hidden;
-        button.setAttribute('aria-expanded', String(!panel.hidden));
-        button.textContent = panel.hidden ? label : 'Hide';
-      });
-      return button;
-    };
-
-    const readRow = (r: Snowball.ScanResult) => {
-      const findings = h('div', { class: 'scan-findings' },
-        ...r.findings.map((f) =>
-          h('div', { class: 'scan-finding' },
-            h('div', { class: 'scan-finding-title' }, f.title),
-            h('div', { class: 'muted' }, f.detail),
-            h('code', { class: 'scan-where' }, f.where))),
-        r.verdict === 'dangerous' || r.verdict === 'suspicious'
-          ? h('div', { class: 'scan-advice' }, 'Not sure where this file came from? Turn it off on the Mods page until you are. Mods from Modrinth are recognised automatically, so a well-known mod showing up here usually means it came from somewhere else.')
-          : null);
-      findings.hidden = true;
-      const detail = r.error ? `Could not be read: ${r.error}` : r.findings.length ? plural(r.findings.length, 'thing') + ' to know' : 'Nothing unusual inside';
-      return h('div', { class: 'scan-item' },
-        h('div', { class: 'list-row scan-row' },
-          h('span', { class: `verdict ${r.verdict}` }, VERDICT_LABELS[r.verdict]),
-          h('div', { class: 'grow' }, h('div', { class: 'truncate', title: r.fileName }, r.fileName), h('div', { class: 'muted scan-sub' }, detail)),
-          r.findings.length ? toggle('Details', findings) : null),
-        findings);
-    };
-
-    void api.scanMods(instanceId).then(({ results, recognised }) => {
-      if (!results.length) {
-        summary.textContent = 'This instance has no mods to check.';
-        return;
-      }
-      const known = results.filter((r) => r.verdict === 'known');
-      const look = results.filter((r) => r.verdict === 'dangerous' || r.verdict === 'suspicious' || r.verdict === 'watch');
-      const fine = results.filter((r) => r.verdict === 'clean');
-
-      const parts = [
-        known.length ? `${plural(known.length, 'known mod')}` : '',
-        fine.length ? `${fine.length} that look${fine.length === 1 ? 's' : ''} fine` : '',
-        look.length ? `${look.length} worth a look` : '',
-      ].filter(Boolean);
-      summary.textContent = `Checked ${plural(results.length, 'mod')}: ${parts.join(', ')}.${look.length ? '' : ' Nothing needs your attention.'}`;
-
-      const sections: Node[] = [];
-      if (look.length) sections.push(h('div', {}, h('div', { class: 'section-title' }, 'WORTH A LOOK'), h('div', { class: 'list' }, ...look.map(readRow))));
-      if (fine.length) sections.push(h('div', {}, h('div', { class: 'section-title' }, 'READ ON THIS COMPUTER'), h('div', { class: 'list' }, ...fine.map(readRow))));
-      if (known.length) {
-        const names = h('div', { class: 'scan-known-list' },
-          ...known
-            .slice()
-            .sort((a, b) => (a.known?.project ?? a.fileName).localeCompare(b.known?.project ?? b.fileName))
-            .map((r) => h('div', { class: 'scan-known' },
-              h('span', { class: 'truncate' }, r.known?.project ?? r.fileName),
-              h('span', { class: 'muted truncate' }, r.known?.version ?? ''))));
-        names.hidden = true;
-        sections.push(h('div', {},
-          h('div', { class: 'section-title' }, 'KNOWN MODS'),
-          h('div', { class: 'list-row scan-row' },
-            h('span', { class: 'verdict known' }, VERDICT_LABELS.known),
-            h('div', { class: 'grow' },
-              h('div', {}, `${plural(known.length, 'mod')} exactly as published`),
-              h('div', { class: 'muted scan-sub' }, 'Same file, byte for byte, as the release on Modrinth, so there is nothing to check.')),
-            toggle('Show', names)),
-          names));
-      }
-      content.replaceChildren(...sections);
-      note.textContent = recognised
-        ? 'Known mods are recognised by fingerprint: only that was sent to Modrinth. Every other file was read on this computer and nothing was uploaded.'
-        : 'Modrinth could not be reached, so no mod could be recognised as a known release this time. Every file was read on this computer instead.';
-    }).catch((err) => {
-      summary.textContent = 'The check could not finish.';
-      content.replaceChildren(h('div', { class: 'muted' }, errorMessage(err)));
-    });
   }
 
   /** How Discord Rich Presence stands, in a sentence. */
