@@ -17,6 +17,7 @@ import { usesLwjgl2, VersionManager } from './minecraft/VersionManager.js';
 import { ModLoaderRegistry } from './modloader/ModLoaderRegistry.js';
 import { ModManager } from './mods/ModManager.js';
 import { ModrinthService } from './mods/Modrinth.js';
+import { createModrinthPackDownloader, inspectModrinthPack, installModrinthPackFiles } from './mods/ModrinthPack.js';
 import { getProfile, installProfile, PERFORMANCE_PROFILES, resolveProfile } from './performance/PerformanceProfiles.js';
 import { scanJars, type ScanReport } from './security/ModScanner.js';
 import { GameActivityInterpreter } from './process/GameOutput.js';
@@ -288,6 +289,52 @@ export class Launcher extends EventEmitter {
       }
     }
     return this.instances.load(id);
+  }
+
+  /** Imports a Modrinth .mrpack as a new isolated instance. Minecraft itself is prepared on first Play. */
+  async importModrinthPack(filePath: string): Promise<InstanceConfig> {
+    const plan = await inspectModrinthPack(filePath);
+    const rec = recommendMemory();
+    const maxMb = this.settings.get().java.defaultMaxMemoryMb ?? rec.recommendedMaxMb;
+    const config = await this.instances.create({
+      name: plan.info.name,
+      minecraftVersion: plan.info.minecraftVersion,
+      loader: plan.info.loader,
+      loaderVersion: plan.info.loaderVersion,
+      memory: { minMb: Math.min(1024, maxMb), maxMb },
+      performanceProfile: 'none',
+      pendingFabricApi: false,
+    });
+    const say = this.activity.reporter(config.id);
+    try {
+      await this.instances.ensureLayout(config.id);
+      say('info', `Installing ${plan.info.name} modpack files...`);
+      const downloadSettings = this.settings.get().downloads;
+      const packDownloads = createModrinthPackDownloader({
+        concurrency: downloadSettings.concurrency,
+        retries: downloadSettings.retries,
+        userAgent: `LUCIDLauncher/${this.options.launcherVersion}`,
+      });
+      const result = await installModrinthPackFiles(filePath, plan.indexSha256, this.instances.gameDir(config.id), packDownloads);
+      if (this.core.registry.find(config.minecraftVersion, config.loader)) {
+        try {
+          await this.core.ensure(this.coreTarget(config.id, config), say);
+        } catch (err) {
+          say('warn', `LUCID setup will finish when you press Play (${(err as Error).message})`);
+        }
+      }
+      const notes = [
+        `${result.downloaded} required file${result.downloaded === 1 ? '' : 's'}`,
+        `${result.overridesInstalled} client override${result.overridesInstalled === 1 ? '' : 's'}`,
+        result.optionalSkipped ? `${result.optionalSkipped} optional skipped` : '',
+        result.unsupportedSkipped ? `${result.unsupportedSkipped} server-only skipped` : '',
+      ].filter(Boolean).join(', ');
+      say('success', `Imported ${plan.info.name} (${notes}). Press Play to finish Minecraft setup.`);
+      return await this.instances.load(config.id);
+    } catch (error) {
+      await this.instances.delete(config.id).catch((cleanupError) => log.warn('Could not remove failed modpack instance', { error: String(cleanupError) }));
+      throw error;
+    }
   }
 
   /** Stores the newest stable loader version for the instance's Minecraft version. */

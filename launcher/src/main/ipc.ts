@@ -259,6 +259,17 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
     return dto(config.id);
   });
 
+  handle('modpack:import', async () => {
+    const result = await dialog.showOpenDialog(win, {
+      title: 'Import a Modrinth modpack',
+      properties: ['openFile'],
+      filters: [{ name: 'Modrinth modpacks', extensions: ['mrpack'] }],
+    });
+    if (result.canceled || !result.filePaths[0]) return null;
+    const config = await launcher.importModrinthPack(result.filePaths[0]);
+    return dto(config.id);
+  });
+
   handle('instances:update', async (id: unknown, patch: Snowball.InstancePatch) => {
     const iid = await instanceId(id);
     if (launcher.processes.isRunning(iid) || launcher.launchPhase(iid)) throw new Error('Stop the game before editing this instance.');

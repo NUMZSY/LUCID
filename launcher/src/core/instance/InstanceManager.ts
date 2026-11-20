@@ -58,6 +58,8 @@ export interface CreateInstanceOptions {
   icon?: string;
   memory?: { minMb: number; maxMb: number };
   performanceProfile?: PerformanceProfileId;
+  /** False for imported packs that manage their own Fabric API version. */
+  pendingFabricApi?: boolean;
 }
 
 export class InstanceError extends Error {
@@ -218,7 +220,7 @@ export class InstanceManager {
         icon: options.icon,
         memory: options.memory,
         performanceProfile: options.performanceProfile ?? 'none',
-        pendingFabricApi: options.loader === 'fabric',
+        pendingFabricApi: options.pendingFabricApi ?? options.loader === 'fabric',
       },
       id,
     );

@@ -100,6 +100,7 @@ describe('Fabric API by default', () => {
   it('marks only new Fabric instances', async () => {
     const manager = new InstanceManager(tempDir());
     expect((await manager.create({ name: 'F', minecraftVersion: '1.21.1', loader: 'fabric' })).pendingFabricApi).toBe(true);
+    expect((await manager.create({ name: 'Pack', minecraftVersion: '1.21.1', loader: 'fabric', pendingFabricApi: false })).pendingFabricApi).toBe(false);
     expect((await manager.create({ name: 'N', minecraftVersion: '1.21.1', loader: 'neoforge' })).pendingFabricApi).toBe(false);
     expect(normalizeInstanceConfig({ minecraftVersion: '1.21.1', loader: 'forge', pendingFabricApi: true }, 'X').pendingFabricApi).toBe(false);
   });

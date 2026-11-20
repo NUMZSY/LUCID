@@ -193,6 +193,9 @@ settings.json accounts.json
   filters, one-click installs that pick the file for the instance's exact Minecraft version and
   loader, required dependencies resolved before anything downloads, and updates from the MODS page.
   Installed mods are recognised by SHA-1, so hand-added and profile-installed mods count too.
+- Import a Modrinth `.mrpack` as a separate instance. LUCID keeps its Minecraft/loader versions,
+  checks downloaded files against the pack's hashes, applies `overrides` and `client-overrides`, and
+  skips optional and server-only files. Press Play to finish downloading Minecraft itself.
 - Skin changer (SKINS page): saved skins with a turning 3D preview, added by a player's name, an
   https link or a PNG file, Classic/Slim arms (detected from the picture), favourites, rename and
   delete, and Equip through Mojang's API for the signed-in Microsoft account. The skin you are wearing

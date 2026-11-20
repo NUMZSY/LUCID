@@ -1039,7 +1039,8 @@
               h('div', { class: 'launch-scene-copy' }, h('span', {}, 'LUCID / LAUNCHPAD'), h('strong', {}, 'READY WHEN YOU ARE'))),
             h('div', { class: 'empty-launch-title' }, 'Your next world starts here'),
             h('div', { class: 'empty-launch-copy' }, 'Create a Minecraft instance to add a version, choose a loader, and start playing.'),
-            h('button', { class: 'btn primary', onClick: () => { ui.view = 'instances'; render(); } }, 'CREATE AN INSTANCE'))),
+            h('button', { class: 'btn primary', onClick: () => { ui.view = 'instances'; render(); } }, 'CREATE AN INSTANCE'),
+            h('button', { class: 'btn', style: 'margin-top:10px', onClick: (e: MouseEvent) => void importModrinthPack(e.currentTarget as HTMLButtonElement) }, 'IMPORT MODRINTH PACK'))),
         h('aside', { class: 'home-aside' }, featuredPanel())));
   }
 
@@ -1232,13 +1233,32 @@
     view.scrollTop = view.scrollHeight;
   }
 
+  async function importModrinthPack(button?: HTMLButtonElement): Promise<void> {
+    const originalText = button?.textContent ?? 'Import Modrinth pack';
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Importing pack...';
+    }
+    const imported = await guard(() => api.importModrinthPack());
+    if (button?.isConnected) {
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+    if (!imported) return;
+    ui.selectedId = imported.id;
+    ui.view = 'home';
+    await refresh();
+    toast(`Imported ${imported.name}. Press Play to finish downloading Minecraft and start the pack.`);
+  }
+
   function instancesView(): Node {
     const state = ui.state!;
     const newButton = h('button', { class: 'btn primary', onClick: () => createInstanceDialog() }, '+ New instance');
     const importButton = h('button', { class: 'btn', onClick: () => importDialog() }, 'Import from another launcher');
-    if (state.instances.length === 0) return h('div', {}, header('INSTANCES', 'Isolated game installations'), emptyState('Each instance has its own version, mods, settings and worlds.'));
+    const packButton = h('button', { class: 'btn', onClick: (e: MouseEvent) => void importModrinthPack(e.currentTarget as HTMLButtonElement) }, 'Import Modrinth pack');
+    if (state.instances.length === 0) return h('div', {}, header('INSTANCES', 'Isolated game installations', packButton, newButton), emptyState('Create an instance or import a Modrinth modpack to get started.'));
     return h('div', {},
-      header('INSTANCES', `${state.instances.length} isolated installation${state.instances.length === 1 ? '' : 's'}`, importButton, newButton),
+      header('INSTANCES', `${state.instances.length} isolated installation${state.instances.length === 1 ? '' : 's'}`, packButton, importButton, newButton),
       h('div', { class: 'grid cards' }, ...state.instances.map((inst) =>
         h('div', { class: `card instance-card${inst.id === ui.selectedId ? ' selected' : ''}`, onClick: () => select(inst.id) },
           h('div', { class: 'row' },

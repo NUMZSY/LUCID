@@ -448,6 +448,8 @@ declare namespace Snowball {
     listMinecraftVersions(includeSnapshots: boolean): Promise<MinecraftVersion[]>;
     listLoaderVersions(loader: LoaderId, minecraftVersion: string): Promise<LoaderVersion[]>;
     createInstance(options: CreateInstance): Promise<Instance>;
+    /** Opens a main-process file picker and imports a Modrinth .mrpack as a new instance. */
+    importModrinthPack(): Promise<Instance | null>;
     updateInstance(id: string, patch: InstancePatch): Promise<Instance>;
     deleteInstance(id: string): Promise<void>;
     cloneInstance(id: string, name: string): Promise<Instance>;

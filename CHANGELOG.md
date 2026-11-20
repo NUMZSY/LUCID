@@ -9,6 +9,14 @@ installer once.
 
 ---
 
+## 2.1.4
+
+### What's new
+- **Import Modrinth modpacks.** Choose a `.mrpack` from the Instances page to create a separate game instance with the pack's Minecraft version, mod loader, required mods and client configuration files.
+- Optional mods are skipped for now; server-only files are not installed. Minecraft's game files finish downloading when you press Play.
+
+---
+
 ## 2.1.3
 
 ### What's new
