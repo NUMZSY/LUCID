@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemEntityRenderer.class)
 public abstract class ItemEntityRendererMixin {
-	@Inject(method = "extractRenderState", at = @At("TAIL"))
+	@Inject(method = "render", at = @At("TAIL"))
 	private void snowballclient$itemPhysics(ItemEntity entity, ItemEntityRenderState state, float partialTick, CallbackInfo ci) {
 		if (ModuleRegistry.ITEM_PHYSICS != null) state.bobOffset = ModuleRegistry.ITEM_PHYSICS.bob(state.bobOffset);
 	}
