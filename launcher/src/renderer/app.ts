@@ -39,6 +39,7 @@
 		  packError: null as string | null,
 		  packMods: new Map<string, Snowball.ModSearchHit[]>(),
 		  packSelected: null as string | null,
+		  packInstalling: false,
 		  packSeq: 0,
 	  },
     updates: new Map<string, Map<string, Snowball.ModUpdate>>(),
@@ -1497,6 +1498,17 @@
       }
       b.paint();
     };
+    const installPack = async (pack: Snowball.ModpackSearchHit) => {
+      b.packInstalling = true;
+      b.paint();
+      const result = await guard(() => api.installModpack(inst.id, pack.projectId));
+      b.packInstalling = false;
+      if (result) {
+        toast(result.installed.length ? `Installed ${result.installed.length} mod${result.installed.length === 1 ? '' : 's'} from ${pack.title}.` : `${pack.title} is already installed.`);
+        await loadPackInstalled();
+      }
+      b.paint();
+    };
     const modpackRow = (pack: Snowball.ModpackSearchHit): HTMLElement => {
       const placeholder = h('div', { class: 'mod-icon placeholder' }, pack.title.slice(0, 1).toUpperCase());
       let iconEl: HTMLElement = placeholder;
@@ -1528,7 +1540,7 @@
       const selected = b.packSelected ? b.packHits.find((p) => p.projectId === b.packSelected) : null;
       if (selected) {
         const mods = b.packMods.get(selected.projectId) ?? [];
-        results.replaceChildren(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { class: 'section-title' }, `${selected.title} — contained mods`), h('div', { class: 'spacer' }), h('button', { class: 'btn small ghost', onClick: () => { b.packSelected = null; paint(); } }, 'Back to packs')), h('p', { class: 'muted' }, 'Install individual mods from this pack. Required dependencies are added automatically; the complete modpack is never installed as one action.'), b.packLoading ? h('div', { class: 'muted' }, 'Loading contained mods...') : mods.length ? h('div', { class: 'list' }, ...mods.map(containedRow)) : h('div', { class: 'muted' }, 'No compatible mods were listed for this version.'))); footer.replaceChildren(); return;
+        results.replaceChildren(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { class: 'section-title' }, `${selected.title} — contained mods`), h('div', { class: 'spacer' }), h('button', { class: 'btn small primary', disabled: b.packInstalling || engaged(inst), onClick: () => void installPack(selected) }, b.packInstalling ? 'Installing pack...' : 'Install entire modpack'), h('button', { class: 'btn small ghost', onClick: () => { b.packSelected = null; paint(); } }, 'Back to packs')), h('p', { class: 'muted' }, 'Install every required and optional mod from the compatible pack version, including dependencies. Existing compatible mods are skipped.'), b.packLoading ? h('div', { class: 'muted' }, 'Loading contained mods...') : mods.length ? h('div', { class: 'list' }, ...mods.map(containedRow)) : h('div', { class: 'muted' }, 'No compatible mods were listed for this version.'))); footer.replaceChildren(); return;
       }
       if (!b.packHits.length) { results.replaceChildren(h('div', { class: 'muted' }, b.packLoading || !b.packSearched ? 'Searching...' : 'No modpacks match these filters.')); footer.replaceChildren(); return; }
       results.replaceChildren(...b.packHits.map(modpackRow));

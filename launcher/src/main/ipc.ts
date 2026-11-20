@@ -387,10 +387,18 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
     if (launcher.processes.isRunning(iid) || launcher.launchPhase(iid)) throw new Error('Stop the game before installing mods.');
     const project = str(projectId, 'project id', 64);
     if (!/^[A-Za-z0-9_.-]+$/.test(project)) throw new Error('Invalid project id');
-    return launcher.modrinth.install(await modTarget(iid), project);
-  });
+	    return launcher.modrinth.install(await modTarget(iid), project);
+	  });
 
-  handle('mods:installed-projects', async (id: unknown) =>
+	handle('browse:install-modpack', async (id: unknown, projectId: unknown) => {
+		const iid = await instanceId(id);
+		if (launcher.processes.isRunning(iid) || launcher.launchPhase(iid)) throw new Error('Stop the game before installing a modpack.');
+		const project = str(projectId, 'project id', 64);
+		if (!/^[A-Za-z0-9_.-]+$/.test(project)) throw new Error('Invalid project id');
+		return launcher.modrinth.installModpack(await modTarget(iid), project);
+	});
+
+	handle('mods:installed-projects', async (id: unknown) =>
     (await launcher.modrinth.installedProjects(launcher.instances.gameDir(await instanceId(id)))).map((p) => p.projectId));
 
   handle('mods:check-updates', async (id: unknown) => launcher.modrinth.checkUpdates(await modTarget(await instanceId(id))));

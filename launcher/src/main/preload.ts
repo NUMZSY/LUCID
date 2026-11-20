@@ -21,6 +21,7 @@ const api = {
 	  searchModpacks: invoke('browse:search-modpacks'),
 	  modpackMods: invoke('browse:modpack-mods'),
 	  installMod: invoke('browse:install'),
+	  installModpack: invoke('browse:install-modpack'),
   installedModProjects: invoke('mods:installed-projects'),
   checkModUpdates: invoke('mods:check-updates'),
   updateMod: invoke('mods:update'),

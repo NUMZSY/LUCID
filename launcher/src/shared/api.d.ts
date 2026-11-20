@@ -463,6 +463,7 @@ declare namespace Snowball {
 		searchModpacks(options: ModSearchOptions): Promise<{ hits: ModpackSearchHit[]; total: number; offset: number }>;
 		modpackMods(projectId: string, gameVersion: string | null, loader: string | null): Promise<ModSearchHit[]>;
 		installMod(id: string, projectId: string): Promise<{ installed: string[] }>;
+		installModpack(id: string, projectId: string): Promise<{ installed: string[]; projects: number }>;
     installedModProjects(id: string): Promise<string[]>;
     checkModUpdates(id: string): Promise<ModUpdate[]>;
     updateMod(id: string, fileName: string): Promise<{ oldFile: string; newFile: string; version: string }>;

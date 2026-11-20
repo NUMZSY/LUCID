@@ -229,12 +229,41 @@ export class ModrinthService {
     return (await this.scan(gameDir)).installed;
   }
 
-  /** Installs a project and its required dependencies into one instance. Returns the titles installed. */
-  install(target: InstanceTarget, projectId: string, signal?: AbortSignal): Promise<{ installed: string[] }> {
-    return this.locked(target.gameDir, () => this.doInstall(target, projectId, signal));
-  }
+	/** Installs a project and its required dependencies into one instance. Returns the titles installed. */
+	install(target: InstanceTarget, projectId: string, signal?: AbortSignal): Promise<{ installed: string[] }> {
+		return this.locked(target.gameDir, () => this.doInstall(target, projectId, signal));
+	}
 
-  async checkUpdates(target: InstanceTarget): Promise<ModUpdate[]> {
+	/** Installs every required and optional mod referenced by a compatible Modrinth modpack version. */
+	installModpack(target: InstanceTarget, projectId: string, signal?: AbortSignal): Promise<{ installed: string[]; projects: number }> {
+		return this.locked(target.gameDir, async () => {
+			const loaders = modrinthLoaders(target.loader, target.minecraftVersion);
+			if (!loaders.length) throw new ModInstallError('This instance has no mod loader. Choose Fabric, Quilt, Forge or NeoForge in the instance editor first.');
+			const version = (await this.projectVersions(projectId, target.minecraftVersion, loaders, signal))[0];
+			if (!version) throw new ModInstallError(`This modpack has no compatible version for Minecraft ${target.minecraftVersion}.`);
+			const dependencies = (version.dependencies ?? []).filter((d) => d.dependency_type === 'required' || d.dependency_type === 'optional');
+			if (!dependencies.length) throw new ModInstallError('This modpack did not list any installable mod projects for the selected version.');
+			const installed: string[] = [];
+			const seen = new Set<string>();
+			for (const dependency of dependencies) {
+				let dependencyId = dependency.project_id;
+				if (!dependencyId && dependency.version_id) {
+					const pinned = await this.http.fetchJson<ModrinthVersion>(`${API}/version/${encodeURIComponent(dependency.version_id)}`, signal).catch(() => null);
+					dependencyId = pinned?.project_id ?? null;
+				}
+				if (!dependencyId || seen.has(dependencyId)) continue;
+				seen.add(dependencyId);
+				const before = new Set((await this.scan(target.gameDir)).installed.map((item) => item.projectId));
+				if (before.has(dependencyId)) continue;
+				const result = await this.doInstall(target, dependencyId, signal);
+				installed.push(...result.installed);
+			}
+			log.info('Installed modpack mods', { project: projectId, projects: seen.size, installed });
+			return { installed, projects: seen.size };
+		});
+	}
+
+	async checkUpdates(target: InstanceTarget): Promise<ModUpdate[]> {
     const loaders = modrinthLoaders(target.loader, target.minecraftVersion);
     const { installed } = await this.scan(target.gameDir);
     if (!loaders.length || !installed.length) return [];
