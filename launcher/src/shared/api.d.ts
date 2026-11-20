@@ -290,6 +290,19 @@ declare namespace Snowball {
     options: boolean;
   }
 
+  interface ModpackPreview {
+    token: string;
+    name: string;
+    summary: string;
+    minecraftVersion: string;
+    loader: LoaderId;
+    loaderVersion: string | null;
+    requiredFiles: number;
+    optionalFiles: number;
+    unsupportedFiles: number;
+    requiredBytes: number;
+  }
+
   interface ChatMessage {
     id: string;
     name: string;
@@ -453,8 +466,10 @@ declare namespace Snowball {
     listMinecraftVersions(includeSnapshots: boolean): Promise<MinecraftVersion[]>;
     listLoaderVersions(loader: LoaderId, minecraftVersion: string): Promise<LoaderVersion[]>;
     createInstance(options: CreateInstance): Promise<Instance>;
-    /** Opens a main-process file picker and imports a Modrinth .mrpack as a new instance. */
-    importModrinthPack(): Promise<Instance | null>;
+    /** Opens a main-process file picker and returns sanitized metadata for a new isolated import. */
+    previewModrinthPack(): Promise<ModpackPreview | null>;
+    /** Imports the previously previewed pack as a new isolated instance. */
+    importModrinthPack(token: string, name: string): Promise<Instance>;
     updateInstance(id: string, patch: InstancePatch): Promise<Instance>;
     deleteInstance(id: string): Promise<void>;
     cloneInstance(id: string, name: string): Promise<Instance>;

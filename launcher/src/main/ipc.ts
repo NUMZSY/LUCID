@@ -1,10 +1,12 @@
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { LOADER_IDS, PERFORMANCE_PROFILES as PROFILE_IDS, type InstanceConfig, type InstanceSummary } from '../core/instance/InstanceManager.js';
 import { recommendMemory } from '../core/java/JavaManager.js';
 import type { Launcher } from '../core/Launcher.js';
 import { getLogger, logSink } from '../core/logging/Logger.js';
 import { modrinthLoaders, SEARCH_SORTS } from '../core/mods/Modrinth.js';
+import { inspectModrinthPack } from '../core/mods/ModrinthPack.js';
 import { PERFORMANCE_PROFILES } from '../core/performance/PerformanceProfiles.js';
 import { splitArgs } from '../core/process/LaunchArguments.js';
 import { SKIN_ID } from '../core/skins/SkinLibrary.js';
@@ -259,14 +261,28 @@ export function registerIpc(launcher: Launcher, win: BrowserWindow, updates?: Up
     return dto(config.id);
   });
 
-  handle('modpack:import', async () => {
+  const pickedModpacks = new Map<string, { filePath: string; preview: Snowball.ModpackPreview }>();
+  handle('modpack:preview', async (): Promise<Snowball.ModpackPreview | null> => {
     const result = await dialog.showOpenDialog(win, {
       title: 'Import a Modrinth modpack',
       properties: ['openFile'],
       filters: [{ name: 'Modrinth modpacks', extensions: ['mrpack'] }],
     });
     if (result.canceled || !result.filePaths[0]) return null;
-    const config = await launcher.importModrinthPack(result.filePaths[0]);
+    const plan = await inspectModrinthPack(result.filePaths[0]);
+    const token = randomUUID();
+    const preview: Snowball.ModpackPreview = { token, ...plan.info, ...plan.preview };
+    pickedModpacks.set(token, { filePath: result.filePaths[0], preview });
+    while (pickedModpacks.size > 10) pickedModpacks.delete(pickedModpacks.keys().next().value!);
+    return preview;
+  });
+  handle('modpack:import', async (token: unknown, rawName: unknown) => {
+    const key = str(token, 'modpack token', 64);
+    const picked = pickedModpacks.get(key);
+    if (!picked) throw new Error('That modpack preview expired. Choose the pack again.');
+    pickedModpacks.delete(key);
+    const name = typeof rawName === 'string' ? str(rawName, 'instance name', 64) : picked.preview.name;
+    const config = await launcher.importModrinthPack(picked.filePath, name);
     return dto(config.id);
   });
 

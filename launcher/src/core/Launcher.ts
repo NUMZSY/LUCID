@@ -295,12 +295,13 @@ export class Launcher extends EventEmitter {
   }
 
   /** Imports a Modrinth .mrpack as a new isolated instance. Minecraft itself is prepared on first Play. */
-  async importModrinthPack(filePath: string): Promise<InstanceConfig> {
+  async importModrinthPack(filePath: string, customName?: string): Promise<InstanceConfig> {
     const plan = await inspectModrinthPack(filePath);
+    const requestedName = customName?.replace(/[\x00-\x1f\x7f]/g, ' ').trim().slice(0, 64);
     const rec = recommendMemory();
     const maxMb = this.settings.get().java.defaultMaxMemoryMb ?? rec.recommendedMaxMb;
     const config = await this.instances.create({
-      name: plan.info.name,
+      name: requestedName || plan.info.name,
       minecraftVersion: plan.info.minecraftVersion,
       loader: plan.info.loader,
       loaderVersion: plan.info.loaderVersion,

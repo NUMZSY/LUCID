@@ -1237,21 +1237,52 @@
   }
 
   async function importModrinthPack(button?: HTMLButtonElement): Promise<void> {
-    const originalText = button?.textContent ?? 'Import Modrinth pack';
+    const originalText = button?.textContent ?? 'Import as new instance';
     if (button) {
       button.disabled = true;
-      button.textContent = 'Importing pack...';
+      button.textContent = 'Reading pack...';
     }
-    const imported = await guard(() => api.importModrinthPack());
+    const preview = await guard(() => api.previewModrinthPack());
     if (button?.isConnected) {
       button.disabled = false;
       button.textContent = originalText;
     }
-    if (!imported) return;
-    ui.selectedId = imported.id;
-    ui.view = 'home';
-    await refresh();
-    toast(`Imported ${imported.name} as a new isolated instance. Press Play to finish downloading Minecraft and start the pack.`);
+    if (!preview) return;
+
+    const name = h('input', { class: 'input', value: preview.name, maxlength: '64', autocomplete: 'off' }) as HTMLInputElement;
+    const stat = (label: string, value: string) => h('div', { class: 'mini-row' }, h('span', { class: 'k' }, label), h('span', { class: 'v' }, value));
+    const loader = preview.loader === 'vanilla' ? 'Vanilla' : `${LOADER_NAMES[preview.loader]} ${preview.loaderVersion ?? 'latest'}`;
+    const body = h('div', { class: 'stack' },
+      h('p', { class: 'muted' }, preview.summary || 'Review this pack before creating its isolated instance.'),
+      h('div', { class: 'card' },
+        stat('Minecraft', preview.minecraftVersion),
+        stat('Loader', loader),
+        stat('Required files', `${preview.requiredFiles} · ${fmtBytes(preview.requiredBytes)}`),
+        preview.optionalFiles ? stat('Optional files', String(preview.optionalFiles)) : null,
+        preview.unsupportedFiles ? stat('Server-only skipped', String(preview.unsupportedFiles)) : null),
+      field('Instance name', name, 'This name is used for the new isolated instance. Existing instances are not changed.'));
+
+    modal('Review modpack import', body, [
+      { label: 'Cancel', kind: 'ghost', onClick: (close) => close() },
+      { label: 'Create isolated instance', kind: 'primary', onClick: async (close) => {
+        const chosenName = name.value.trim() || preview.name;
+        if (button) {
+          button.disabled = true;
+          button.textContent = 'Importing pack...';
+        }
+        const imported = await guard(() => api.importModrinthPack(preview.token, chosenName));
+        if (button?.isConnected) {
+          button.disabled = false;
+          button.textContent = originalText;
+        }
+        if (!imported) return;
+        close();
+        ui.selectedId = imported.id;
+        ui.view = 'home';
+        await refresh();
+        toast(`Imported ${imported.name} as a new isolated instance. Press Play to finish downloading Minecraft and start the pack.`);
+      } },
+    ]);
   }
 
   function instancesView(): Node {

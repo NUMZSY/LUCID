@@ -32,6 +32,12 @@ export interface ModrinthPackPlan {
   info: ModrinthPackInfo;
   /** Detects if a file was changed between inspection and installation. */
   indexSha256: string;
+  preview: {
+    requiredFiles: number;
+    optionalFiles: number;
+    unsupportedFiles: number;
+    requiredBytes: number;
+  };
 }
 
 export interface ModrinthPackInstallResult {
@@ -251,7 +257,16 @@ export async function inspectModrinthPack(filePath: string): Promise<ModrinthPac
   const { zip, entries } = await openArchive(filePath);
   try {
     const { index, digest } = await readIndex(zip, entries, filePath.split(/[\\/]/).pop() ?? 'Modrinth Modpack');
-    return { info: index.info, indexSha256: digest };
+    return {
+      info: index.info,
+      indexSha256: digest,
+      preview: {
+        requiredFiles: index.files.filter((file) => file.client === 'required').length,
+        optionalFiles: index.files.filter((file) => file.client === 'optional').length,
+        unsupportedFiles: index.files.filter((file) => file.client === 'unsupported').length,
+        requiredBytes: index.files.filter((file) => file.client === 'required').reduce((total, file) => total + file.size, 0),
+      },
+    };
   } finally {
     zip.close();
   }

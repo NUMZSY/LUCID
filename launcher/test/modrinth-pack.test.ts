@@ -57,6 +57,12 @@ describe('Modrinth modpack import', () => {
         loader: 'fabric',
         loaderVersion: '0.16.10',
       },
+      preview: {
+        requiredFiles: 1,
+        optionalFiles: 1,
+        unsupportedFiles: 1,
+        requiredBytes: bytes.length,
+      },
       indexSha256: expect.stringMatching(/^[a-f0-9]{64}$/),
     });
   });

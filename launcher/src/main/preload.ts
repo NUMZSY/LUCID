@@ -9,6 +9,7 @@ const api = {
   listMinecraftVersions: invoke('versions:list'),
   listLoaderVersions: invoke('loaders:versions'),
   createInstance: invoke('instances:create'),
+  previewModrinthPack: invoke('modpack:preview'),
   importModrinthPack: invoke('modpack:import'),
   updateInstance: invoke('instances:update'),
   deleteInstance: invoke('instances:delete'),
