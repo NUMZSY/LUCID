@@ -3217,3 +3217,211 @@ body.reduce-motion .promo-card {
   .home-grid { grid-template-columns: minmax(0, 1fr); }
   .home-aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 }
+
+
+/* Compact launcher home: one dominant play stage and restrained news rail. */
+.lucid-home {
+  min-height: calc(100vh - 50px);
+}
+.lucid-home .home-topbar {
+  min-height: 48px;
+  padding: 0 0 10px;
+  align-items: center;
+}
+.lucid-home .welcome-hello {
+  font-size: 15px;
+  letter-spacing: 0.16em;
+}
+.lucid-home .welcome-sub {
+  margin-top: 2px;
+  font-size: 11px;
+}
+.lucid-home .home-grid {
+  grid-template-columns: minmax(0, 7fr) minmax(250px, 3fr);
+  gap: 14px;
+  min-height: calc(100vh - 136px);
+}
+.lucid-home .home-main {
+  min-height: 0;
+}
+.lucid-home .launch-panel {
+  min-height: calc(100vh - 136px);
+  display: flex;
+  flex-direction: column;
+  padding: 20px clamp(18px, 2.3vw, 32px) 18px;
+}
+.lucid-home .launch-panel .hero-top {
+  flex: 0 0 auto;
+}
+.lucid-home .hero-name {
+  font-size: clamp(21px, 1.8vw, 29px);
+}
+.lucid-home .launch-scene {
+  flex: 1 1 auto;
+  min-height: 260px;
+  margin: 10px 0 8px;
+}
+.lucid-home .launch-scene-mark {
+  width: 82px;
+  height: 82px;
+}
+.lucid-home .launch-scene-orbit {
+  width: min(390px, 62%);
+  height: 148px;
+}
+.lucid-home .launch-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+.lucid-home .hero-actions {
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.lucid-home .launch-secondary-actions {
+  display: flex;
+  gap: 8px;
+}
+.lucid-home .launch-panel .btn.play {
+  min-width: min(280px, 56%);
+  padding: 14px 32px;
+}
+.lucid-home .home-aside {
+  max-height: none;
+  overflow: visible;
+}
+.lucid-home .news-panel {
+  height: fit-content;
+  min-height: 180px;
+  padding: 15px;
+  border-color: rgba(137, 165, 225, 0.24);
+  background: linear-gradient(165deg, rgba(20, 29, 45, 0.82), rgba(9, 13, 21, 0.92));
+}
+.lucid-home .news-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(141, 169, 224, 0.14);
+  color: #bdcdf0;
+  font: 10px 'Monocraft', monospace;
+  letter-spacing: 0.14em;
+}
+.lucid-home .news-heading svg {
+  width: 15px;
+  height: 15px;
+  color: var(--accent);
+}
+.lucid-home .news-list {
+  display: flex;
+  flex-direction: column;
+}
+.lucid-home .news-item {
+  display: grid;
+  grid-template-columns: 7px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: start;
+  width: 100%;
+  padding: 13px 2px;
+  border: 0;
+  border-bottom: 1px solid rgba(141, 169, 224, 0.1);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.lucid-home .news-item:last-child {
+  border-bottom: 0;
+}
+.lucid-home .news-item:disabled {
+  cursor: default;
+}
+.lucid-home .news-item:not(:disabled):hover .news-copy strong,
+.lucid-home .news-item:not(:disabled):focus-visible .news-copy strong {
+  color: var(--accent);
+}
+.lucid-home .news-dot {
+  width: 5px;
+  height: 5px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 9px rgba(105, 151, 255, 0.8);
+}
+.lucid-home .news-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.lucid-home .news-copy strong {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lucid-home .news-copy span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.lucid-home .news-arrow {
+  color: var(--accent);
+  font-size: 13px;
+}
+.lucid-home .news-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  gap: 10px;
+  color: var(--muted);
+  font: 9px 'Monocraft', monospace;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.lucid-home .news-empty-icon svg {
+  width: 24px;
+  height: 24px;
+  color: rgba(157, 180, 235, 0.55);
+}
+@media (max-width: 980px) {
+  .lucid-home .home-grid {
+    min-height: 0;
+  }
+  .lucid-home .launch-panel {
+    min-height: 560px;
+  }
+}
+@media (max-width: 620px) {
+  .lucid-home .launch-panel {
+    min-height: 520px;
+    padding: 16px;
+  }
+  .lucid-home .launch-scene {
+    min-height: 210px;
+  }
+  .lucid-home .launch-meta {
+    flex-wrap: wrap;
+  }
+  .lucid-home .launch-panel .btn.play {
+    min-width: 100%;
+  }
+  .lucid-home .launch-secondary-actions {
+    width: 100%;
+  }
+  .lucid-home .launch-secondary-actions .btn {
+    flex: 1;
+  }
+}

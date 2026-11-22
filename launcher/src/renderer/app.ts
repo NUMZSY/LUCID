@@ -168,6 +168,7 @@
     download: '<path d="M12 3v12"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M4 20h16"/>',
     alert: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/>',
     settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    news: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6M7 16h8"/>',
   };
 
   function icon(name: string): SVGSVGElement {
@@ -1009,20 +1010,20 @@
       if (result) toast('Game files checked. Anything missing or damaged was downloaded again.');
     });
 
-    return h('div', { class: 'page-home' },
+    const output = engaged(inst) || Boolean(inst.error)
+      ? h('div', { class: 'card output-card' },
+          h('div', { class: 'row log-head' }, h('div', { class: 'section-title' }, 'OUTPUT'), h('div', { class: 'spacer' }), logTabs),
+          logView)
+      : null;
+    return h('div', { class: 'page-home lucid-home' },
       welcomeBar(picker),
       inst.error ? h('div', { class: 'issue' }, `This instance could not be loaded: ${inst.error}`) : null,
       h('div', { class: 'home-grid' },
         h('div', { class: 'home-main' },
           launchPanel(inst, modsValue, verifyButton),
-          h('div', { class: 'card output-card' },
-            h('div', { class: 'row log-head' }, h('div', { class: 'section-title' }, 'OUTPUT'), h('div', { class: 'spacer' }), logTabs),
-            logView)),
+          output),
         h('div', { class: 'home-aside' },
-          featuredPanel(),
-          snowballCard(inst),
-          playerCount(),
-          quickActions(inst))));
+          newsPanel())));
   }
 
   function emptyHomeView(): HTMLElement {
@@ -1044,36 +1045,27 @@
             h('button', { class: 'btn primary', onClick: () => { ui.view = 'instances'; render(); } }, 'CREATE AN INSTANCE'),
             h('div', { class: 'muted import-note' }, 'Imports always create a separate isolated instance.'),
             h('button', { class: 'btn', style: 'margin-top:10px', onClick: (e: MouseEvent) => void importModrinthPack(e.currentTarget as HTMLButtonElement) }, 'IMPORT AS NEW INSTANCE'))),
-        h('aside', { class: 'home-aside' }, featuredPanel())));
+        h('aside', { class: 'home-aside' }, newsPanel())));
   }
 
-  function featuredPanel(): HTMLElement {
-    return h('section', { class: 'card featured-panel', 'aria-label': 'Featured and promoted content' },
-      h('div', { class: 'featured-heading' },
-        h('div', { class: 'section-title' }, 'FEATURED'),
-        h('span', { class: 'featured-heading-tag' }, 'PROMOTED SPACE')),
-      h('div', { class: 'featured-list' }, ...window.lucidPromotions.map((promotion, index) => {
-        const open = () => {
-          if (promotion.url) {
-            void api.openExternalLink(promotion.url).catch((error: unknown) =>
-              toast(error instanceof Error ? error.message : 'Could not open that promotion link.'));
-          } else {
-            toast('Edit home-promotions.ts to add an HTTPS link and optional local banner.');
-          }
-        };
-        const art = promotion.image
-          ? h('div', { class: 'promo-art has-image' }, h('img', { src: promotion.image, alt: '', loading: 'lazy' }))
-          : h('div', { class: `promo-art tone-${promotion.tone}` },
-              h('span', { class: 'promo-art-mark' }, 'L'),
-              h('span', { class: 'promo-art-caption' }, `SPOTLIGHT / 0${index + 1}`));
-        return h('button', { class: `promo-card tone-${promotion.tone}`, type: 'button', onClick: open },
-          art,
-          h('span', { class: 'promo-copy' },
-            h('span', { class: 'promo-meta' }, h('span', {}, promotion.label), h('span', { class: 'promo-number' }, `0${index + 1}`)),
-            h('strong', { class: 'promo-title' }, promotion.title),
-            h('span', { class: 'promo-description' }, promotion.description),
-            h('span', { class: 'promo-action' }, promotion.action, h('span', { 'aria-hidden': 'true' }, ' ↗'))));
-      })));
+  function newsPanel(): HTMLElement {
+    const promotions = window.lucidPromotions;
+    return h('section', { class: 'card news-panel', 'aria-label': 'News' },
+      h('div', { class: 'news-heading' }, icon('news'), h('span', {}, 'NEWS')),
+      promotions.length
+        ? h('div', { class: 'news-list' }, ...promotions.map((promotion) => {
+            const open = () => {
+              if (!promotion.url) return;
+              void api.openExternalLink(promotion.url).catch((error: unknown) => toast(error instanceof Error ? error.message : 'Could not open that news link.', 'error'));
+            };
+            return h('button', { class: 'news-item', disabled: !promotion.url, onClick: open },
+              h('span', { class: 'news-dot' }),
+              h('span', { class: 'news-copy' },
+                h('strong', {}, promotion.title),
+                h('span', {}, promotion.description)),
+              promotion.url ? h('span', { class: 'news-arrow', 'aria-hidden': 'true' }, '↗') : null);
+          }))
+        : h('div', { class: 'news-empty' }, h('div', { class: 'news-empty-icon' }, icon('news')), 'NO NEWS AVAILABLE AT THE MOMENT.'));
   }
 
   /**
@@ -1081,24 +1073,12 @@
    * only: everywhere else a heading says what the page is, but here you already know.
    */
   function welcomeBar(picker: HTMLElement): HTMLElement {
-    const state = ui.state!;
-    const account = state.accounts.find((a) => a.id === state.settings.accounts.selectedAccountId) ?? state.accounts[0];
-    const rank = ui.chat?.configured ? ui.chat.rank : undefined;
-    const online = ui.chat?.configured ? ui.stats?.online ?? ui.chat.online : 0;
-
     return h('div', { class: 'welcome home-topbar' },
       h('div', { class: 'welcome-text' },
-        h('div', { class: 'welcome-hello' },
-          account ? `Welcome back, ${account.name}` : 'Welcome to LUCID',
-          rank && rank !== 'snowball' ? rankChip(rank) : null),
-        h('div', { class: 'welcome-sub' }, account ? 'Pick an instance and press play.' : 'Add a Microsoft account in Settings to get started.')),
+        h('div', { class: 'welcome-hello' }, 'PLAY'),
+        h('div', { class: 'welcome-sub' }, 'Choose an instance and launch.')),
       h('div', { class: 'spacer' }),
-      picker,
-      online
-        ? h('div', { class: 'welcome-online', title: 'People using LUCID right now' },
-            h('span', { class: 'count-dot' }),
-            h('span', {}, `${online.toLocaleString()} online`))
-        : null);
+      picker);
   }
 
   /**
@@ -1106,9 +1086,6 @@
    * will start, the button, and while it is working, what it is doing.
    */
   function launchPanel(inst: Snowball.Instance, modsValue: HTMLElement, verifyButton: HTMLElement): HTMLElement {
-    const stat = (label: string, value: Node | string) =>
-      h('div', { class: 'stat' }, h('div', { class: 'stat-label' }, label), typeof value === 'string' ? h('div', { class: 'stat-value' }, value) : value);
-
     return h('div', { class: 'card hero-main launch-panel' },
       h('div', { class: 'hero-top' },
         h('div', { class: 'grow' },
@@ -1122,78 +1099,18 @@
         h('div', { class: 'launch-scene-grid' }),
         h('div', { class: 'launch-scene-orbit' }),
         h('img', { class: 'launch-scene-mark', src: 'assets/logo.png', alt: '' }),
-        h('div', { class: 'launch-scene-copy' }, h('span', {}, 'LUCID / LAUNCHPAD'), h('strong', {}, 'READY WHEN YOU ARE'))),
-      h('div', { class: 'stats' },
-        stat('Minecraft', inst.minecraftVersion),
-        stat('Loader', inst.loader === 'vanilla' ? 'Vanilla' : `${inst.loaderName} ${inst.loaderVersion ?? 'latest'}`),
-        stat('Mods', modsValue),
-        stat('Memory', fmtMemory(inst.memory.maxMb)),
-        stat('Last played', fmtDate(inst.lastPlayed)),
-        stat('Play time', fmtDuration(inst.totalPlayMs))),
+        h('div', { class: 'launch-scene-copy' }, h('span', {}, 'LUCID / PLAY'), h('strong', {}, 'READY WHEN YOU ARE'))),
+      h('div', { class: 'launch-meta' },
+        h('span', {}, `${inst.minecraftVersion} · ${inst.loaderName}`),
+        h('span', {}, '·'),
+        h('span', {}, inst.loader === 'vanilla' ? 'No mods' : modsValue)),
       h('div', { class: 'hero-actions' },
         playButton(inst, true),
-        h('button', { class: 'btn', onClick: () => editInstanceDialog(inst) }, 'Edit'),
-        verifyButton),
+        h('div', { class: 'launch-secondary-actions' },
+          h('button', { class: 'btn ghost', onClick: () => editInstanceDialog(inst) }, 'Edit'),
+          verifyButton)),
       progressBar(inst.id));
   }
-  /** What this build of LUCID is, and whether anything newer is waiting. */
-  function snowballCard(inst: Snowball.Instance): HTMLElement {
-    const update = ui.update;
-    const updateText =
-      update?.status === 'downloading' ? `Downloading ${update.newVersion}` :
-      update?.status === 'ready' ? `${update.newVersion} ready` :
-      update?.status === 'checking' ? 'Checking...' :
-      update?.status === 'up-to-date' ? 'Up to date' :
-      update?.status === 'error' ? 'Check failed' :
-      update?.status === 'manual' ? 'Manual' : '-';
-    const row = (key: string, value: string, tone = '') =>
-      h('div', { class: 'mini-row' }, h('span', { class: 'k' }, key), h('span', { class: `v${tone ? ' ' + tone : ''}` }, value));
-    return h('div', { class: 'mini-card' },
-      h('div', { class: 'mini-head' },
-        h('img', { class: 'core-logo', src: 'assets/logo.png', alt: '' }),
-        h('div', { class: 'section-title' }, 'LUCID')),
-      row('Client', inst.snowball.supported ? inst.snowball.version ?? 'Bundled' : 'Not on this version', inst.snowball.supported ? '' : 'muted'),
-      row('Launcher', ui.version ? `v${ui.version}` : '-'),
-      row('Updates', updateText, update?.status === 'error' ? 'danger-text' : ''),
-      update?.status === 'ready'
-        ? h('button', { class: 'btn small primary', style: 'width:100%;margin-top:12px', onClick: () => void api.installUpdate() }, 'Restart to finish')
-        : null);
-  }
-
-  /** The four things people actually reach for, as a list rather than loose buttons. */
-  function quickActions(inst: Snowball.Instance): HTMLElement {
-    const action = (name: string, label: string, onClick: () => void, disabled = false) =>
-      h('button', { class: 'mini-action', disabled, onClick }, icon(name), label);
-    return h('div', { class: 'mini-card' },
-      h('div', { class: 'section-title' }, 'QUICK ACTIONS'),
-      h('div', { class: 'mini-actions' },
-        action('folder', 'Open game folder', () => void guard(() => api.openInstanceFolder(inst.id, 'root'))),
-        action('mods', 'Manage mods', () => { ui.view = 'mods'; render(); }),
-        action('admin', 'Check mods for malware', () => scanDialog(inst.id), inst.loader === 'vanilla'),
-        action('refresh', 'Check for updates', () => void guard(() => api.checkForUpdates()))));
-  }
-
-  /**
-   * How many people are on Snowball, counted by the LUCID server itself. It is hidden when this
-   * build has no server set, and when the server cannot be reached, rather than showing a zero.
-   */
-  function playerCount(): HTMLElement | null {
-    const stats = ui.stats;
-    if (!stats || (!stats.online && !stats.week && !stats.total)) return null;
-    const number = (value: number, label: string) => h('div', { class: 'count-item grow' },
-      h('div', { class: 'n' }, value.toLocaleString()), h('div', { class: 'l' }, label));
-    return h('div', { class: 'mini-card count-card' },
-      h('div', { class: 'section-title' }, 'LUCID PLAYERS'),
-      h('div', { class: 'count-now' },
-        h('div', { class: 'count-dot' }),
-        h('div', { class: 'count-value' }, stats.online.toLocaleString())),
-      h('div', { class: 'count-label' }, stats.online === 1 ? 'playing right now' : 'playing right now'),
-      h('div', { class: 'count-split' },
-        number(stats.today, 'Today'),
-        number(stats.week, 'This week'),
-        number(stats.total, 'All time')));
-  }
-
   function refreshStats(): void {
     if (!ui.chat?.configured) return;
     void api.snowballStats().then((stats) => {
