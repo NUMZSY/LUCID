@@ -945,25 +945,6 @@
     return true;
   }
 
-  /**
-   * The home card's mod count. Counting reads every mod jar, so a request already on its way is
-   * shared rather than repeated each time home is drawn, and the last count stays up meanwhile.
-   */
-  const modCounts = new Map<string, { text: string; request?: Promise<string> }>();
-  function fillModCount(id: string, into: HTMLElement): void {
-    const entry = modCounts.get(id) ?? { text: '...' };
-    modCounts.set(id, entry);
-    into.textContent = entry.text;
-    entry.request ??= api.listMods(id)
-      .then((r) => `${r.mods.filter((m) => m.enabled).length} enabled`, () => '-')
-      .then((text) => {
-        entry.text = text;
-        entry.request = undefined;
-        return text;
-      });
-    void entry.request.then((text) => (into.textContent = text));
-  }
-
   // ---------- views ----------
   function homeView(): Node {
     const state = ui.state!;
@@ -972,13 +953,6 @@
 
     const picker = h('select', { class: 'input picker', onChange: (e: Event) => select((e.target as HTMLSelectElement).value) },
       ...state.instances.map((i) => h('option', { value: i.id, selected: i.id === inst.id }, i.name)));
-
-    const modsValue = h('div', { class: 'stat-value' }, '...');
-    if (inst.loader !== 'vanilla') {
-      fillModCount(inst.id, modsValue);
-    } else {
-      modsValue.textContent = 'None';
-    }
 
     const logView = h('div', { class: 'log-view', id: 'home-log' });
     const logTabs = h('div', { class: 'log-tabs' });
@@ -1000,16 +974,6 @@
       });
     }
 
-    const verifyButton = h('button', { class: 'btn ghost', disabled: engaged(inst) }, 'Verify files') as HTMLButtonElement;
-    verifyButton.addEventListener('click', async () => {
-      verifyButton.disabled = true;
-      verifyButton.textContent = 'Checking...';
-      const result = await guard(() => api.verifyGameFiles(inst.id));
-      verifyButton.disabled = engaged(inst);
-      verifyButton.textContent = 'Verify files';
-      if (result) toast('Game files checked. Anything missing or damaged was downloaded again.');
-    });
-
     const output = engaged(inst) || Boolean(inst.error)
       ? h('div', { class: 'card output-card' },
           h('div', { class: 'row log-head' }, h('div', { class: 'section-title' }, 'OUTPUT'), h('div', { class: 'spacer' }), logTabs),
@@ -1020,7 +984,7 @@
       inst.error ? h('div', { class: 'issue' }, `This instance could not be loaded: ${inst.error}`) : null,
       h('div', { class: 'home-grid' },
         h('div', { class: 'home-main' },
-          launchPanel(inst, modsValue, verifyButton),
+          launchPanel(inst),
           output),
         h('div', { class: 'home-aside' },
           newsPanel())));
@@ -1075,8 +1039,7 @@
   function welcomeBar(picker: HTMLElement): HTMLElement {
     return h('div', { class: 'welcome home-topbar' },
       h('div', { class: 'welcome-text' },
-        h('div', { class: 'welcome-hello' }, 'PLAY'),
-        h('div', { class: 'welcome-sub' }, 'Choose an instance and launch.')),
+        h('div', { class: 'welcome-hello' }, 'PLAY')),
       h('div', { class: 'spacer' }),
       picker);
   }
@@ -1085,30 +1048,11 @@
    * The launch. One large panel, because on this page nothing competes with it: the instance it
    * will start, the button, and while it is working, what it is doing.
    */
-  function launchPanel(inst: Snowball.Instance, modsValue: HTMLElement, verifyButton: HTMLElement): HTMLElement {
+  function launchPanel(inst: Snowball.Instance): HTMLElement {
     return h('div', { class: 'card hero-main launch-panel' },
-      h('div', { class: 'hero-top' },
-        h('div', { class: 'grow' },
-          h('div', { class: 'hero-name' }, inst.name),
-          h('div', { class: 'hero-tags' },
-            h('span', { class: 'tag' }, inst.minecraftVersion),
-            h('span', { class: 'tag' }, inst.loaderName),
-            inst.snowball.supported ? h('span', { class: 'tag accent' }, `LUCID ${inst.snowball.version ?? ''}`) : null,
-            inst.running ? h('span', { class: 'tag running' }, 'RUNNING') : null))),
-      h('div', { class: 'launch-scene', 'aria-hidden': 'true' },
-        h('div', { class: 'launch-scene-grid' }),
-        h('div', { class: 'launch-scene-orbit' }),
-        h('img', { class: 'launch-scene-mark', src: 'assets/logo.png', alt: '' }),
-        h('div', { class: 'launch-scene-copy' }, h('span', {}, 'LUCID / PLAY'), h('strong', {}, 'READY WHEN YOU ARE'))),
-      h('div', { class: 'launch-meta' },
-        h('span', {}, `${inst.minecraftVersion} · ${inst.loaderName}`),
-        h('span', {}, '·'),
-        h('span', {}, inst.loader === 'vanilla' ? 'No mods' : modsValue)),
-      h('div', { class: 'hero-actions' },
-        playButton(inst, true),
-        h('div', { class: 'launch-secondary-actions' },
-          h('button', { class: 'btn ghost', onClick: () => editInstanceDialog(inst) }, 'Edit'),
-          verifyButton)),
+      h('div', { class: 'launch-center' },
+        h('div', { class: 'launch-instance-name' }, inst.name),
+        playButton(inst, true)),
       progressBar(inst.id));
   }
   function refreshStats(): void {
